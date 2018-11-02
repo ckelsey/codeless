@@ -1,0 +1,7 @@
+.editable-text-element, .editable-text-element * {
+    outline: none !important;
+    user-drag: none;
+    -webkit-user-drag: none;
+    -moz-user-drag: none;
+    -ms-user-drag: none;
+}

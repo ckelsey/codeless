@@ -1,0 +1,6 @@
+<div class="font-picker drop-down">
+    <div class="font-text drop-down-text">Format&nbsp;</div>
+    <div class="font-options drop-down-options">
+        <div class="font-text drop-down-text" v-for="(font, fontKey) in project.data.settings.fonts" :key="fontKey" v-html="getFont(font)" @click="changeFont(font)"></div>
+    </div>
+</div>

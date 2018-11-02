@@ -1,0 +1,37 @@
+// @import '../../index';
+// @import '../../mixins';
+// .font-picker {
+//     position: relative;
+//     .font-text {
+//         cursor: pointer;
+//     }
+//     &:after {
+//         content: '';
+//         position: absolute;
+//         border: 5px solid transparent;
+//         border-top-color: #fff;
+//         top: calc(50% - 1px);
+//         right: -11px;
+//     }
+//     .font-options {
+//         position: absolute;
+//         top: calc(100%);
+//         left: -10px;
+//         display: none;
+//         background: lighten($color: $highlight, $amount: 5);
+//         .font-text {
+//             padding: 10px;
+//             &:hover {
+//                 background: rgba(255, 255, 255, 0.1);
+//             }
+//             * {
+//                 margin: 0px !important;
+//             }
+//         }
+//     }
+//     &:hover {
+//         .font-options {
+//             display: block;
+//         }
+//     }
+// }

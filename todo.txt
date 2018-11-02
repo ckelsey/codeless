@@ -1,0 +1,12 @@
+- create a few pages
+
+
+- ripple effect
+- import global css
+- undo
+- better mechanism for keeping in sync
+- who is working on what
+- smooth scroll to anchor
+- insert html
+- insert embed url
+- preview resolutions

@@ -1,0 +1,36 @@
+@import '../../index';
+@import '../../mixins';
+.primitive-element {
+    width: 100%;
+    position: relative;
+    transition: all 0.5s;
+    outline: none !important;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    box-sizing: border-box;
+    .primitive-inner {
+        padding: 5px 15px;
+        box-sizing: border-box;
+        width: 100%;
+        position: relative;
+        margin: auto;
+        &.editing {
+            position: relative;
+            transition: all 0.5s;
+            z-index: 1;
+        }
+        &.start {
+            padding-left: 60px;
+        }
+        &.end {
+            padding-right: 60px;
+        }
+        &.unpublished{
+            border: 1px dashed transparentize($color: $highlight, $amount: 0.75);
+            .element-content{
+                opacity: 0.62;
+            }
+        }
+    }
+}

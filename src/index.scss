@@ -1,0 +1,136 @@
+$topSpace: 52px;
+$gray1: #1f2325;
+$gray2: #0d1113;
+$gray3: #2c3338;
+$highlight: #009ef1;
+$lightGray: #fafafa;
+$lightGray2: #f1f1f1;
+$lightGray3: #e7e7e7;
+$nvGreen: #76b900;
+$textColor: #cacaca;
+$textColorDark: #1c1c1c;
+$fontSize: 14px;
+$fontWeight: normal;
+$fontFamily: 'Roboto',
+sans-serif;
+@font-face {
+    font-family: "Roboto";
+    src: url(/assets/fonts/Roboto-Thin.ttf) format("truetype");
+    font-weight: 100;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Roboto";
+    src: url(/assets/fonts/Roboto-ThinItalic.ttf) format("truetype");
+    font-weight: 100;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: "Roboto";
+    src: url(/assets/fonts/Roboto-Light.ttf) format("truetype");
+    font-weight: 300;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Roboto";
+    src: url(/assets/fonts/Roboto-LightItalic.ttf) format("truetype");
+    font-weight: 300;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: "Roboto";
+    src: url(/assets/fonts/Roboto-Regular.ttf) format("truetype");
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Roboto";
+    src: url(/assets/fonts/Roboto-Italic.ttf) format("truetype");
+    font-weight: 400;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: "Roboto";
+    src: url(/assets/fonts/Roboto-Medium.ttf) format("truetype");
+    font-weight: 500;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Roboto";
+    src: url(/assets/fonts/Roboto-MediumItalic.ttf) format("truetype");
+    font-weight: 500;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: "Roboto";
+    src: url(/assets/fonts/Roboto-Bold.ttf) format("truetype");
+    font-weight: 700;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Roboto";
+    src: url(/assets/fonts/Roboto-BoldItalic.ttf) format("truetype");
+    font-weight: 700;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: "Roboto";
+    src: url(/assets/fonts/Roboto-Black.ttf) format("truetype");
+    font-weight: 900;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Roboto";
+    src: url(/assets/fonts/Roboto-BlackItalic.ttf) format("truetype");
+    font-weight: 900;
+    font-style: italic;
+}
+
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+
+// @font-face {
+//     font-family: 'Material Icons';
+//     font-style: normal;
+//     font-weight: 400;
+//     src: url(/assets/fonts/MaterialIcons-Regular.eot);
+//     /* For IE6-8 */
+//     src: local('Material Icons'), local('MaterialIcons-Regular'), url(/assets/fonts/MaterialIcons-Regular.woff2) format('woff2'), url(/assets/fonts/MaterialIcons-Regular.woff) format('woff'), url(/assets/fonts/MaterialIcons-Regular.ttf) format('truetype');
+// }
+
+// .material-icons {
+//     font-family: 'Material Icons';
+//     font-weight: normal;
+//     font-style: normal;
+//     font-size: 24px;
+//     /* Preferred icon size */
+//     display: inline-block;
+//     line-height: 1;
+//     text-transform: none;
+//     letter-spacing: normal;
+//     word-wrap: normal;
+//     white-space: nowrap;
+//     direction: ltr;
+//     /* Support for all WebKit browsers. */
+//     -webkit-font-smoothing: antialiased;
+//     /* Support for Safari and Chrome. */
+//     text-rendering: optimizeLegibility;
+//     /* Support for Firefox. */
+//     -moz-osx-font-smoothing: grayscale;
+//     /* Support for IE. */
+//     font-feature-settings: 'liga';
+// }
+
+// .material-icons:before {
+//     display: none;
+// }

@@ -1,0 +1,32 @@
+@import '../../index';
+@import '../../mixins';
+.primitive-thumb-wrapper {
+    width: 37px;
+    min-width: 37px;
+    height: 37px;
+    overflow: hidden;
+    display: inline-block;
+    user-select: none;
+    pointer-events: none;
+    background: #fff;
+    .primitive-thumb {
+        transform: scale3d(0.2, 0.2, 0.2);
+        transform-origin: 0px 0px;
+        max-width: 180px;
+        width: 180px;
+        height: 180px;
+        position: relative;
+        transition: all 0.5s;
+        outline: none !important;
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center;
+        .primitive-inner {
+            padding: 5px 15px;
+            box-sizing: border-box;
+            width: 100%;
+            position: relative;
+            margin: auto;
+        }
+    }
+}

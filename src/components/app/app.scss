@@ -1,0 +1,417 @@
+@import '../../index';
+@import '../../mixins';
+html {
+    // background-color: $lightGray2;
+    backface-visibility: hidden;
+}
+
+body {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    color: $textColorDark;
+    font-size: $fontSize;
+    font-family: $fontFamily;
+    font-weight: $fontWeight;
+    line-height: 24px;
+    margin: 0px; // background: radial-gradient(circle at top right, $lightGray2 0%, rgba(0, 0, 0, 0) 100%);
+    backface-visibility: hidden;
+}
+
+ol,
+ul,
+p,
+span,
+h1,
+h2,
+h3,
+h4,
+div {
+    color: inherit;
+}
+
+h1 {
+    line-height: 1.4em;
+}
+
+h3 {
+    font-weight: 100;
+}
+
+input,
+textarea,
+button,
+select {
+    padding: 10px;
+    border: none;
+    font-size: inherit;
+    font-family: inherit;
+    font-weight: inherit;
+    color: inherit;
+    outline: none !important;
+    width: 100%;
+    box-sizing: border-box;
+    box-sizing: border-box;
+    position: relative;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    border-radius: 1px;
+    box-shadow: none;
+    border-bottom: 1px solid $lightGray3;
+}
+
+select {
+    cursor: pointer;
+}
+
+.select {
+    position: relative;
+    &:after {
+        content: "";
+        position: absolute;
+        top: calc(50% - 3.5px);
+        right: 7px;
+        border: 5px solid transparent;
+        border-top-color: $textColor;
+    }
+}
+
+label {
+    display: block;
+}
+
+button {
+    cursor: pointer;
+    background: transparent;
+    box-shadow: inset 0px 0px 0px 1px rgba(255, 255, 255, 0.25);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    text-transform: uppercase;
+    &.clear {
+        box-shadow: none;
+        padding: 0px;
+    }
+    .icon {
+        margin-right: 4px;
+        width: 15px !important;
+        height: 15px !important;
+    }
+    >*:nth-last-child(1) {
+        margin-right: 0px;
+    }
+    &.btn {
+        background: $highlight;
+        color: #fff;
+        padding: 10px 20px;
+        box-shadow: none;
+    }
+}
+
+a,
+a:visited,
+a:focus {
+    color: inherit;
+}
+
+img {
+    width: auto;
+    display: block;
+    max-width: 100%;
+}
+
+#codeless {
+    display: flex;
+    height: 100%;
+}
+
+.tooltip {
+    position: absolute;
+    white-space: nowrap;
+    left: 50%;
+    transform: translate(-50%, -100%);
+    background: $highlight;
+    color: #fff;
+    padding: 7px 14px;
+    opacity: 0;
+    height: 0px;
+    width: 0px;
+    overflow: hidden;
+    pointer-events: all; // transition: opacity 0.1s;
+    top: 0px;
+    font-size: 0px;
+    opacity: 0;
+    transition: opacity 0.5s;
+}
+
+.tooltip * {
+    pointer-events: all;
+    position: relative;
+}
+
+.tooltip .tooltip-pointer {
+    border: 7px solid transparent;
+    border-top-color: $highlight;
+    display: block;
+    position: absolute;
+    content: "";
+    bottom: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.tooltip.tooltip-active {
+    opacity: 1;
+    z-index: 9999;
+    height: auto;
+    width: auto;
+    overflow: visible;
+    font-size: inherit;
+    @include box-shadow(0 0);
+}
+
+.tooltip[position="right"] {
+    right: 3px;
+    left: auto;
+    transform: translate(0%, -100%);
+}
+
+.tooltip[position="bottom"] {
+    transform: translate(-50%, -7px);
+    top: calc(100% + 18px);
+}
+
+.tooltip[position="bottomright"] {
+    right: 3px;
+    left: auto;
+    top: calc(100% + 14px);
+    transform: translate(0%, -7px);
+}
+
+.tooltip[position="right"] .tooltip-pointer {
+    right: -7px;
+    left: auto;
+}
+
+.tooltip[position="bottom"] .tooltip-pointer {
+    bottom: auto;
+    top: -14px;
+    border-top-color: transparent;
+    border-bottom-color: $highlight;
+}
+
+.input {
+    margin: 7px 0px 21px;
+    .fake-button:nth-child(1) {
+        padding: 7px 7px 7px 0px;
+    }
+    .fake-button:nth-last-of-type() {
+        padding: 7px 0px 7px 7px;
+    }
+}
+
+.fake-button {
+    cursor: pointer;
+    padding: 7px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .icon {
+        margin-right: 3px;
+    }
+}
+
+.btn {
+    background: $highlight;
+    cursor: pointer;
+    padding: 10px 20px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+}
+
+.gray {
+    background: $lightGray3;
+}
+
+.close-button {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    padding: 7px;
+    cursor: pointer;
+}
+
+.file-input {
+    position: relative;
+    display: inline-block;
+    input[type="file"] {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        left: 0px;
+        top: 0px;
+        opacity: 0;
+    }
+}
+
+.primary-color {
+    color: $highlight;
+}
+
+.drag-handle {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: #000;
+    width: 10px;
+    flex-wrap: wrap;
+    line-height: 4px;
+    text-align: justify;
+    left: -7px;
+    top: calc(50% - 10px);
+    font-weight: bold;
+    opacity: .24;
+    cursor: move;
+    transition: all 0.24s;
+    .dot {
+        box-shadow: 1px 1px 0px #fff;
+        border-radius: 50%;
+        width: 3px;
+        height: 3px;
+        margin: 0px 1px 1px 0px;
+    }
+    &:hover {
+        opacity: .5;
+    }
+}
+
+.flex {
+    display: flex;
+    align-items: center;
+}
+
+.drop-down {
+    position: relative;
+    .drop-down-text {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+    }
+    >.drop-down-text {
+        &:after {
+            content: '';
+            position: relative;
+            border: 5px solid transparent;
+            border-top-color: #fff;
+            top: 2px;
+            right: 0px;
+        }
+    }
+    .drop-down-options {
+        position: absolute;
+        top: calc(100%);
+        left: -10px;
+        display: none;
+        background: lighten($color: $highlight, $amount: 5);
+        .drop-down-text {
+            padding: 10px;
+            &:hover {
+                background: rgba(255, 255, 255, 0.1);
+            }
+            * {
+                margin: 0px !important;
+            }
+        }
+        &.right {
+            left: unset;
+            right: -10px;
+        }
+    }
+    &:hover {
+        .drop-down-options {
+            display: block;
+        }
+    }
+}
+
+.colspan1 {
+    grid-column-end: span 1;
+}
+
+.colspan2 {
+    grid-column-end: span 2;
+}
+
+.colspan3 {
+    grid-column-end: span 3;
+}
+
+.colspan4 {
+    grid-column-end: span 4;
+}
+
+.colspan5 {
+    grid-column-end: span 5;
+}
+
+.colspan6 {
+    grid-column-end: span 6;
+}
+
+.colspan7 {
+    grid-column-end: span 7;
+}
+
+.colspan8 {
+    grid-column-end: span 8;
+}
+
+.colspan9 {
+    grid-column-end: span 9;
+}
+
+.colspan10 {
+    grid-column-end: span 10;
+}
+
+.colspan11 {
+    grid-column-end: span 11;
+}
+
+.colspan12 {
+    grid-column-end: span 12;
+}
+
+@media(max-width:800px) {
+    .primitive-element.colspan12,
+    .primitive-element.colspan11,
+    .primitive-element.colspan10,
+    .primitive-element.colspan9,
+    .primitive-element.colspan8,
+    .primitive-element.colspan7,
+    .primitive-element.colspan6,
+    .primitive-element.colspan5,
+    .primitive-element.colspan4,
+    .primitive-element.colspan3,
+    .primitive-element.colspan2,
+    .primitive-element.colspan1 {
+        grid-column-end: span 12;
+        .primitive-inner {
+            padding-left: 60px;
+            padding-right: 60px;
+        }
+    }
+}
+
+.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}

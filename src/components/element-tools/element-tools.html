@@ -1,0 +1,121 @@
+<div class="element-resizer" draggable="false" v-if="project.isEditing">
+    <div class="sort-handle element-resizer-handle" draggable="false" @mousedown="moverDown = true" @mouseup="moverDown = false"
+        @mouseleave="moverDown = false" :class="{clicker: moverDown}">
+        <div class="dot">&middot;</div>
+        <div class="dot">&middot;</div>
+        <div class="dot">&middot;</div>
+        <div class="dot">&middot;</div>
+        <div class="dot">&middot;</div>
+        <div class="dot">&middot;</div>
+        <div class="dot">&middot;</div>
+        <div class="dot">&middot;</div>
+        <div class="dot">&middot;</div>
+        <div class="dot">&middot;</div>
+    </div>
+
+    <div class="element-resizer-e element-resizer-handle dont-drag" draggable="false" @mousedown="resize($event);resizerDown = true"
+        @mouseup="resizerDown = false" @mouseleave="resizerDown = false" :class="{clicker: resizerDown}">
+        <div class="dot">&middot;</div>
+        <div>
+            <div class="dot">&middot;</div>
+            <div class="dot">&middot;</div>
+            <div class="dot">&middot;</div>
+        </div>
+        <div>
+            <div class="dot">&middot;</div>
+            <div class="dot">&middot;</div>
+            <div class="dot">&middot;</div>
+            <div class="dot">&middot;</div>
+            <div class="dot">&middot;</div>
+        </div>
+    </div>
+
+    <div class="element-settings dont-drag" draggable="false" @click="activate()" @mousedown="app.saveSelection()" @mouseup="app.restoreSelection()">
+        <div>
+            <div v-tooltip="element.active" :tooltip-update="repositionTooltip" class="do-not-close-tooltip-on-outer-click tooltip-active">
+
+                <div class="tooltip-button font-picker-wrapper" v-if="element.type === `text`">
+                    <font-picker :element="element" :changeFont="changeFont"></font-picker>
+                </div>
+
+                <div class="tooltip-button color-picker-wrapper" v-if="element.type === `text`">
+                    <div class="color-picker">
+                        <i class="material-icons">format_color_text</i>
+                        <div class="color-swatches">
+                            <div class="color-swatch" v-for="(color, colorKey) in project.data.settings.colors" :key="colorKey" :style="getColor(color)"
+                                @click="execCommand('foreColor', color)"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tooltip-button" @click="execCommand('bold')" v-if="element.type === `text`">
+                    <i class="material-icons">format_bold</i>
+                </div>
+
+                <div class="tooltip-button" @click="execCommand('italic')" v-if="element.type === `text`">
+                    <i class="material-icons">format_italic</i>
+                </div>
+
+                <div class="tooltip-button" @click="execCommand('underline')" v-if="element.type === `text`">
+                    <i class="material-icons">format_underline</i>
+                </div>
+
+                <div class="tooltip-button" @click="execCommand('insertOrderedList')" v-if="element.type === `text`">
+                    <i class="material-icons">format_list_numbered</i>
+                </div>
+
+                <div class="tooltip-button" @click="execCommand('insertUnorderedList')" v-if="element.type === `text`">
+                    <i class="material-icons">format_list_bulleted</i>
+                </div>
+
+                <div class="tooltip-button" v-if="element.type === `text` || element.type === `image`" @click="renderer.openLinkDialogue()">
+                    <i class="material-icons">link</i>
+                </div>
+
+                <div class="color-picker-wrapper tooltip-button" v-if="element.type === `text`">
+                    <div class="color-picker">
+                        <i class="material-icons">format_color_fill</i>
+                        <div class="color-swatches">
+                            <div class="color-swatch" v-for="(color, colorKey) in project.data.settings.colors" :key="colorKey" :style="getColor(color)"
+                                @click="setBackgroundColor(color)"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tooltip-button" v-if="element.type === `text` || element.type === `image`" @click="renderer.openImageUpload(`${element.type === `text` ? `backgroundImage`: `content`}`)">
+                    <i class="material-icons">image</i>
+                </div>
+
+                <div class="tooltip-button" v-if="element.type === `form`" @click="renderer.showFormInputs = element.id">
+                    <i class="material-icons">list_alt</i>
+                </div>
+
+                <div class="tooltip-button">
+                    <div class="drop-down">
+                        <div class="drop-down-text">
+                            <i class="material-icons">more_vert</i>
+                        </div>
+                        <div class="drop-down-options right">
+                            <div class="drop-down-text" @click="togglePublish()">
+                                <span class="flex">
+                                    <i class="material-icons">{{element.published ? 'check_box' : 'check_box_outline_blank'}}</i> Publish</span>
+                            </div>
+                            <div class="drop-down-text" @click="toggleGlobal()">
+                                <span class="flex">
+                                    <i class="material-icons">{{element.global ? 'check_box' : 'check_box_outline_blank'}}</i> Global component</span>
+                            </div>
+                            <div class="drop-down-text" @click="project.deleteItem(element.id)">
+                                <span class="flex">
+                                    <i class="material-icons">delete</i> Delete</span>
+                            </div>
+                            <div class="drop-down-text" @click="renderer.showCSS = element.id">
+                                <span class="flex">
+                                    <i class="material-icons">code</i> CSS</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

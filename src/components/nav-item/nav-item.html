@@ -1,0 +1,39 @@
+<div class="nav-item" v-dragdrop="{ondrop, ondragover, ondragout, group:`nav`, handle:`.drag-handle`}" draggable="false" :class="{linkIsShowing, linkIsAbove, isFirstContent}">
+    <div class="drag-handle" draggable="false" v-if="project.isEditing">
+        <div class="dot">&middot;</div>
+        <div class="dot">&middot;</div>
+        <div class="dot">&middot;</div>
+        <div class="dot">&middot;</div>
+        <div class="dot">&middot;</div>
+        <div class="dot">&middot;</div>
+        <div class="dot">&middot;</div>
+        <div class="dot">&middot;</div>
+        <div class="dot">&middot;</div>
+        <div class="dot">&middot;</div>
+    </div>
+    <div class="nav-item-name" @click="expanded=!expanded">
+        <i v-if="hasContent && !expanded" class="material-icons">chevron_right</i>
+        <i v-if="hasContent && expanded" class="material-icons">expand_more</i>
+        <a :href="navItem.link">
+            <span>{{text}}</span>
+        </a>
+        <div class="nav-item-buttons" v-if="project.isEditing">
+            <i @click="edit()" class="material-icons">edit</i>
+            <i @click="deleteItem()" class="material-icons">delete</i>
+        </div>
+    </div>
+    <div class="nav-item-content" :class="{expanded}">
+        <nav-item v-for="(item, itemKey) in navItem.content" :key="itemKey" :path="path + '.content.' + itemKey"></nav-item>
+    </div>
+    <div class="dropzones">
+        <div class="dropzone dropzone-above" zone="above">
+            <span class="material-icons">expand_less</span>
+        </div>
+        <div class="dropzone dropzone-in" zone="in">
+            <span class="material-icons">chevron_right</span>
+        </div>
+        <div class="dropzone dropzone-below" zone="below">
+            <span class="material-icons">expand_more</span>
+        </div>
+    </div>
+</div>

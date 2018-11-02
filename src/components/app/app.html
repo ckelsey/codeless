@@ -1,0 +1,5 @@
+<div id="codeless" v-if="project.data">
+    <page-renderer :pageId="project.currentPage"></page-renderer>
+    <side-bar></side-bar>
+    <nv-checkbox :label="checkboxLabel" :disabled="checkboxDisabled" :value="checkboxValue" @change="whenUpdate"></nv-checkbox>
+</div>

@@ -1,0 +1,141 @@
+<div id="side-bar" v-if="project.isEditing && !auth.showLogin">
+    <div id="side-bar-nav">
+        <div class="tab" @click="activateTab(`insert`)" :class="isActive(`insert`)">Insert</div>
+        <div class="tab" @click="activateTab(`pages`)" :class="isActive(`pages`)" id="pages-nav-button">Pages</div>
+    </div>
+    <div class="tab-indicator" :style="tabIndicatorStyle"></div>
+    <div id="side-bar-content">
+        <div class="tab-content" :class="isActive(`insert`)">
+            <div class="buttons">
+                <div id="add-text" class="insert-button" @click="project.addText()">
+                    <i class="material-icons">text_fields</i>
+                    <div>Text</div>
+                </div>
+                <div id="add-image" class="insert-button" @click="project.addImage()">
+                    <i class="material-icons">image</i>
+                    <div>Image</div>
+                </div>
+                <div id="add-rule" class="insert-button" @click="project.addDivider()">
+                    <i class="material-icons">remove</i>
+                    <div>Divider</div>
+                </div>
+                <div id="add-rule" class="insert-button" @click="project.addForm()">
+                    <i class="material-icons">list_alt</i>
+                    <div>Form</div>
+                </div>
+            </div>
+            <div class="global-elements" v-if="hasGlobalElements">
+                <p style="padding: 14px 7px 0px;">Global elements</p>
+                <div v-for="(element, index) in project.data.elements" :key="index" v-if="element.global" class="global-element-item">
+                    <div class="global-element-item-thumb" @click="project.addElement(element)">
+                        <primitive-thumb :elementId="index"></primitive-thumb>
+                    </div>
+                    <div class="global-element-item-name" style="width: 100%;">
+                        <input type="text" v-model="element.name" @input="project.savePage(project.currentPage)">
+                    </div>
+                    <div class="page-settings">
+                        <div class="page-settings-icon">
+                            <i class="material-icons">more_vert</i>
+                        </div>
+                        <div v-tooltip="">
+                            <div class="page-settings-item" @click="toggleGlobalElement(index)">
+                                <span class="flex">
+                                    <i class="material-icons">{{element.global ? 'check_box' : 'check_box_outline_blank'}}</i> Global component</span>
+                            </div>
+                            <div class="page-settings-item" @click="deleteGlobalElement(index)">
+                                <span class="flex">
+                                    <i class="material-icons">delete</i> Delete globally</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tab-content" :class="isActive(`pages`)">
+            <div class="page-filter-wrapper">
+                <div class="page-filter">
+                    <div class="filter-icon">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                    <input type="text" v-model="project.pageFilter" placeholder="filter">
+                </div>
+                <span class="btn" @click="project.addPage()">
+                    <span class="material-icons">add</span>
+                    <span>New</span>
+                </span>
+            </div>
+            <div class="pages">
+                <div v-for="(page, index) in project.filteredPages" :key="index" class="page-item" :page="page" :class="{currentPage:page===project.currentPage}"
+                    v-if="project.data.pages[page]">
+                    <div class="page-thumb-wrapper" @click="project.openPage(page)">
+                        <div class="page-thumb-container no-shadow" v-if="project.data.home === page">
+                            <span class="material-icons">home</span>
+                        </div>
+                        <div class="page-thumb-container" v-if="project.data.home !== page">
+                            <page-thumb :pageId="page"></page-thumb>
+                        </div>
+                    </div>
+                    <div class="page-name">
+                        <input type="text" v-model="project.data.pages[page].name" @input="project.savePage(page)">
+                    </div>
+                    <div class="page-settings">
+                        <div class="page-settings-icon">
+                            <i class="material-icons">more_vert</i>
+                        </div>
+                        <div v-tooltip="">
+                            <div class="page-settings-item" @click="project.setHomePage(page)">
+                                <span class="material-icons">home</span>
+                                <span>&nbsp;Make home</span>
+                            </div>
+                            <div class="page-settings-item" @click="project.duplicatePage(page)">
+                                <span class="material-icons">library_books</span>
+                                <span>&nbsp;Duplicate</span>
+                            </div>
+                            <div class="page-settings-item" @click="project.deletePage(page)">
+                                <span class="material-icons">delete</span>
+                                <span>&nbsp;Delete</span>
+                            </div>
+                            <div class="page-settings-item" @click="project.togglePageNav(page)">
+                                <span class="material-icons">near_me</span>
+                                <span>&nbsp;Add to nav</span>
+                            </div>
+                            <div class="page-settings-item" @click="project.saveAsTemplate(page)">
+                                <span class="material-icons">art_track</span>
+                                <span>&nbsp;Save as template</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pages">
+                <p style="padding: 14px 7px 0px;">Templates</p>
+                <p v-if="!project.data.templates || !Object.keys(project.data.templates).length" style="padding: 14px 7px 0px;opacity:0.5;">
+                    <i>No templates created yet</i>
+                </p>
+                <div v-for="(template, index) in project.data.templates" :key="index" class="page-item" :template="index" v-if="project.data.templates[index]">
+                    <div class="page-thumb-wrapper" @click="project.newPageFromTemplate(index)">
+                        <div class="page-thumb-container">
+                            <page-thumb :pageId="index" :type="'template'"></page-thumb>
+                        </div>
+                    </div>
+                    <div class="page-name">
+                        <input type="text" v-model="template.name" @input="project.savePage(project.currentPage)">
+                    </div>
+                    <div class="page-settings">
+                        <div class="page-settings-icon">
+                            <i class="material-icons">more_vert</i>
+                        </div>
+                        <div v-tooltip="">
+                            <div class="page-settings-item" @click="project.deleteTemplate(index)">
+                                <span class="material-icons">delete</span>
+                                <span>&nbsp;Delete</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

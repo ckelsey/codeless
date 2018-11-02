@@ -1,0 +1,2 @@
+<div class="editable-text-element" draggable="false" v-if="element.type === `text`" v-html="element.content[0]" :contenteditable="project.isEditing"
+    @paste="handlePaste($event)" @input="setElementText()" @focus="activate()" @blur="blur"></div>

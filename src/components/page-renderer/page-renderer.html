@@ -1,0 +1,263 @@
+<div id="page-renderer" :class="editorClass">
+    <div id="login" v-if="auth.showLogin">
+        <button class="btn" @click="auth.login">Login</button>
+    </div>
+
+    <top-bar v-if="!auth.showLogin"></top-bar>
+
+    <div class="page-container" v-if="!auth.showLogin">
+        <div id="nav">
+            <div class="site-logo" v-if="project.data && project.data.settings.logo">
+                <a href="/">
+                    <img :src="project.data && project.data.settings.logo">
+                </a>
+            </div>
+            <h3 class="site-name" v-if="project.data && project.data.settings.name">
+                <a href="/">{{project.data.settings.name}}</a>
+            </h3>
+            <div class="nav-item-container" :class="{expanded:renderer.showingNav}">
+                <div class="nav-item-toggler list" :class="{active:!renderer.showingNav}" @click="renderer.showingNav = !renderer.showingNav">
+                    <i class="material-icons">menu</i>
+                </div>
+                <div class="nav-item-toggler menu" :class="{active:renderer.showingNav}" @click="renderer.showingNav = !renderer.showingNav">
+                    <i class="material-icons">close</i>
+                    <span>&nbsp;&nbsp;Menu</span>
+                </div>
+                <div class="nav-items">
+                    <nav-item v-for="(item, itemKey) in project.data.navigation" v-if="project.data.navigation.length" :key="itemKey" :path="itemKey"></nav-item>
+                    <div style="padding: 5px 0px 5px 21px;" v-if="project.isEditing">
+                        <button class="btn new-nav-item-btn" @click="renderer.addNewNavItem()">
+                            <span class="material-icons">add</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="search-toggle" @click="renderer.showSearch = true">
+                <i class="material-icons">search</i>
+            </div>
+        </div>
+        <div id="page" tool-tip-max="true">
+            <primitive-element v-for="(id, index) in content" :key="id" :index="index" :pageId="pageId"></primitive-element>
+            <div style="padding:40px;grid-column-end: span 12;"></div>
+        </div>
+    </div>
+
+    <div id="search" :class="{showSearch:renderer.showSearch}">
+        <div id="search-inner">
+            <i class="material-icons fake-button" style="display: flex;" @click="renderer.showSearch = false">arrow_back</i>
+            <span class="search-input">
+                <span class="search-input-inner">
+                    <i class="material-icons search-button fake-button">search</i>
+                    <input type="text" v-model="renderer.searchTerm" placeholder="search">
+                </span>
+            </span>
+        </div>
+        <div id="search-results" :class="{showSearchResults:Object.keys(renderer.searchResults).length}">
+            <div v-for="result in renderer.searchResults" :key="result.page.id" class="search-result">
+                <div class="search-result-name" @click="project.openPage(result.page.id); renderer.showSearch = false">
+                    <h2>{{result.page.name}}</h2>
+                </div>
+                <div v-for="term in result.terms">
+                    <div class="search-term-text" @click="project.openPage(result.page.id, term.id); renderer.showSearch = false">{{term.text}}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div v-if="project.isEditing" :class="{showDialogue:renderer.linkDialogueActive}" class="dialogue-wrapper linkDialogueActive"
+        @click="dialogueScrimClick($event, 'linkDialogueActive')">
+        <div class="dialogue">
+            <div class="close-button" @click="renderer.linkDialogueActive = false" @mouseup="app.restoreSelection()">
+                <i class="material-icons">close</i>
+            </div>
+            <div class="input" v-if="renderer.showLinkTextInput">
+                <label>Text</label>
+                <input type="text" v-model="renderer.linkText">
+            </div>
+            <div class="input">
+                <label>Link</label>
+                <input type="text" v-model="renderer.linkUrl">
+            </div>
+            <div class="input" style="display: flex;align-items:center;">
+                <span class="fake-button" @mousedown="renderer.selectLinkElement()">Select element</span>
+                <span>&nbsp;or&nbsp;</span>
+                <span class="fake-button" @mousedown="renderer.selectLinkElement(true)">Select page</span>
+            </div>
+            <div class="input">
+                <button class="btn" @mousedown="app.restoreSelection()" @click="renderer.addLink()">Apply</button>
+            </div>
+        </div>
+    </div>
+
+    <div v-if="project.isEditing" :class="{showDialogue:renderer.navItemDialogue !== null}" class="dialogue-wrapper navItemDialogue"
+        @click="dialogueScrimClick($event, 'navItemDialogue')">
+        <div class="dialogue">
+            <div class="close-button" @click="renderer.navItemDialogue = null">
+                <i class="material-icons">close</i>
+            </div>
+            <div class="input" v-if="renderer.showLinkTextInput">
+                <label>Text</label>
+                <input type="text" v-model="renderer.newNavItem.text">
+            </div>
+            <div class="input">
+                <label>Link</label>
+                <input type="text" v-model="renderer.newNavItem.link">
+            </div>
+            <div class="input">
+                <button class="btn" @click="renderer.saveNavItem(renderer.newNavItem)">{{renderer.navItemDialogue === `new` ? `Insert` : `Save`}}</button>
+            </div>
+        </div>
+    </div>
+
+    <div v-if="project.isEditing" :class="{showDialogue:renderer.imageUploadDialogueActive}" class="dialogue-wrapper imageUploadDialogueActive"
+        @click="dialogueScrimClick($event, 'imageUploadDialogueActive')">
+        <div class="dialogue">
+            <div class="close-button" @click="renderer.imageUploadDialogueActive = false">
+                <i class="material-icons">close</i>
+            </div>
+            <div class="input">
+                <label>Image Url</label>
+                <input type="text" v-model="renderer.imageUrl">
+            </div>
+            <div class="input">
+                <label>Upload file</label>
+                <input type="file" @change="renderer.file = $event.target.files[0]">
+            </div>
+
+            <div class="input">
+                <div class="drive-list">
+                    <div v-for="file in renderer.uploadedFiles" :key="file.id" class="drive-item" @click="renderer.imageUrl = auth.getFileUrl(file.id);renderer.addImageUrl()">
+                        <img :src="auth.getFileUrl(file.id)">
+                    </div>
+                </div>
+            </div>
+            <div class="input">
+                <button class="btn" @click="renderer.addImageUrl()">Apply</button>
+            </div>
+        </div>
+    </div>
+
+    <div v-if="project.isEditing" :class="{showDialogue:renderer.showCSS}" class="dialogue-wrapper showCSS" @click="dialogueScrimClick($event, 'showCSS')">
+        <div class="dialogue">
+            <div class="close-button" @click="renderer.showCSS = false">
+                <i class="material-icons">close</i>
+            </div>
+            <div class="input">
+                <label>CSS</label>
+                <textarea v-model="project.data && project.data.elements[renderer.showCSS] && project.data.elements[renderer.showCSS].css"
+                    @mousedown="app.clearSelection()"></textarea>
+            </div>
+            <div class="input">
+                <button class="btn" @click="project.savePage(project.currentPage); renderer.showCSS = false">Apply</button>
+            </div>
+        </div>
+    </div>
+
+    <div v-if="project.isEditing" :class="{showDialogue:renderer.showFormInputs}" class="dialogue-wrapper showFormInputs" @click="dialogueScrimClick($event, 'showFormInputs')">
+        <div class="dialogue" v-if="project.data && project.data.elements[renderer.showFormInputs]">
+            <div class="close-button" @click="renderer.showFormInputs = false">
+                <i class="material-icons">close</i>
+            </div>
+            <div class="input">
+                <label>Title</label>
+                <input type="text" v-model="project.data.elements[renderer.showFormInputs].name">
+            </div>
+
+            <div class="input">
+                <label>Recipient emails</label>
+                <input type="text" v-model="project.data.elements[renderer.showFormInputs].generic">
+            </div>
+
+            <div class="input" v-for="(input, index) in project.data.elements[renderer.showFormInputs].content" :key="index">
+                <div class="flex">
+                    <input type="text" v-model="project.data.elements[renderer.showFormInputs].content[index]">
+                    <i class="material-icons" @click="project.data.elements[renderer.showFormInputs].content.splice(index, 1)">delete</i>
+                </div>
+            </div>
+
+            <div class="input flex">
+                <button class="btn" @click="project.savePage(project.currentPage); renderer.showFormInputs = false">Apply</button>
+                <div class="fake-button" @click="project.data.elements[renderer.showFormInputs].content.push('')">Add input</div>
+            </div>
+        </div>
+    </div>
+
+    <div v-if="project.isEditing" :class="{showDialogue:renderer.formSent}" class="dialogue-wrapper formSent" @click="dialogueScrimClick($event, 'formSent')">
+        <div class="dialogue">
+            <div class="close-button" @click="renderer.formSent = false">
+                <i class="material-icons">close</i>
+            </div>
+            <div class="input">
+                <span>Submission successful</span>
+            </div>
+            <div class="input flex">
+                <button class="btn" @click="renderer.formSent = false">Ok</button>
+            </div>
+        </div>
+    </div>
+
+    <div v-if="project.isEditing" :class="{showDialogue:renderer.showProjectSettings}" class="dialogue-wrapper showProjectSettings"
+        @click="dialogueScrimClick($event, 'showProjectSettings')">
+        <div class="dialogue">
+            <div class="close-button" @click="renderer.showProjectSettings = false">
+                <i class="material-icons">close</i>
+            </div>
+            <div class="input">
+                <label>Name</label>
+                <input type="text" v-model="project.data.settings.name">
+            </div>
+
+            <div class="input">
+                <label>Logo URL</label>
+                <input type="text" v-model="project.data.settings.logo">
+            </div>
+
+            <div class="input">
+                <label>Upload a logo</label>
+                <input type="file" @change="renderer.logoFile = $event.target.files[0]">
+            </div>
+
+            <div class="input">
+                <label>Select a logo</label>
+                <div class="drive-list">
+                    <div v-for="file in renderer.uploadedFiles" :key="file.id" class="drive-item" :class="{active: project.data.settings.logo === auth.getFileUrl(file.id)}"
+                        @click="project.data.settings.logo = auth.getFileUrl(file.id)">
+                        <img :src="auth.getFileUrl(file.id)">
+                    </div>
+                </div>
+            </div>
+
+            <div class="input">
+                <label>Favicon URL</label>
+                <input type="text" v-model="project.data.settings.favicon">
+            </div>
+
+            <div class="input">
+                <label>Upload a favicon</label>
+                <input type="file" @change="renderer.faviconFile = $event.target.files[0]">
+            </div>
+
+            <div class="input">
+                <label>Select a favicon</label>
+                <div class="drive-list">
+                    <div v-for="file in renderer.uploadedFiles" :key="file.id" class="drive-item" :class="{active: project.data.settings.favicon === auth.getFileUrl(file.id)}"
+                        @click="project.data.settings.favicon = auth.getFileUrl(file.id)">
+                        <img :src="auth.getFileUrl(file.id)">
+                    </div>
+                </div>
+            </div>
+
+            <div class="input">
+                <label>Colors</label>
+                <textarea v-model="project.projectColors"></textarea>
+            </div>
+            <div class="input">
+                <button class="btn" @click="renderer.applySettings()">Apply</button>
+            </div>
+        </div>
+    </div>
+    <div v-if="project.isEditing" :class="{showScrim:renderer.showScrim}" class="overlay-scrim" @click="renderer.scrimClick()"></div>
+    <div class="spinner-wrapper" v-if="renderer.showSpinner">
+        <div class="spinner"></div>
+    </div>
+</div>

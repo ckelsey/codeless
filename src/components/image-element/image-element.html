@@ -1,0 +1,6 @@
+<div v-if="element.type === `image`">
+    <img class="editable-image-element" v-if="!element.link" :src="src">
+    <a v-if="element.link" :href="element.link" @click="renderer.handleLinkClick($event)">
+        <img class="editable-image-element" :src="src">
+    </a>
+</div>

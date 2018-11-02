@@ -1,0 +1,12 @@
+<div v-if="element.type === 'form'" class="form-element">
+    <h2 class="form message" v-if="element.name">{{element.name}}</h2>
+    <div class="inputs">
+        <div class="form-input input" v-for="(input, index) in element.content" :key="index">
+            <label>{{input}}</label>
+            <input type="text" v-model="values[index]" @input="onInput(index)">
+        </div>
+    </div>
+    <div class="input">
+        <button class="btn" @click="sendForm()">Send</button>
+    </div>
+</div>

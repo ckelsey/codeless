@@ -1,0 +1,123 @@
+@import '../../index';
+@import '../../mixins';
+.element-resizer {
+    display: none;
+}
+
+.dont-drag,
+.dont-drag * {
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+}
+
+.editor-mode {
+    .primitive-element {
+        .tooltip {
+            display: none;
+        }
+        .primitive-inner {
+            &:hover,
+            &.editing {
+                .element-resizer {
+                    display: block;
+                    position: absolute;
+                    left: 0px;
+                    top: 0px;
+                    width: 100%;
+                    height: 100%;
+                    pointer-events: none;
+                    box-shadow: inset 0px 0px 0px 2px $highlight;
+                    transition: opacity 1s;
+                    .element-resizer-handle {
+                        display: none;
+                    }
+                }
+            }
+            &.editing {
+                .tooltip {
+                    display: none;
+                    align-items: center;
+                    justify-content: center;
+                    &.tooltip-active {
+                        display: flex;
+                    }
+                    .tooltip-button {
+                        padding: 3px 7px;
+                        font-size: 16px;
+                        cursor: pointer;
+                        transition: all 0.5s;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        &:hover {
+                            background: rgba(255, 255, 255, 0.1);
+                        }
+                        &.font-picker-wrapper {
+                            margin-right: 10px;
+                            &:hover {
+                                background: transparent;
+                            }
+                        }
+                    }
+                }
+                .element-resizer {
+                    .element-settings {
+                        position: absolute;
+                        top: calc(100% - 18px);
+                        left: 50%;
+                    }
+                    .element-resizer-handle {
+                        display: block;
+                        position: absolute;
+                        pointer-events: all;
+                        top: calc(50% - 13px);
+                        cursor: ew-resize;
+                        padding: 3px 6px;
+                        box-sizing: border-box;
+                        &.element-resizer-e,
+                        &.sort-handle {
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 14px;
+                            color: #000;
+                            width: 22px;
+                            flex-wrap: wrap;
+                            line-height: 4px;
+                            text-align: justify;
+                            left: -3px;
+                            font-weight: bold;
+                            opacity: .24;
+                            cursor: move;
+                            transition: all 0.24s;
+                            .dot {
+                                box-shadow: 1px 1px 0px #fff;
+                                border-radius: 50%;
+                                width: 3px;
+                                height: 3px;
+                                margin: 0px 1px 1px 0px;
+                            }
+                            &:hover {
+                                opacity: .5;
+                            }
+                        }
+                        &.element-resizer-e {
+                            width: 19px;
+                            right: 2px;
+                            left: auto;
+                            flex-wrap: nowrap;
+                            cursor: ew-resize;
+                            @include clicker-after(calc(50% - 20px), -3px, 40px, 40px);
+                        }
+                        &.sort-handle {
+                            @include clicker-after(calc(50% - 20px), -10px, 40px, 40px);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

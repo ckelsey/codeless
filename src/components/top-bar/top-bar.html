@@ -1,0 +1,21 @@
+<div id="top-bar" v-if="project.author">
+    <div class="left-side">
+        <span class="material-icons" @click="renderer.showProjectSettings = true">settings</span>
+        <div id="project-name">
+            <input type="text" v-model="project.data.settings.name" placeholder="Untitled project" @input="project.savePage(project.currentPage)">
+        </div>
+        <div id="view-selector" v-if="renderer.view">
+            <div class="fake-button gray">
+                <span class="material-icons">{{renderer.view.icon}}</span>
+                <span>&nbsp;{{renderer.view.name}}</span>
+                <span class="material-icons">expand_more</span>
+            </div>
+            <div v-tooltip>
+                <div class="view-selector-option" v-for="view in renderer.views" @click="renderer.setView(view)">
+                    <span class="material-icons">{{view.icon}}</span>
+                    <span>&nbsp;{{view.name}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

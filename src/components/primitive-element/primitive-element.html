@@ -1,0 +1,13 @@
+<div class="primitive-element" v-if="element" :id="`element-${element.id}`" v-dragdrop="{handle:`.sort-handle`, canAddTo:`nav`, ondrop}"
+    :style="elementStyle" tool-tip-anchor="true" @click="activate()" draggable="false" tabindex="-1" v-if="project.isEditing || project.previewing || element.published"
+    :class="colspan">
+    <div :class="classes" class="primitive-inner">
+        <div class="element-content">
+            <text-element :element="element" :pageId="pageId"></text-element>
+            <image-element :element="element"></image-element>
+            <divider-element :element="element"></divider-element>
+            <form-element :element="element"></form-element>
+        </div>
+        <element-tools :element="element" :pageId="pageId"></element-tools>
+    </div>
+</div>

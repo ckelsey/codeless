@@ -1,0 +1,9 @@
+@import '../../index';
+[draggable="true"] {
+    background-color: $lightGray3;
+    opacity: 0.4;
+}
+.dragover {
+    background-color: $lightGray2;
+    box-shadow: inset 5px 5px $highlight;
+}

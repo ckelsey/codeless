@@ -1,0 +1,154 @@
+@import '../../index';
+.nav-item-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-grow: 1;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.2s;
+    >* {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 18px;
+    }
+}
+
+.nav-item {
+    padding: 5px 0px 5px 21px;
+    position: relative;
+    transition: all 0.2s;
+    line-height: 28px;
+    .drag-handle {
+        display: none;
+        top: 9px;
+    }
+    &.dragover {
+        z-index: 1;
+        box-shadow: none;
+        background: transparentize($color: $highlight, $amount: 0.5);
+    }
+    .dropzones {
+        display: none;
+        position: absolute;
+        width: 100%;
+        height: 35px;
+        top: 0px;
+        left: 0px;
+        .dropzone {
+            position: relative;
+            height: 10px;
+            width: 100%;
+            opacity: 0;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s;
+            &.dropzone-above {
+                border-top: 2px solid $highlight;
+            }
+            &.dropzone-below {
+                border-bottom: 2px solid $highlight;
+            }
+            &.dropzone-in {
+                height: 15px;
+            }
+            .material-icons {
+                position: relative;
+                left: 0px;
+                font-weight: bold;
+                color: $highlight;
+                pointer-events: none;
+            }
+        }
+        &[zone="above"] {
+            .dropzone.dropzone-above {
+                opacity: 1;
+            }
+        }
+        &[zone="in"] {
+            .dropzone.dropzone-in {
+                opacity: 1;
+            }
+        }
+        &[zone="below"] {
+            .dropzone.dropzone-below {
+                opacity: 1;
+            }
+        }
+    }
+    &:hover {
+        .drag-handle {
+            display: flex;
+        }
+    }
+}
+
+.dragging-elements {
+    .nav-item {
+        .dropzones {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 10;
+        }
+    }
+}
+
+.nav-item-name {
+    display: flex;
+    align-items: center;
+    position: relative;
+    width: 100%;
+    cursor: pointer;
+    a {
+        text-decoration: none;
+    }
+    &:hover {
+        .nav-item-buttons {
+            opacity: 1;
+            pointer-events: all;
+        }
+    }
+    >i.material-icons {
+        margin-left: -20px;
+        width: 20px;
+    }
+}
+
+.nav-item-content {
+    display: none;
+    &.expanded {
+        display: block;
+    }
+}
+
+// .linkIsShowing:before,
+// .linkIsAbove:before {
+//     content: '';
+//     position: absolute;
+//     display: block;
+//     top: 0px;
+//     left: -21px;
+//     width: 33px;
+//     height: 29px;
+//     transition: all 0.2s;
+//     pointer-events: none;
+// }
+
+// .linkIsAbove:before {
+//     box-shadow: 1px 0px 0px $highlight;
+// }
+
+// .linkIsAbove.isFirstContent:before {
+//     box-shadow: 1px 0px 0px $highlight;
+// }
+
+// .linkIsShowing:before {
+//     box-shadow: 1px 0px 0px $highlight;
+// }
+
+// .linkIsShowing.isFirstContent:before {
+//     box-shadow: 1px 0px 0px $highlight;
+// }

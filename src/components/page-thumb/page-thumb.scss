@@ -1,0 +1,30 @@
+@import '../../index';
+@import '../../mixins';
+
+.page-thumb-renderer {
+    width: 37px;
+    min-width: 37px;
+    height: 37px;
+    overflow: hidden;
+    display: inline-block;
+    user-select: none;
+    pointer-events: none;
+}
+
+.page-thumb {
+    max-width: 1280px;
+    background: $lightGray;
+    color: $textColorDark;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    display: grid;
+    grid-auto-rows: min-content;
+    grid-template-columns: repeat(auto-fill, 8.33333333%);
+    overflow-y: auto;
+    overflow-x: visible;
+    width: 1280px;
+    transform: scale3d(0.028, 0.028, 0.028);
+    transform-origin: 0px 0px;
+    height: 1280px;
+}
