@@ -1,6 +1,6 @@
 {
     "name": "codelessapi",
     "dependencies": {
-        "googleapis": "^32.0.0"
+        "googleapis": "^39.1.0"
     }
 }
