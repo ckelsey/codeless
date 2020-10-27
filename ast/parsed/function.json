@@ -1,0 +1,49 @@
+{
+    "type": "FunctionDeclaration",
+    "id": {
+        "type": "Identifier",
+        "name": "doId"
+    },
+    "generator": false,
+    "async": false,
+    "params": [
+        {
+            "type": "Identifier",
+            "name": "indx"
+        },
+        {
+            "type": "Identifier",
+            "name": "indxes"
+        }
+    ],
+    "body": {
+        "type": "BlockStatement",
+        "body": [
+            {
+                "type": "ReturnStatement",
+                "argument": {
+                    "type": "BinaryExpression",
+                    "left": {
+                        "type": "CallExpression",
+                        "callee": {
+                            "type": "Identifier",
+                            "name": "doHash"
+                        },
+                        "arguments": [
+                            {
+                                "type": "Identifier",
+                                "name": "indxes"
+                            }
+                        ]
+                    },
+                    "operator": "+",
+                    "right": {
+                        "type": "Identifier",
+                        "name": "indx"
+                    }
+                }
+            }
+        ],
+        "directives": []
+    }
+}

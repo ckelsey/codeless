@@ -1,0 +1,34 @@
+#top-section {
+    width: 100%;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#main-section {
+    width: 100%;
+    display: flex;
+    flex-wrap: nowrap;
+    flex-grow: 1;
+    overflow: auto;
+    position: relative;
+}
+
+#main-section-overlay,
+#center-section-overlay {
+    pointer-events: none;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+}
+
+#center-section {
+    flex-grow: 1;
+    position: relative;
+    background-color: #fff;
+    color: #333;
+    border-radius: 2px;
+}

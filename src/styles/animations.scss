@@ -1,0 +1,56 @@
+@keyframes rotating {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes onAutoFillStart {
+    from {
+        /**/
+    }
+
+    to {
+        /**/
+    }
+}
+
+@keyframes onAutoFillCancel {
+    from {
+        /**/
+    }
+
+    to {
+        /**/
+    }
+}
+
+@keyframes delayOverflowIn {
+    0% {
+        overflow: hidden;
+    }
+
+    99% {
+        overflow: hidden;
+    }
+
+    100% {
+        overflow: visible;
+    }
+}
+
+@keyframes delayOverflowOut {
+    0% {
+        overflow: visible;
+    }
+
+    99% {
+        overflow: visible;
+    }
+
+    100% {
+        overflow: hidden;
+    }
+}

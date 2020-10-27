@@ -1,0 +1,60 @@
+/*
+For simple CSS tabs
+<div class="tabs-container">
+    <input class="tab-input" name="tabs" type="radio" id="tab-1" checked>
+    <label class="tab-label" for="tab-1">Tab 1</label>
+    <div class="tab-content">Tab 1 content...</div>
+
+    <input class="tab-input" name="tabs" type="radio" id="tab-2" checked>
+    <label class="tab-label" for="tab-2">Second tab</label>
+    <div class="tab-content">Tab 2 content...</div>
+</div>
+*/
+
+.tabs-container {
+    display: flex;
+    flex-wrap: wrap;
+
+    .tab-input {
+        position: absolute;
+        opacity: 0;
+        margin: 0;
+        padding: 0;
+        width: 0;
+        height: 0;
+
+        &:checked + .tab-label {
+            z-index: 1;
+
+            & + .tab-content {
+                order: 99;
+                width: 100%;
+                opacity: 1;
+                position: relative;
+                pointer-events: all;
+                user-select: initial;
+            }
+        }
+    }
+
+    .tab-label {
+        padding: 1em;
+        cursor: pointer;
+        margin: 0;
+        transition: background 0.1s, color 0.1s;
+
+        &.end-fill {
+            flex-grow: 1;
+            cursor: none;
+            pointer-events: none;
+            user-select: none;
+        }
+    }
+
+    .tab-content {
+        opacity: 0;
+        position: absolute;
+        pointer-events: none;
+        user-select: none;
+    }
+}

@@ -1,0 +1,17 @@
+{
+    "type": "VariableDeclaration",
+    "declarations": [
+        {
+            "type": "VariableDeclarator",
+            "id": {
+                "type": "Identifier",
+                "name": "index"
+            },
+            "init": {
+                "type": "NumericLiteral",
+                "value": 0
+            }
+        }
+    ],
+    "kind": "let"
+}

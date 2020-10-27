@@ -1,0 +1,115 @@
+@import "../../styles/vars-input";
+
+@mixin checkedBox {
+    background-color: theme-color("accent");
+    box-shadow: inset 0 0px 2px 0px transparentize(theme-color("accent"), 0.5);
+    color: theme-color("accent-offset");
+}
+
+field-checkbox {
+    @include fieldBase;
+
+    &.no-label,
+    &[hasicon="true"].no-label {
+        .field-element-container {
+            label {
+                &:before {
+                    top: 0;
+                }
+            }
+        }
+    }
+
+    .field-checkbox-container {
+        @include fieldContainer;
+        display: flex;
+        min-width: 1.25em;
+        align-items: center;
+        min-height: 1.62em;
+
+        input {
+            @include field;
+            padding: 0;
+            margin: 0;
+            width: 1.5em;
+            height: 1.5em;
+            opacity: 0;
+            cursor: pointer;
+            display: inline-flex;
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: transparent;
+            box-shadow: none;
+
+            &:checked ~ label::before {
+                @include checkedBox;
+            }
+
+            &:checked ~ label::after {
+                opacity: 1;
+                transform: rotate(133deg) scale(1);
+                transition: transform 0.1s linear 0.05s, opacity 0.1s linear 0.05s;
+            }
+        }
+
+        label {
+            @include label;
+
+            display: flex;
+            align-items: flex-start;
+            text-transform: capitalize;
+            color: theme-color("foreground");
+            cursor: pointer;
+            margin: 0;
+            padding: 0 0 0 2em;
+            position: relative;
+            transform: none;
+            pointer-events: all;
+
+            &:before,
+            &:after {
+                line-height: 150%;
+                border-radius: 2px;
+                content: "";
+                position: absolute;
+                pointer-events: none;
+                width: 1.5em;
+                height: 1.5em;
+                top: 0;
+                left: 0;
+                display: block;
+                margin: 0;
+                text-align: center;
+                font-weight: bold;
+                transform-origin: center;
+                pointer-events: none;
+            }
+
+            &:before {
+                background-color: transparentize(theme-color("foreground"), 0.5);
+                box-shadow: 0 0 0 100px transparentize(theme-color("foreground", "light"), 0.5) inset;
+                transition: background-color 0.1s, box-shadow 0.15s;
+            }
+
+            &:after {
+                transform: rotate(133deg) scale(0, 1);
+                font-size: 1.25em;
+                pointer-events: none;
+                line-height: 0;
+                top: -0.62em;
+                left: -0.5em;
+                opacity: 0;
+                content: "\00ac";
+                color: theme-color("accent-offset");
+                transition: transform 0.1s linear, opacity 0.1s linear;
+            }
+        }
+    }
+
+    @include helptext;
+
+    .field-help-text {
+        width: 100%;
+    }
+}

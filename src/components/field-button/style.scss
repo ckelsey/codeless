@@ -1,0 +1,204 @@
+@import "../../styles/vars.scss";
+@import "../../styles/vars-input.scss";
+@import "../../styles/animations.scss";
+
+field-button {
+    display: inline-block;
+    vertical-align: text-bottom;
+    white-space: nowrap;
+
+    .field-button-container {
+        display: inline-block;
+
+        button {
+            border-radius: $inputRadius;
+            font-size: inherit;
+            font-weight: bold;
+            line-height: normal;
+            opacity: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            padding: 0.832em;
+            color: theme-color("accent-offset");
+            background-color: theme-color("accent");
+            min-width: 5em;
+            border: none;
+            outline: none !important;
+            transition: color 0.2s, background-color 0.2s;
+
+            &:hover {
+                color: theme-color("accent-offset", "light");
+                background-color: theme-color("accent", "light");
+            }
+
+            &:before {
+                content: "";
+                margin-right: 0em;
+                width: 0em;
+                height: 0em;
+                border: 0px solid currentColor;
+                border-top-color: transparent;
+                border-radius: 50%;
+                opacity: 0;
+                transition: width 0.2s, height 0.2s, border-width 0.4s, margin-right 0.2s, opacity 0.3s;
+            }
+        }
+    }
+
+    &[kind="link"] {
+        .field-button-container {
+            button {
+                color: theme-color("accent");
+                background-color: transparent;
+                font-weight: normal;
+
+                &:hover {
+                    color: theme-color("accent", "light");
+                    background-color: transparent;
+                }
+            }
+        }
+    }
+
+    &[theme="danger"] {
+        .field-button-container {
+            button {
+                color: theme-color("danger-offset");
+                background-color: theme-color("danger");
+
+                &:hover {
+                    color: theme-color("danger-offset", "light");
+                    background-color: theme-color("danger", "light");
+                }
+            }
+        }
+
+        &[kind="link"] {
+            .field-button-container {
+                button {
+                    color: theme-color("danger");
+                    background-color: transparent;
+
+                    &:hover {
+                        color: theme-color("danger", "light");
+                        background-color: transparent;
+                    }
+                }
+            }
+        }
+    }
+
+    &[theme="warning"] {
+        .field-button-container {
+            button {
+                color: theme-color("warning-offset");
+                background-color: theme-color("warning");
+
+                &:hover {
+                    color: theme-color("warning-offset", "light");
+                    background-color: theme-color("warning", "light");
+                }
+            }
+        }
+
+        &[kind="link"] {
+            .field-button-container {
+                button {
+                    color: theme-color("warning");
+                    background-color: transparent;
+
+                    &:hover {
+                        color: theme-color("warning", "light");
+                        background-color: transparent;
+                    }
+                }
+            }
+        }
+    }
+
+    &[theme="secondary"] {
+        .field-button-container {
+            button {
+                color: theme-color("background");
+                background-color: theme-color("foreground");
+
+                &:hover {
+                    color: theme-color("background", "light");
+                    background-color: theme-color("foreground", "light");
+                }
+            }
+        }
+
+        &[kind="link"] {
+            .field-button-container {
+                button {
+                    color: theme-color("foreground");
+                    background-color: transparent;
+
+                    &:hover {
+                        color: theme-color("foreground", "light");
+                        background-color: transparent;
+                    }
+                }
+            }
+        }
+    }
+
+    &[size="small"] {
+        .field-button-container {
+            button {
+                font-size: 80%;
+                padding: 0.125em 0.5em;
+                min-width: unset;
+            }
+        }
+    }
+
+    &[size="big"] {
+        .field-button-container {
+            button {
+                font-size: 120%;
+            }
+        }
+    }
+
+    &[disabled="true"] {
+        cursor: not-allowed;
+        user-select: none;
+
+        .field-button-container {
+            pointer-events: none;
+            opacity: 0.5;
+
+            * {
+                pointer-events: none;
+            }
+        }
+    }
+
+    &[spinner="true"] {
+        cursor: not-allowed;
+
+        .field-button-container {
+            & * {
+                pointer-events: none;
+            }
+
+            button {
+                &:before {
+                    animation: rotating 1.38s linear infinite;
+                    height: 0.62em;
+                    width: 0.62em;
+                    margin-right: 0.38em;
+                    border-width: 2px;
+                    opacity: 0.75;
+                }
+                & > * {
+                    opacity: 0.5;
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,72 @@
+@import "../../styles/vars-input";
+
+$selectArrow: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="270" height="240"><path fill="dimGray" d="M5,5H265L135,230"/></svg>');
+
+field-select {
+    @include fieldBase;
+
+    .field-select-container {
+        @include fieldContainer;
+
+        select {
+            @include field;
+            background-image: $selectArrow;
+            background-position: calc(100% - 0.5em) 50%;
+            background-size: 0.75em 0.5em;
+            background-repeat: no-repeat;
+            -webkit-appearance: none;
+            appearance: none;
+            box-shadow: inset 0 0px 2px 0px transparentize(theme-color("foreground", "light"), 0.5);
+
+            &:focus {
+                box-shadow: none;
+                outline: none;
+                background-image: $selectArrow;
+            }
+
+            &[multiple] {
+                background-image: none !important;
+            }
+
+            &::-ms-expand {
+                display: none;
+            }
+
+            &:-moz-focusring {
+                color: transparent;
+                text-shadow: none;
+            }
+
+            option {
+                font-weight: normal;
+            }
+
+            &:disabled,
+            &[aria-disabled="true"] {
+                color: transparentize(theme-color("background"), 0.5);
+                background-color: transparentize(theme-color("foreground"), 0.5);
+                cursor: not-allowed;
+            }
+
+            &.inside-label {
+                padding: 1.3em 1.7em 0.3em 0.7em !important;
+            }
+
+            &.thin {
+                padding: 0.2em 1.7em 0.2em 0.5em !important;
+                background-position: calc(100% - 1.125em) 0.65em, calc(100% - 0.7em) 0.65em;
+            }
+
+            &.inside-label ~ label.inside {
+                width: calc(100% - 1em);
+            }
+        }
+
+        label {
+            @include label;
+        }
+    }
+
+    @include helptext;
+    @include icon;
+}

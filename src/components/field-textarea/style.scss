@@ -1,0 +1,44 @@
+@import "../../styles/vars-input";
+
+field-textarea {
+    @include fieldBase;
+
+    .field-textarea-container {
+        position: relative;
+        width: $inputWidth;
+        max-width: 100%;
+        margin-top: $space3;
+        margin-bottom: $space3;
+
+        @include fieldContainer;
+
+        textarea {
+            @include field;
+            resize: none;
+        }
+
+        label {
+            @include label;
+        }
+    }
+
+    &[resize="auto"] textarea,
+    &[resize="none"] textarea {
+        resize: none;
+    }
+
+    &[resize="horizontal"] textarea {
+        resize: horizontal;
+    }
+
+    &[resize="vertical"] textarea {
+        resize: vertical;
+    }
+
+    &[resize="both"] textarea {
+        resize: both;
+    }
+
+    @include helptext;
+    @include icon;
+}

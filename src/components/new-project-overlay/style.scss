@@ -1,0 +1,14 @@
+@import "../../styles/vars-input.scss";
+
+new-project-overlay {
+    visibility: hidden;
+
+    &[ready="true"] {
+        visibility: visible;
+    }
+}
+
+.projects-list-overlay-inner {
+    width: $inputWidth;
+    max-width: 80%;
+}

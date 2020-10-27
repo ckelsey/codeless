@@ -1,0 +1,1 @@
+module.exports = json => require('./write-file')('./parsed/parsed-ast.json', json)

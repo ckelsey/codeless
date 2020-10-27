@@ -1,0 +1,305 @@
+@import "vars";
+@import "animations";
+
+$labelPadding: 0.125em 0.5em 0 1em;
+$labelIconPadding: 0.125em 0.5em 0 2.5em;
+$labelUpIconPadding: 0.125em 0.5em 0 3em;
+$inputPadding: 1.3em 0.7em 0.3em;
+$inputLabelTopPadding: 0.8em 0.7em;
+$inputIconPadding: 1.3em 0.7em 0.3em 2.3em;
+$inputLabelTopIconPadding: 0.8em 0.7em 0.8em 2.3em;
+$inputRadius: 2px;
+$inputWidth: 30em;
+
+$inputShadow: inset 0 0px 2px 0px transparentize(theme-color("foreground", "light"), 0.5),
+    0 0 0 100px theme-color("foreground") inset;
+$inputShadowFocused: inset 0 0px 2px 0px transparentize(theme-color("foreground", "light"), 0.5),
+    0 0 0 100px theme-color("foreground", "light") inset;
+
+@mixin errorText {
+    content: "*";
+    color: theme-color("danger");
+    line-height: 0;
+    position: relative;
+    top: 0.2em;
+    margin-right: 0.1em;
+}
+
+@mixin label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    text-align: left;
+    padding: $labelPadding;
+    display: flex;
+    align-items: center;
+    transform: translateX(-0.25em) translateY(0.5em) translateZ(0px) scale(1);
+    transform-origin: 0 0;
+    text-transform: capitalize;
+    font-size: inherit;
+    pointer-events: none;
+    color: transparentize(theme-color("background"), 0.38);
+    opacity: 0;
+    transition: transform 0.2s, opacity 0.2s ease-in 0.062s;
+
+    &[error]:not([error=""]) {
+        &:after {
+            content: attr(error);
+            color: theme-color("danger");
+            font-size: 80%;
+            display: inline-block;
+            margin-left: $space1;
+        }
+    }
+}
+
+@mixin label-up {
+    transform: translateX(0em) translateY(0.125em) translateZ(0) scale(0.7);
+}
+
+@mixin disabled {
+    cursor: not-allowed;
+    opacity: 0.38;
+}
+
+@mixin placeholder {
+    color: transparent;
+    opacity: 0;
+}
+
+@mixin autofillStart {
+    animation-name: onAutoFillStart;
+    transition: background-color 50000s ease-in-out 0s;
+}
+
+@mixin autofillEnd {
+    animation-name: onAutoFillCancel;
+}
+
+@mixin icon {
+    .icon-container {
+        position: absolute;
+        left: 0.5em;
+        color: #222;
+        top: 0.65em;
+        line-height: 0;
+        pointer-events: none;
+        width: 1.5em;
+        height: 1.5em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        & svg {
+            width: 1.5em;
+            height: auto;
+        }
+    }
+
+    &[hasicon="true"] {
+        input,
+        textarea,
+        select {
+            padding: $inputIconPadding;
+
+            &[label-up="true"] ~ label,
+            &:not(:placeholder-shown):not([value=""]) ~ label {
+                padding: $labelUpIconPadding;
+            }
+        }
+        label {
+            padding: $labelIconPadding;
+        }
+
+        &.no-label {
+            .field-element-container {
+                input,
+                textarea,
+                select {
+                    padding: $inputLabelTopIconPadding;
+                }
+            }
+        }
+    }
+}
+
+@mixin fieldBase {
+    display: inline-block;
+    max-width: 100%;
+    opacity: 0;
+    transition: opacity 0.2s ease-in 0.025s;
+
+    &[ready] {
+        opacity: 1;
+
+        .field-element-container {
+            label {
+                opacity: 1;
+            }
+        }
+    }
+
+    &.no-label,
+    &[hasicon="true"].no-label {
+        .field-element-container {
+            input,
+            textarea,
+            select {
+                padding: $inputLabelTopPadding;
+            }
+
+            label {
+                padding: 0;
+                transform: none;
+
+                &:before {
+                    position: absolute;
+                    top: 1.62em;
+                    margin-right: 0.25em;
+                    right: 0;
+                }
+            }
+        }
+    }
+
+    &[labelalign="top"] {
+        .field-element-container {
+            input,
+            textarea,
+            select {
+                padding: $inputLabelTopIconPadding;
+            }
+
+            label,
+            input[label-up="true"] ~ label,
+            textarea[label-up="true"] ~ label,
+            select[label-up="true"] ~ label {
+                order: -1;
+                position: relative;
+                color: theme-color("foreground", "dark");
+                transform: none;
+                padding: 0;
+                margin-top: -1.5em;
+                pointer-events: all;
+            }
+        }
+    }
+
+    &.mtop-0 {
+        .field-element-container {
+            margin-top: 0;
+        }
+    }
+
+    &.mbottom-0 {
+        .field-element-container {
+            margin-bottom: 0;
+        }
+    }
+
+    &.w-auto {
+        .field-element-container {
+            width: auto;
+        }
+    }
+}
+
+@mixin fieldContainer {
+    position: relative;
+    width: $inputWidth;
+    max-width: 100%;
+    margin-top: $space3;
+    margin-bottom: $space3;
+    display: flex;
+    flex-direction: column;
+}
+
+@mixin field {
+    padding: $inputPadding;
+    position: relative;
+    margin: 0;
+    height: auto;
+    width: 100%;
+    border-radius: $inputRadius;
+    background-color: theme-color("foreground");
+    color: theme-color("background");
+    box-shadow: $inputShadow;
+    border: none !important;
+    font-size: inherit;
+    font-family: inherit;
+    line-height: initial;
+    outline: none !important;
+    transition: color 0.2s, background-color 0.2s, box-shadow 0.2s, transform 0.2s;
+
+    &:focus {
+        background-color: theme-color("foreground", "light");
+        box-shadow: $inputShadowFocused;
+    }
+
+    &:-internal-autofill-selected {
+        background-color: theme-color("foreground") !important;
+    }
+
+    &:-webkit-autofill {
+        @include autofillStart;
+    }
+
+    &:not(:-webkit-autofill) {
+        @include autofillEnd;
+    }
+
+    &::-webkit-input-placeholder {
+        @include placeholder;
+    }
+
+    &:-webkit-input-placeholder {
+        @include placeholder;
+    }
+
+    &:-ms-input-placeholder {
+        @include placeholder;
+    }
+
+    &::placeholder {
+        @include placeholder;
+    }
+
+    &[readonly]:not([readonly="false"]),
+    &[readonly="true"] {
+        cursor: not-allowed;
+    }
+
+    &[disabled] {
+        @include disabled;
+
+        &[required] + label:before {
+            opacity: 0.5;
+        }
+    }
+
+    &[required] + label:before {
+        @include errorText;
+    }
+
+    &[required].no-required-symbol + label:before {
+        display: none;
+    }
+
+    &[label-up="true"] ~ label,
+    &:not(:placeholder-shown):not([value=""]):not([type="checkbox"]):not([type="radio"]) ~ label {
+        @include label-up;
+    }
+}
+
+@mixin helptext {
+    .field-help-text,
+    .field-count-text {
+        font-size: 75%;
+        margin-bottom: -2em;
+        display: block;
+        font-style: italic;
+        font-weight: 100;
+        opacity: 0.62;
+    }
+}

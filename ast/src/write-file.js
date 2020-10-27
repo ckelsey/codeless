@@ -1,0 +1,1 @@
+module.exports = (content, url) => require('fs').writeFileSync(require('path').resolve(url), typeof content == 'string' ? content : JSON.stringify(content))

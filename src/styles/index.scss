@@ -1,0 +1,65 @@
+@import "vars";
+
+html {
+    min-height: 100%;
+    height: 100%;
+}
+
+body {
+    font-size: 16px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    line-height: 150%;
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    max-height: 100%;
+    overflow: hidden;
+    color: theme-color("foreground");
+    background: theme-color("background");
+    margin: 0;
+}
+
+body * {
+    box-sizing: border-box;
+}
+
+a {
+    color: inherit;
+    opacity: 0.8;
+    text-decoration: none;
+    transition: color 0.2s, opacity 0.2s;
+    cursor: pointer;
+}
+
+a:hover {
+    opacity: 1;
+}
+
+a.active {
+    opacity: 1;
+    color: theme-color("accent");
+}
+
+a.active-bg {
+    opacity: 1;
+    @include activeBackground;
+}
+
+h1 {
+    font-size: 2em;
+}
+
+h2 {
+    font-size: 1.5em;
+}
+
+h3 {
+    font-size: 1.25em;
+}
+
+@import "flex";
+@import "padding";
+@import "margin";
+@import "page-elements";
+@import "layout";
+@import "helpers";

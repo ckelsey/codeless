@@ -1,23 +1,37 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="assets/nv-components/nvcomponents.js"></script>
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>XnI</title>
+        <link rel="stylesheet" href="/main.css">
+        <script src="/main.js"></script>
+    </head>
 
-<body>
-    <div id="app"></div>
-
-    <script>
-        window.codeless = {
-            document:'1CLqglE_XgrNk8OPLVmoce3SRWhnVL0HVcySE7sw_lk0',
-            upload: '1TZp0IGKDSOBd6uqtkTpHwxNP5l8xkKpt',
-            domain: 'ckcreates.com'
-        }
-    </script>
-    <script src="https://apis.google.com/js/api.js"></script>
-    <script src="./codeless.js"></script>
-</body>
+    <body>
+        <div id="top-section">
+            <div class="flex-left-center grow p-2">
+                <div class="items-space">
+                    <a href="projects">Projects</a>
+                    <a href="pages">Pages</a>
+                    <a href="components">Components</a>
+                    <a href="behaviors">Behaviors</a>
+                    <a href="services">Services</a>
+                    <a href="utilities">Utilities</a>
+                </div>
+            </div>
+            <div class="flex-right-center grow p-2">
+                <div class="items-space">
+                    <a href="/preview">Preview</a>
+                </div>
+            </div>
+        </div>
+        <div id="main-section">
+            <div id="left-section" class="p-2 hide-empty"></div>
+            <div id="center-section" class="p-2 hide-empty"></div>
+            <div id="right-section" class="p-2 hide-empty"></div>
+        </div>
+    </body>
 
 </html>

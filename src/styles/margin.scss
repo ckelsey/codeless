@@ -1,0 +1,101 @@
+@import "vars";
+
+.m-0 {
+    margin: 0em;
+}
+
+.m-1 {
+    margin: $space1;
+}
+
+.m-2 {
+    margin: $space2;
+}
+
+.m-3 {
+    margin: $space3;
+}
+
+.m-4 {
+    margin: $space4;
+}
+
+.mtop-0 {
+    margin-top: 0em;
+}
+
+.mtop-1 {
+    margin-top: $space1;
+}
+
+.mtop-2 {
+    margin-top: $space2;
+}
+
+.mtop-3 {
+    margin-top: $space3;
+}
+
+.mtop-4 {
+    margin-top: $space4;
+}
+
+.mbottom-0 {
+    margin-bottom: 0em;
+}
+
+.mbottom-1 {
+    margin-bottom: $space1;
+}
+
+.mbottom-2 {
+    margin-bottom: $space2;
+}
+
+.mbottom-3 {
+    margin-bottom: $space3;
+}
+
+.mbottom-4 {
+    margin-bottom: $space4;
+}
+
+.mleft-0 {
+    margin-left: 0em;
+}
+
+.mleft-1 {
+    margin-left: $space1;
+}
+
+.mleft-2 {
+    margin-left: $space2;
+}
+
+.mleft-3 {
+    margin-left: $space3;
+}
+
+.mleft-4 {
+    margin-left: $space4;
+}
+
+.mright-0 {
+    margin-right: 0em;
+}
+
+.mright-1 {
+    margin-right: $space1;
+}
+
+.mright-2 {
+    margin-right: $space2;
+}
+
+.mright-3 {
+    margin-right: $space3;
+}
+
+.mright-4 {
+    margin-right: $space4;
+}

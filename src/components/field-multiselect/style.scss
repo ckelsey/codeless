@@ -1,0 +1,11 @@
+@import "../../styles/vars-input";
+
+field-multiselect {
+    @include fieldBase;
+
+    .field-multiselect-container {
+        @include fieldContainer;
+        display: flex;
+        min-width: 1.25em;
+    }
+}

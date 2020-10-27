@@ -1,0 +1,153 @@
+{
+    "type": "Program",
+    "body": [
+        {
+            "type": "ExportDefaultDeclaration",
+            "declaration": {
+                "type": "FunctionDeclaration",
+                "id": {
+                    "type": "Identifier",
+                    "name": "IsObject"
+                },
+                "generator": false,
+                "expression": false,
+                "async": false,
+                "params": [
+                    {
+                        "type": "Identifier",
+                        "name": "value",
+                        "typeAnnotation": {
+                            "type": "TSTypeAnnotation",
+                            "typeAnnotation": {
+                                "type": "TSAnyKeyword"
+                            }
+                        }
+                    }
+                ],
+                "body": {
+                    "type": "BlockStatement",
+                    "body": [
+                        {
+                            "type": "ReturnStatement",
+                            "argument": {
+                                "type": "LogicalExpression",
+                                "operator": "&&",
+                                "left": {
+                                    "type": "LogicalExpression",
+                                    "operator": "&&",
+                                    "left": {
+                                        "type": "LogicalExpression",
+                                        "operator": "&&",
+                                        "left": {
+                                            "type": "BinaryExpression",
+                                            "operator": ">",
+                                            "left": {
+                                                "type": "CallExpression",
+                                                "callee": {
+                                                    "type": "MemberExpression",
+                                                    "object": {
+                                                        "type": "UnaryExpression",
+                                                        "operator": "typeof",
+                                                        "prefix": true,
+                                                        "argument": {
+                                                            "type": "Identifier",
+                                                            "name": "value"
+                                                        }
+                                                    },
+                                                    "property": {
+                                                        "type": "Identifier",
+                                                        "name": "indexOf"
+                                                    },
+                                                    "computed": false,
+                                                    "optional": false
+                                                },
+                                                "arguments": [
+                                                    {
+                                                        "type": "Literal",
+                                                        "raw": "'object'",
+                                                        "value": "object"
+                                                    }
+                                                ],
+                                                "optional": false
+                                            },
+                                            "right": {
+                                                "type": "UnaryExpression",
+                                                "operator": "-",
+                                                "prefix": true,
+                                                "argument": {
+                                                    "type": "Literal",
+                                                    "value": 1,
+                                                    "raw": "1"
+                                                }
+                                            }
+                                        },
+                                        "right": {
+                                            "type": "BinaryExpression",
+                                            "operator": "!==",
+                                            "left": {
+                                                "type": "Identifier",
+                                                "name": "value"
+                                            },
+                                            "right": {
+                                                "type": "Literal",
+                                                "value": null,
+                                                "raw": "null"
+                                            }
+                                        }
+                                    },
+                                    "right": {
+                                        "type": "UnaryExpression",
+                                        "operator": "!",
+                                        "prefix": true,
+                                        "argument": {
+                                            "type": "CallExpression",
+                                            "callee": {
+                                                "type": "MemberExpression",
+                                                "object": {
+                                                    "type": "Identifier",
+                                                    "name": "Array"
+                                                },
+                                                "property": {
+                                                    "type": "Identifier",
+                                                    "name": "isArray"
+                                                },
+                                                "computed": false,
+                                                "optional": false
+                                            },
+                                            "arguments": [
+                                                {
+                                                    "type": "Identifier",
+                                                    "name": "value"
+                                                }
+                                            ],
+                                            "optional": false
+                                        }
+                                    }
+                                },
+                                "right": {
+                                    "type": "UnaryExpression",
+                                    "operator": "!",
+                                    "prefix": true,
+                                    "argument": {
+                                        "type": "BinaryExpression",
+                                        "operator": "instanceof",
+                                        "left": {
+                                            "type": "Identifier",
+                                            "name": "value"
+                                        },
+                                        "right": {
+                                            "type": "Identifier",
+                                            "name": "Date"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }
+            },
+            "exportKind": "value"
+        }
+    ],
+    "sourceType": "module"
+}

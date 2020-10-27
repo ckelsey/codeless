@@ -1,104 +1,57 @@
-'use strict'
-const path = require('path')
-const env = process.env.NODE_ENV || 'production'
-const VueLoaderPlugin = require('vue-loader/lib/plugin')
+var path = require('path');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const autoprefixer = require('autoprefixer')
+const mode = process.env.MODE || 'production'
+const webpack = require('webpack')
 
 module.exports = {
-    mode: 'production',
-    context: path.resolve(__dirname),
-    entry: {
-        app: './src/index.ts'
-    },
+    entry: './src/index',
+    mode,
+    stats: "normal",
+    optimization: { minimize: mode === 'production' },
     output: {
-        filename: 'codeless.js',
         path: path.resolve(__dirname, 'dist'),
-        // libraryTarget: 'umd',
-        // library: 'ckodeless',
-        umdNamedDefine: true
-        // libraryTarget: 'window',
-        // library: 'Docks'
+        filename: '[name].js'
     },
     resolve: {
-        alias: {
-            'vue$': 'vue/dist/vue.esm.js'
-        },
-        extensions: ['*', '.ts', '.js', '.vue', '.json', '.html']
+        extensions: ['.ts', '.tsx', '.js', '.json', '.scss']
     },
-    optimization: {
-        minimize: env === 'production'
-    },
-    plugins: [
-        new VueLoaderPlugin()
-    ],
     module: {
-        rules: [
-            {
-                test: /\.scss$/,
-                use: [
-                    'vue-style-loader',
-                    'css-loader',
-                    'sass-loader'
-                ]
-            },
-            {
-                test: /\.vue$/,
-                loader: 'vue-loader',
-                options: {
-                    loaders: {
-                        ts: 'babel-loader!ts-loader'
-                    },
-                    cssSourceMap: false,
-                    transformToRequire: {
-                        video: ['src', 'poster'],
-                        source: 'src',
-                        img: 'src',
-                        image: 'xlink:href'
+        rules: [{
+            test: /\.(ts|js)x?$/,
+            exclude: /node_modules/,
+            loader: 'ts-loader'
+        }, {
+            test: /\.(scss|css)$/,
+            exclude: /node_modules/,
+            use: [
+                {
+                    loader: MiniCssExtractPlugin.loader,
+                    options: {
+                        esModule: true,
+                        filename: '[name].css',
+                        chunkFilename: '[name].css'
+                    }
+                },
+                'css-loader',
+                'sass-loader',
+                'postcss-loader'
+            ]
+        }, {
+            test: /\.html$/,
+            exclude: /node_modules/,
+            use: [
+                {
+                    loader: 'html-loader',
+                    options: {
+                        minimize: true
                     }
                 }
-            },
-            {
-                test: /\.js$/,
-                loader: 'babel-loader',
-                include: [path.resolve(__dirname, 'src')]
-            },
-            {
-                test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
-                loader: 'url-loader',
-                options: {
-                    limit: 10000,
-                    name: path.resolve(__dirname, 'dist/assets/[name].[ext]')
-                }
-            },
-            {
-                test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
-                loader: 'url-loader',
-                options: {
-                    limit: 10000,
-                    name: path.resolve(__dirname, 'dist/assets/fonts/[name].[ext]')
-                }
-            },
-            {
-                test: /\.ts$/,
-                exclude: /node_modules|vue\/src/,
-                loader: "babel-loader!ts-loader"
-            },
-            {
-                test: /\.html$/,
-                exclude: /node_modules/,
-                loader: "html-loader?exportAsEs6Default"
-            }
-        ]
+            ]
+        }]
     },
-    node: {
-        // prevent webpack from injecting useless setImmediate polyfill because Vue
-        // source contains it (although only uses it if it's native).
-        setImmediate: false,
-        // prevent webpack from injecting mocks to Node native modules
-        // that does not make sense for the client
-        dgram: 'empty',
-        fs: 'empty',
-        net: 'empty',
-        tls: 'empty',
-        child_process: 'empty'
-    }
-}
+    plugins: [
+        new webpack.LoaderOptionsPlugin({ options: { postcss: [autoprefixer()] } }),
+        new MiniCssExtractPlugin()
+    ],
+};

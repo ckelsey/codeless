@@ -1,0 +1,1 @@
+module.exports = json => require('@babel/generator').default(typeof json == 'string' ? JSON.parse(json) : json, {}).code

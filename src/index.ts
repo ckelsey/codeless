@@ -1,14 +1,4 @@
-import Vue from 'vue'
-import App from './components/app/app'
+import App from './services/app'
+import DOMReady from './utils/dom/ready'
 
-Vue.config.ignoredElements = [
-	'nv-checkbox'
-]
-
-new Vue({
-	el: '#app',
-	components: {
-		'app-entry': App
-	},
-	template: '<app-entry></app-entry>'
-})
+DOMReady().then(() => App())

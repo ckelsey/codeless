@@ -1,12 +1,84 @@
-- create a few pages
+INPUTS
+ - format
+ - validation
+    * valid url
+    * valid email
+    * valid tel
+    * valid color
+    * valid file
+    * valid date
+    * valid time
+    * valid date time
+    * valid password
+    * valid range
 
 
-- ripple effect
-- import global css
-- undo
-- better mechanism for keeping in sync
-- who is working on what
-- smooth scroll to anchor
-- insert html
-- insert embed url
-- preview resolutions
+BEHAVIOURS
+ - push
+ - underline
+ - line around
+
+
+OPTIMIZATION
+- global weak set of all observers
+- observers as weak sets
+- check to make sure nodeObserver is getting disconnected
+- Slots: Needs to delay for a microsecond as components inside a slot get messed up. Need to find a better way
+
+
+
+
+Pages
+    - frame
+    - page settings
+    - component list
+        - drag and drop
+        - movable
+
+Projects
+    - frame
+
+MODES
+    1) Component list/creator
+        - styles
+        - events/subscriptions
+        - markup
+        - elements
+        - properties
+        - methods
+        - show where is used
+
+    2) Page list/creator
+        - routes
+            - path
+            - query
+            - permissions
+
+        - meta
+
+    3) Service list/creator
+        - methods
+        - properties
+        - data structure
+
+    4) Helper list/creator
+
+
+
+- components
+    - {tag:object}
+
+- pages
+    - route
+        - path
+        - allowedQueries
+        - content
+            - initialize function
+        - service/prop to check
+        - redirect on failed check
+
+- currentPage
+
+- history/undo
+
+- performance

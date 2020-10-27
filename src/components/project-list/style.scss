@@ -1,0 +1,26 @@
+@import "../../styles/vars.scss";
+
+projects-list {
+    display: block;
+    width: 100%;
+
+    .projects-list-items {
+        display: flex;
+        flex-direction: column;
+
+        .project-link {
+            display: flex;
+            align-items: center;
+            font-size: 80%;
+            padding: 0.5em 1em;
+
+            &:nth-child(odd) {
+                background: transparentize(theme-color("foreground"), 0.9);
+
+                &.active-bg {
+                    @include activeBackground;
+                }
+            }
+        }
+    }
+}

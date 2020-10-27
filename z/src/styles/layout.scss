@@ -1,0 +1,12 @@
+@import "vars";
+
+.items-space {
+    margin-left: -$space1;
+    margin-right: -$space1;
+}
+
+.items-space > * {
+    margin-left: $space1;
+    margin-right: $space1;
+    display: inline-block;
+}
