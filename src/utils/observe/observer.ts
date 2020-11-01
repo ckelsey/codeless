@@ -3,38 +3,46 @@ import Type from '../types/type'
 import Equals from '../checks/equals'
 import Debounce from '../timing/debounce'
 import Get from '../objects/get'
-// import Diff from '../objects/diff'
+import Diff from '../objects/diff'
+
+const observers = new WeakMap()
+const observerKeys: { [key: string]: string[] } = {}
+
+    ; (window as any).observers = () => ({
+        map: observers,
+        keys: Object.keys(observerKeys)
+    })
 
 const emptyNext = (_value: any, _force?: boolean) => { }
 const emptyError = (_value: any) => { }
 const emptyFn = () => { }
 export const SubscribeFn = (_next: typeof emptyNext, _error?: typeof emptyError, _complete?: typeof emptyFn) => emptyFn
-// const emptyUnsubscribe = (_subscription: ObserverSubscription) => { }
+const emptyUnsubscribe = (_subscription: ObserverSubscription) => { }
 export const nullObserver = (): ObserverInstance => ({
-    // isComplete: true,
+    isComplete: true,
     value: undefined,
     previous: undefined,
     subscriptions: {},
-    // lastUpdate: 0,
-    // settings: {},
-    // removed: [],
-    // added: [],
-    // changed: {},
+    lastUpdate: 0,
+    settings: {},
+    removed: [],
+    added: [],
+    changed: {},
     next: emptyNext,
     error: emptyError,
     complete: emptyFn,
     subscribe: SubscribeFn,
-    // unsubscribe: emptyUnsubscribe,
+    unsubscribe: emptyUnsubscribe,
     insert: (_element: any, _index?: number) => { },
-    // insertAll: (_elements: any, _index?: number) => { },
-    // remove: (_element: any, _index: any, _all?: boolean) => { },
-    // removeElements: (_elements: any[]) => { },
-    // reverse: emptyFn,
-    // has: (_value: any) => false,
-    // indexOf: (_value: any) => -1,
-    // on: (_name: string, _callback: Function) => () => { },
-    // trigger: (_name: string, _data: any) => { },
-    // merge: (_observers: ObserverInstance[]) => { }
+    insertAll: (_elements: any, _index?: number) => { },
+    remove: (_element: any, _index: any, _all?: boolean) => { },
+    removeElements: (_elements: any[]) => { },
+    reverse: emptyFn,
+    has: (_value: any) => false,
+    indexOf: (_value: any) => -1,
+    on: (_name: string, _callback: Function) => () => { },
+    trigger: (_name: string, _data: any) => { },
+    data: {}
 })
 
 export interface ObserverSubscription {
@@ -52,6 +60,7 @@ export interface ObserverOptions {
     matchType?: boolean
     takeFirst?: boolean
     takeLast?: boolean
+    takeBy?: number
     onSubscribe?: (subscription?: ObserverSubscription) => void
     formatter?: (toFormat: any, observer?: ObserverInstance) => any
     initialValue?: any
@@ -72,41 +81,43 @@ export interface ObserverValuesObject {
     noSubsComplete: boolean
     takeFirst: boolean
     takeLast: boolean
+    takeBy: number
     value: any
     previousValue: any
 }
 
 export interface ObserverInstance {
-    // isComplete: boolean
+    isComplete: boolean
     value: any
     previous: any
     subscriptions: { [key: string]: ObserverSubscription }
-    // lastUpdate: number
-    // settings: ObserverOptions
-    // removed: any[]
-    // added: any[]
-    // changed: { [key: string]: any }
+    lastUpdate: number
+    settings: ObserverOptions
+    removed: any[]
+    added: any[]
+    changed: { [key: string]: any }
     next: typeof emptyNext
     error: typeof emptyError
     complete: typeof emptyFn
     subscribe: typeof SubscribeFn
-    // unsubscribe: typeof emptyUnsubscribe
+    unsubscribe: typeof emptyUnsubscribe
     insert: (element: any, index?: number) => void
-    // insertAll: (elements: any, index?: number) => void
-    // remove: (element: any, index: any, all?: boolean) => void
-    // removeElements: (elements: any[]) => void
-    // reverse: typeof emptyFn
-    // has: (value: any) => boolean
-    // indexOf: (value: any) => number
-    // on: (name: string, callback: Function) => Function
-    // trigger: (name: string, data: any) => void
-    // merge: (observers: ObserverInstance[]) => void
+    insertAll: (elements: any, index?: number) => void
+    remove: (element: any, index: any, all?: boolean) => void
+    removeElements: (elements: any[]) => void
+    reverse: typeof emptyFn
+    has: (value: any) => boolean
+    indexOf: (value: any) => number
+    on: (name: string, callback: Function) => Function
+    trigger: (name: string, data: any) => void
+    data: any
 }
 
 export default function Observer(initialValue?: any, options: ObserverOptions = {}) {
+    let _this: any = [ID()]
+    observerKeys[_this[0]] = _this
     const noInit = options.noInit ? true : false
     const nextOnNew = options.nextOnNew ? true : false
-    const noSubsComplete = options.noSubsComplete === true ? true : false
     const matchType = options.matchType ? true : false
     const onSubscribe = options.onSubscribe && typeof options.onSubscribe === 'function' ? options.onSubscribe : (val: any) => val
     const formatter = options.formatter && typeof options.formatter === 'function' ? options.formatter : (val: any) => val
@@ -114,34 +125,476 @@ export default function Observer(initialValue?: any, options: ObserverOptions = 
     const takeFirst = !!options.takeFirst
     const takeLast = !!options.takeLast
     const debounced = !!takeFirst || !!takeLast
+    const takeBy = options.takeBy || 0
+
+    const getInstance = () => observers.get(_this)
 
     const formatValue = (toFormat: any, obs: any = {}) => {
         const f = formatter(toFormat, obs)
-        return matchType && Type(f) != initialType ? values.value : f
+        const inst = getInstance()
+        return inst && matchType && Type(f) != initialType ? inst.data.value : f
     }
 
     const states = [formatValue(initialValue)]
 
-    const values: ObserverValuesObject = {
-        errors: [],
-        updated: new Date().getTime(),
-        subscriptions: {},
-        isComplete: false,
-        initialType,
-        initialValue,
-        eventCallbacks: {},
-        formatter,
-        matchType,
-        nextOnNew,
-        noInit,
-        noSubsComplete,
-        takeFirst,
-        takeLast,
-        value: null,
-        previousValue: null
+    const addedRemovedReducer = (source: any[]) => (target: any[], current: any) => {
+        if (source.indexOf(current) === -1) { target.push(current) }
+        return target
     }
 
-    Object.defineProperties(values, {
+    const bothArray = (source: any, target: any) => Array.isArray(source) && Array.isArray(target)
+
+    function getAddedRemoved(source: any[], target: any[]) {
+        return !bothArray(source, target) ? [] : source.reduce(addedRemovedReducer(target), [])
+    }
+
+
+    function getRemoved() {
+        const inst = getInstance()
+        return inst && inst.data ?
+            getAddedRemoved(inst.data.previousValue, inst.data.value) :
+            []
+    }
+
+    function getAdded() {
+        const inst = getInstance()
+        return inst && inst.data ? getAddedRemoved(inst.data.value, inst.data.previousValue) : []
+    }
+
+    function destroy() {
+        const inst = getInstance()
+
+        if (!inst) { return }
+
+        inst.trigger('destroy', inst.data)
+
+        Object.keys(inst.data.subscriptions).forEach(k => Get(inst.data, `subscriptions.${k}.unsubscribe`, emptyFn))
+
+        inst.data.isComplete = true
+
+        delete observerKeys[_this[0]]
+        observers.delete(_this)
+        _this = undefined
+    }
+
+    const callFn = (
+        val: any,
+        valuesObj: ObserverValuesObject | undefined,
+        functionKey: string,
+        subscriptions: { [key: string]: ObserverSubscription }
+    ) =>
+        (id: string) => {
+            const fn = Get(subscriptions, `${id}.${functionKey}`)
+            typeof fn === 'function' ? fn(val, valuesObj || {}, id) : undefined
+        }
+
+    function doLoop(functionKey: string, val: any, valuesObj?: ObserverValuesObject) {
+        const inst = getInstance()
+
+        if (!inst) { return }
+
+        inst.trigger(functionKey, valuesObj || {})
+
+        const subs = inst.data.subscriptions
+
+        Object.keys(subs).forEach(callFn(val, valuesObj, functionKey, subs))
+
+        if (functionKey === 'complete') { destroy() }
+    }
+
+    const debouncedLoop = Debounce(doLoop, takeBy, !!takeFirst)
+    const loop = !debounced ? doLoop : debouncedLoop
+
+    function unsubscribe(subscription: ObserverSubscription) {
+        return function unsubscribeInner() {
+            const inst = getInstance()
+
+            if (!inst) { return }
+
+            const subscriptions = inst.data.subscriptions
+
+            delete subscriptions[subscription.id]
+
+            inst.trigger('unsubscribe', { subscription, subscriptions })
+
+            if (inst.data.noSubsComplete && Object.keys(subscriptions).length === 0) {
+                destroy()
+            }
+        }
+    }
+
+    function getArrayIndexOf(element: any, isArray: boolean) {
+        const inst = getInstance()
+
+        if (!inst || !isArray) { return }
+
+        const index = inst.data.value.indexOf(element)
+
+        return index > -1 ? index : undefined
+    }
+
+    function getObjectKey(value: any) {
+        let _result
+
+        const inst = getInstance()
+
+        if (!inst) { return }
+
+        const dataVal = inst.data.value
+
+        const keys = Object.keys(dataVal)
+        let i = keys.length
+
+        while (i--) {
+            if (value === dataVal[keys[i]]) {
+                _result = keys[i]
+                break
+            }
+        }
+
+        return _result
+    }
+
+    function getValTypes(inst?: any) {
+        inst = inst || getInstance()
+        const value = Get(inst, 'data.value')
+
+        return inst ? {
+            value,
+            isArray: Array.isArray(value),
+            isString: typeof value === 'string'
+        } : {}
+    }
+
+    let result: ObserverInstance = {
+        get isComplete() {
+            const inst = getInstance()
+            if (!inst) { return true }
+
+            return inst.data.isComplete
+        },
+        get value() {
+            const inst = getInstance()
+            if (!inst) { return }
+            return inst.data.value
+        },
+        get previous() {
+            const inst = getInstance()
+            if (!inst) { return }
+            return inst.data.previousValue
+        },
+        get subscriptions() {
+            const inst = getInstance()
+            if (!inst) { return }
+            return inst.data.subscriptions
+        },
+        get lastUpdate() {
+            const inst = getInstance()
+            if (!inst) { return }
+            return inst.data.updated
+        },
+        get settings() {
+            return {
+                initialType,
+                formatter,
+                matchType,
+                nextOnNew,
+                noInit,
+                takeFirst,
+                takeLast,
+                takeBy
+            }
+        },
+
+        get removed() { return getRemoved() },
+
+        get added() { return getAdded() },
+
+        get changed() {
+            const inst = getInstance()
+            if (!inst) { return [] }
+            return Diff(inst.data.previousValue, inst.data.value)
+        },
+
+        next: function (v: any, force?: boolean) {
+            const inst = getInstance()
+            if (!inst) { return }
+
+            const formatted = formatValue(v, inst)
+
+            if (!force && nextOnNew && Equals(formatted, inst.data.value)) { return }
+
+            inst.data.value = formatted
+            inst.data.updated = new Date().getTime()
+
+            loop('next', inst.data.value, inst.data)
+
+            return inst.data
+        },
+
+        error: function (err: string) {
+            const inst = getInstance()
+            if (!inst) { return }
+
+            inst.data.errors = inst.data.errors.concat([err])
+            inst.data.updated = new Date().getTime()
+
+            loop('error', err, inst.data)
+
+            inst.complete()
+        },
+
+        complete: function () {
+            const inst = getInstance()
+            if (!inst) { return }
+            loop('complete', inst.data)
+        },
+
+        subscribe: function (next: (value: any, force?: boolean) => void, error = (_err: string) => { }, complete = emptyFn) {
+            const inst = getInstance()
+
+            if (!inst) { return () => { } }
+
+            const subscription: ObserverSubscription = Object.assign({}, {
+                next: next,
+                error: error,
+                complete: complete,
+                id: ID()
+            })
+
+            subscription.unsubscribe = unsubscribe(subscription)
+            inst.data.subscriptions[subscription.id] = subscription
+
+            if (!noInit && inst.data.value !== undefined && typeof subscription.next === 'function') {
+                subscription.next(inst.data.value)
+            }
+
+            onSubscribe(subscription)
+
+            return unsubscribe(subscription)
+        },
+
+        unsubscribe: function (subscription: ObserverSubscription) {
+            const inst = getInstance()
+
+            if (!inst || !subscription || !subscription.id || !inst.data.subscriptions[subscription.id]) { return }
+
+            return unsubscribe(subscription)
+        },
+
+        insert: function (element: any, index?: number) {
+            const inst = getInstance()
+
+            if (!inst) { return }
+
+            const valData = getValTypes(inst)
+            index = index == undefined ? Get(valData, 'value.length', 0) : index
+
+            if (valData.isArray) {
+                valData.value.splice(index, index !== valData.value.length ? 1 : 0, element)
+                return inst.next(valData.value, true)
+            }
+
+            if (typeof valData.value === 'string') {
+                valData.value = valData.value.slice(0, index) + element + valData.value.slice(index)
+                return inst.next(valData.value, true)
+            }
+
+            valData.value[index as number] = element
+
+            return inst.next(valData.value, true)
+        },
+
+        insertAll: function (elements: any[] | { [key: string]: any }, index?: number) {
+            const inst = getInstance()
+
+            if (!inst) { return }
+
+            const valData = getValTypes(inst)
+            index = index == undefined ? Get(valData, 'value.length', 0) : index
+
+            if (valData.isArray) {
+                if (!Array.isArray(elements)) { return }
+                valData.value.splice.apply(valData.value, [index, index !== valData.value.length ? 1 : 0, ...elements])
+                return inst.next(valData.value, true)
+            }
+
+            const elementsObject = elements as { [key: string]: any }
+
+            Object.keys(elementsObject).forEach(elementKey => inst.data.value[elementKey] = elementsObject[elementKey])
+
+            return inst.next(valData.value, true)
+        },
+
+        remove: function (element: any, index: any, all = false) {
+            const inst = getInstance()
+
+            if (!inst) { return }
+
+            const valData = getValTypes(inst)
+
+            if (index === undefined) {
+                index = getArrayIndexOf(element, valData.isArray as boolean)
+            }
+
+            if (index === undefined && valData.isArray) {
+                return valData.value
+            }
+
+            if (index === undefined && valData.isString) {
+                return inst.next(valData.value.replace(new RegExp(element, all ? 'gm' : ''), ''), true)
+            }
+
+            if (index !== undefined) {
+                if (valData.isArray) {
+                    valData.value.splice(index, 1)
+                } else if (valData.isString) {
+                    inst.data.value = valData.value.slice(0, index)
+                } else {
+                    inst.data.value[index] = undefined
+                    delete inst.data.value[index]
+                }
+
+                return inst.next(valData.value, true)
+            }
+
+            const objectKey = getObjectKey(element)
+
+            if (objectKey !== undefined) {
+                inst.data.value[objectKey] = null
+                delete inst.data.value[objectKey]
+                return inst.next(inst.data.value, true)
+            }
+
+            return inst.next(inst.data.value, true)
+        },
+
+        removeElements: function (elements: any[]) {
+            const inst = getInstance()
+
+            if (!inst) { return }
+
+            const valData = getValTypes(inst)
+
+            if (valData.isArray) {
+
+                for (let i = 0; i < elements.length; i = i + 1) {
+                    const index = valData.value.indexOf(elements[i])
+                    if (index > -1) {
+                        valData.value.splice(index, 1)
+                    }
+                }
+
+                return inst.next(valData.value, true)
+            }
+
+            Object.keys(elements).forEach(prop => delete valData.value[prop])
+
+            return inst.next(valData.value, true)
+        },
+
+        reverse: function () {
+            const inst = getInstance()
+
+            if (!inst) { return }
+
+            const valData = getValTypes(inst)
+
+            if (valData.isArray) {
+                return inst.next(valData.value.reverse(), true)
+            }
+
+            if (valData.isString) {
+                return inst.next(valData.value.split('').reverse(), true)
+            }
+
+            inst.next(valData.value, true)
+        },
+
+        has: function has(value: any) {
+            const valData = getValTypes()
+
+            if (valData.isArray) {
+                return getArrayIndexOf(value, valData.isArray) || false
+            }
+
+            if (valData.isString) {
+                return valData.value.indexOf(value) > -1
+            }
+
+            const objectKey = getObjectKey(value)
+
+            if (objectKey !== undefined) {
+                return true
+            }
+
+            return false
+        },
+
+        indexOf: function indexOf(value: any) {
+            const valData = getValTypes()
+
+            if (valData.isArray) {
+                return getArrayIndexOf(value, valData.isArray) || -1
+            }
+
+            if (valData.isString) {
+                return valData.value.indexOf(value)
+            }
+
+            return getObjectKey(value) || -1
+        },
+
+        on: function on(name: string, callback: Function) {
+            const inst = getInstance()
+
+            if (!inst) { return () => { } }
+
+            if (!inst.data.eventCallbacks[name]) {
+                observers.get(_this).data.eventCallbacks[name] = {}
+            }
+
+            const id = ID()
+            observers.get(_this).data.eventCallbacks[name][id] = callback
+
+            return () => delete observers.get(_this).data.eventCallbacks[name][id]
+        },
+
+        trigger: function trigger(name: string, data: any) {
+            const inst = getInstance()
+
+            if (!inst) { return }
+
+            const callbacks = inst.data.eventCallbacks[name]
+
+            if (!callbacks) { return }
+
+            Object.keys(callbacks).forEach(prop => callbacks[prop](data))
+        },
+
+        data: {
+            errors: [],
+            updated: new Date().getTime(),
+            subscriptions: {},
+            isComplete: false,
+            initialType,
+            initialValue,
+            eventCallbacks: {},
+            formatter,
+            matchType,
+            nextOnNew,
+            noInit,
+            noSubsComplete: options.noSubsComplete === true ? true : false,
+            takeFirst,
+            takeLast,
+            value: null,
+            previousValue: null
+        }
+    }
+
+    observers.set(_this, result)
+
+    Object.defineProperties(getInstance().data, {
         value: {
             get() {
                 return states[0]
@@ -158,348 +611,6 @@ export default function Observer(initialValue?: any, options: ObserverOptions = 
         }
     })
 
-    // const addedRemovedReducer = (source: any[]) => (target: any[], current: any) => {
-    //     if (source.indexOf(current) === -1) { target.push(current) }
-    //     return target
-    // }
 
-    // const bothArray = (source: any, target: any) => Array.isArray(source) && Array.isArray(target)
-
-    // const getAddedRemoved = (source: any[], target: any[]) => !bothArray(source, target) ? [] : source.reduce(addedRemovedReducer(target), [])
-
-    // const getRemoved = () => values ? getAddedRemoved(values.previousValue, values.value) : []
-
-    // const getAdded = () => values ? getAddedRemoved(values.value, values.previousValue) : []
-
-    function destroy() {
-        if (!result) { return }
-        // result.trigger('destroy', values)
-
-        Object.keys(values.subscriptions).forEach(k => Get(values, `subscriptions.${k}.unsubscribe`, emptyFn))
-
-        Object.defineProperties(result, {
-            value: { get: function () { return undefined } },
-            previous: { get: function () { return undefined } },
-            subscriptions: { get: function () { return undefined } },
-            next: { value: emptyFn },
-            error: { value: emptyFn },
-            complete: { value: emptyFn },
-            subscribe: { value: emptyFn },
-            unsubscribe: { value: emptyFn },
-            insert: { value: emptyFn },
-            insertAll: { value: emptyFn },
-            remove: { value: emptyFn },
-            removeElements: { value: emptyFn },
-            has: { value: emptyFn },
-            indexOf: { value: emptyFn },
-            reverse: { value: emptyFn },
-            on: { value: emptyFn },
-            trigger: { value: emptyFn },
-        })
-
-        values.eventCallbacks = {}
-        values.isComplete = true
-    }
-
-    const callFn = (
-        val: any,
-        valuesObj: ObserverValuesObject | undefined,
-        functionKey: string,
-        subscriptions: { [key: string]: ObserverSubscription }
-    ) =>
-        (id: string) => {
-            const fn = Get(subscriptions, `${id}.${functionKey}`)
-            typeof fn === 'function' ? fn(val, valuesObj || {}, id) : undefined
-        }
-
-    const doLoop = (functionKey: string, val: any, valuesObj?: ObserverValuesObject) => {
-        // if (result) { result.trigger(functionKey, valuesObj || {}) }
-        Object.keys(values.subscriptions).forEach(callFn(val, valuesObj, functionKey, values.subscriptions))
-        if (functionKey === 'complete') { destroy() }
-    }
-
-    const debouncedLoop = Debounce(doLoop, 1000, !!takeFirst)
-    const loop = !debounced ? doLoop : debouncedLoop
-
-    function unsubscribe(subscription: ObserverSubscription) {
-        return function unsubscribeInner() {
-            delete values.subscriptions[subscription.id]
-
-            // if (result) {
-            //     result.trigger('unsubscribe', { subscription, subscriptions: values.subscriptions })
-            // }
-
-            if (noSubsComplete && Object.keys(values.subscriptions).length === 0) {
-                destroy()
-            }
-        }
-    }
-
-    // function getArrayIndexOf(element: any, isArray: boolean) {
-    //     if (!isArray) { return }
-    //     const index = values.value.indexOf(element)
-    //     return index > -1 ? index : undefined
-    // }
-
-    // function getObjectKey(value: any) {
-    //     let _result
-
-    //     const keys = Object.keys(values.value)
-    //     let i = keys.length
-
-    //     while (i--) {
-    //         if (value === values.value[keys[i]]) {
-    //             _result = keys[i]
-    //             break
-    //         }
-    //     }
-
-    //     return _result
-    // }
-
-    let result: ObserverInstance = {
-        // get isComplete() { return values.isComplete },
-        get value() { return values.value },
-        get previous() { return values.previousValue },
-        get subscriptions() { return values.subscriptions },
-        // get lastUpdate() { return values.updated },
-        // get settings() {
-        //     return {
-        //         initialType,
-        //         formatter,
-        //         matchType,
-        //         nextOnNew,
-        //         noInit,
-        //         takeFirst,
-        //         takeLast
-        //     }
-        // },
-
-        // get removed() { return getRemoved() },
-
-        // get added() { return getAdded() },
-
-        // get changed() {
-        //     return Diff(values.previousValue, values.value)
-        // },
-
-        next: function (v: any, force?: boolean) {
-            const formatted = formatValue(v, result)
-
-            if (!force && nextOnNew && Equals(formatted, values.value)) { return }
-
-            values.value = formatted
-            values.updated = new Date().getTime()
-
-            loop('next', values.value, values)
-            return values
-        },
-
-        error: function (err: string) {
-            values.errors = values.errors.concat([err])
-            values.updated = new Date().getTime()
-
-            loop('error', err, values)
-
-            result.complete()
-        },
-
-        complete: function () { loop('complete', values) },
-
-        subscribe: function (next: (value: any, force?: boolean) => void, error = (_err: string) => { }, complete = emptyFn) {
-            const subscription: ObserverSubscription = Object.assign({}, {
-                next: next,
-                error: error,
-                complete: complete,
-                id: ID()
-            })
-
-            subscription.unsubscribe = unsubscribe(subscription)
-            values.subscriptions[subscription.id] = subscription
-
-            if (!noInit && values.value !== undefined && typeof subscription.next === 'function') {
-                subscription.next(values.value)
-            }
-
-            onSubscribe(subscription)
-
-            return unsubscribe(subscription)
-        },
-
-        // unsubscribe: function (subscription: ObserverSubscription) {
-        //     if (!subscription || !subscription.id || !values.subscriptions[subscription.id]) { return }
-
-        //     return unsubscribe(subscription)
-        // },
-
-        insert: function (element: any, index: number = values.value.length) {
-            if (Array.isArray(values.value)) {
-                (values.value as any[]).splice(index, index !== values.value.length ? 1 : 0, element)
-                return result.next(values.value, true)
-            }
-
-            if (typeof values.value === 'string') {
-                values.value = values.value.slice(0, index) + element + values.value.slice(index)
-                return result.next(values.value, true)
-            }
-
-            values.value[index] = element
-
-            return result.next(values.value, true)
-        },
-
-        // insertAll: function (elements: any[] | { [key: string]: any }, index: number = values.value.length) {
-        //     if (index === undefined) {
-        //         index = values.value.length
-        //     }
-
-        //     if (Array.isArray(values.value)) {
-        //         if (!Array.isArray(elements)) { return }
-        //         values.value.splice.apply(values.value, [index, index !== values.value.length ? 1 : 0, ...elements])
-        //         return result.next(values.value, true)
-        //     }
-
-        //     const elementsObject = elements as { [key: string]: any }
-
-        //     Object.keys(elementsObject).forEach(elementKey => values.value[elementKey] = elementsObject[elementKey])
-
-        //     return result.next(values.value, true)
-        // },
-
-        // remove: function (element: any, index: any, all = false) {
-        //     const isArray = Array.isArray(values.value)
-        //     const isString = typeof values.value === 'string'
-
-        //     if (index === undefined) {
-        //         index = getArrayIndexOf(element, isArray)
-        //     }
-
-        //     if (index === undefined && isArray) {
-        //         return values.value
-        //     }
-
-        //     if (index === undefined && isString) {
-        //         return result.next(values.value.replace(new RegExp(element, all ? 'gm' : ''), ''), true)
-        //     }
-
-        //     if (index !== undefined) {
-        //         if (isArray) {
-        //             values.value.splice(index, 1)
-        //         } else if (isString) {
-        //             values.value = values.value.slice(0, index)
-        //         } else {
-        //             values.value[index] = undefined
-        //             delete values.value[index]
-        //         }
-
-        //         return result.next(values.value, true)
-        //     }
-
-        //     const objectKey = getObjectKey(element)
-
-        //     if (objectKey !== undefined) {
-        //         values.value[objectKey] = null
-        //         delete values.value[objectKey]
-        //         return result.next(values.value, true)
-        //     }
-
-        //     return result.next(values.value, true)
-        // },
-
-        // removeElements: function (elements: any[]) {
-        //     if (Array.isArray(values.value)) {
-
-        //         for (let i = 0; i < elements.length; i = i + 1) {
-        //             const index = values.value.indexOf(elements[i])
-        //             if (index > -1) {
-        //                 values.value.splice(index, 1)
-        //             }
-        //         }
-
-        //         return result.next(values.value, true)
-        //     }
-
-        //     Object.keys(elements).forEach(prop => delete values.value[prop])
-
-        //     return result.next(values.value, true)
-        // },
-
-        // reverse: function () {
-        //     const isArray = Array.isArray(values.value)
-        //     const isString = typeof values.value === 'string'
-
-        //     if (isArray) {
-        //         return result.next(values.value.reverse(), true)
-        //     }
-
-        //     if (isString) {
-        //         return result.next(values.value.split('').reverse(), true)
-        //     }
-
-        //     result.next(values.value, true)
-        // },
-
-        // has: function (value: any) {
-        //     const isArray = Array.isArray(values.value)
-        //     const isString = typeof values.value === 'string'
-
-        //     if (isArray) {
-        //         return getArrayIndexOf(value, isArray) || false
-        //     }
-
-        //     if (isString) {
-        //         return values.value.indexOf(value) > -1
-        //     }
-
-        //     const objectKey = getObjectKey(value)
-
-        //     if (objectKey !== undefined) {
-        //         return true
-        //     }
-
-        //     return false
-        // },
-
-        // indexOf: function (value: any) {
-        //     const isArray = Array.isArray(values.value)
-        //     const isString = typeof values.value === 'string'
-
-        //     if (isArray) {
-        //         return getArrayIndexOf(value, isArray) || -1
-        //     }
-
-        //     if (isString) {
-        //         return values.value.indexOf(value)
-        //     }
-
-        //     return getObjectKey(value) || -1
-        // },
-
-        // on: function (name: string, callback: Function) {
-        //     if (!values.eventCallbacks[name]) {
-        //         values.eventCallbacks[name] = {}
-        //     }
-
-        //     const id = ID()
-        //     values.eventCallbacks[name][id] = callback
-
-        //     return () => delete values.eventCallbacks[name][id]
-        // },
-
-        // trigger: function (name: string, data: any) {
-        //     if (!values.eventCallbacks[name]) { return }
-        //     Object.keys(values.eventCallbacks[name]).forEach(prop => values.eventCallbacks[name][prop](data))
-        // },
-
-        // merge(observers: typeof result[]): ObserverInstance {
-        //     const observer = Observer(values.value, options)
-        //     const subscriptions: Function[] = []
-        //     const observerSubscribe = (_observer: ObserverInstance) => subscriptions.push(_observer.subscribe(_observer.next, _observer.error, _observer.complete))
-        //     observer.on('complete', () => subscriptions.forEach(unsubscribe => unsubscribe()))
-        //     observers.forEach(observerSubscribe)
-        //     return observer
-        // }
-    }
-
-    return result
+    return getInstance()
 }

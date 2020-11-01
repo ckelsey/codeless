@@ -9,8 +9,13 @@ import '../field-button'
 import '../field-checkbox'
 import '../field-select'
 import '../field-multiselect'
-import '../drop-down'
+import '../field-number'
+import '../field-radio'
+import '../field-time'
 import '../editor-function'
+import '../drop-down'
+import '../calendar-day'
+import '../calendar-month'
 
 
 const ServiceSettings: ComponentArguments = {
@@ -20,7 +25,7 @@ const ServiceSettings: ComponentArguments = {
         name: {
             selector: 'field-text[name="name"]',
             onChange: el => el.events = {
-                service: Services.subscribeToCurrent(service => el.value = service.name)
+                service: Services.subscribeToCurrent((service: any) => el.value = service.name)
             }
         },
         btnAddPublicMethod: {

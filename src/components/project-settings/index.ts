@@ -35,7 +35,7 @@ const ProjectSettings: ComponentArguments = {
             selector: 'field-text[name="project-name"]',
             onChange(el) {
                 el.events = {
-                    current: Projects.subscribeToCurrent(current => (el as any).value = Get(current, 'name'))
+                    current: Projects.subscribeToCurrent((current: any) => (el as any).value = Get(current, 'name'))
                 }
             }
         },
@@ -79,7 +79,7 @@ const ProjectSettings: ComponentArguments = {
         deleteMsg: {
             selector: '[slot-ref="body"]',
             onChange: (el) => el.events = {
-                project: Projects.subscribeToCurrent(current => el.textContent = `Are you want to delete ${current.name}?`)
+                project: Projects.subscribeToCurrent((current: any) => el.textContent = `Are you want to delete ${current.name}?`)
             }
 
         }

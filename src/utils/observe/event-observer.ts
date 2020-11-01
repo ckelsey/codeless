@@ -6,7 +6,11 @@ export interface EventObserverOptions extends ObserverOptions {
     stopPropagation?: boolean | ((e: Event) => any)
 }
 
-export default function EventObserver(element: Element | Window, eventName: string, options: EventObserverOptions = {}): ObserverInstance {
+export default function EventObserver(
+    element: Element | Window,
+    eventName: string,
+    options: EventObserverOptions = {}
+): ObserverInstance {
     if (!element || !eventName) { return nullObserver() }
 
     let isRunning = false
@@ -29,7 +33,7 @@ export default function EventObserver(element: Element | Window, eventName: stri
         element.addEventListener(eventName, eventHandler, options.useCapture)
     }
 
-    const observer = Observer(undefined, { onSubscribe, noSubsComplete: true })
+    const observer = Observer(undefined, Object.assign({}, options, { onSubscribe, noSubsComplete: true }))
 
     function eventHandler(event: Event) {
         if (!observer || !observer.subscriptions || Object.keys(observer.subscriptions).length === 0) { return shutDown() }

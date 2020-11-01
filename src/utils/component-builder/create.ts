@@ -5,7 +5,7 @@ import ID from '../id'
 import Equals from '../checks/equals'
 import RemoveElementEvents from './remove-element-events'
 import Get from '../objects/get'
-import Observer, { ObserverInstance } from '../observe/observer'
+import Observer from '../observe/observer'
 import ArrayFrom from '../conversion/array-from'
 import RemoveChildren from '../dom/remove-children'
 import DispatchEvent from '../dom/dispatch-event'
@@ -23,7 +23,8 @@ win.showGenesis = () => {
 interface mutaionObserverConfig {
     attributes: boolean
     attributeFilter?: string[]
-    childList?: boolean
+    childList?: boolean,
+    subtree?: boolean
 }
 
 function emptyFn() { }
@@ -37,7 +38,7 @@ function attributeMutation(mutation: MutationRecord) {
     target[attr] = target.getAttribute(mutation.attributeName)
 }
 
-function childMutation(host: any, slotSettings: SlotObjects | undefined) {
+function checkSlots(host: any, slotSettings: SlotObjects | undefined) {
     if (!host || !slotSettings) { return }
 
     ArrayFrom(host.children).forEach(el => {
@@ -55,22 +56,42 @@ function childMutation(host: any, slotSettings: SlotObjects | undefined) {
 
         // TODO: Needs to delay for a microsecond as components inside a slot get messed up. Need to find a better way
         target.appendChild(document.adoptNode(el))
+        // target.appendChild(el)
         DispatchEvent(host, 'slotchanged', { slot: slotKey, element: el })
+    })
+}
+
+function childMutation(host: any, settings: ComponentArguments) {
+    checkSlots(host, settings.slots)
+
+    const elements = settings.elements || {}
+
+    Object.keys(elements).forEach(key => {
+        if (!elements[key] || typeof elements[key].onChange !== 'function') { return }
+
+        const el = host.elements.__getElement(key)
+        console.log('el', el)
+
+        if (el && !Equals(el, host.elements.__elementCache[key])) {
+            host.elements[key] = el
+        }
     })
 }
 
 function componentObserverConfig(attributes: string[], slots?: SlotObjects | undefined) {
     const isArray = Array.isArray(attributes) && attributes.length
     const config: mutaionObserverConfig = {
-        attributes: isArray ? true : false
+        attributes: isArray ? true : false,
+        childList: true,
+        subtree: true
     }
 
-    if (config.attributes) {
-        config.attributeFilter = attributes
-    }
+    if (config.attributes || slots) {
+        config.attributeFilter = attributes || []
 
-    if (slots) {
-        config.childList = true
+        if (slots) {
+            config.attributeFilter.push('slot-ref')
+        }
     }
 
     return config
@@ -78,55 +99,36 @@ function componentObserverConfig(attributes: string[], slots?: SlotObjects | und
 
 function initHost(host: any) {
     host.constructed = true
-    host.componentId = ID()
-    host.state = {}
-    host.elements = {}
+    host.componentId = host.componentId || ID()
+    host.state = host.state || {}
+    host.elements = host.elements || {}
     return host
-}
-
-function removeElement(el: Element) {
-    const parent: Node = Get(el, 'parentNode', Get(el, 'host'))
-    if (!parent) { return }
-    parent.removeChild(el)
 }
 
 function ComponentCreateElements(
     host: any,
     elements: ComponentElements
 ) {
-    const elStates: { [key: string]: ObserverInstance } = {}
-    const state: { [key: string]: any | any[] } = {}
-
-    function getEl(key: string) {
-        const els = ArrayFrom(host.querySelectorAll(elements[key].selector))
-        state[key] = els.length > 1 ? els : els[0]
-        return state[key]
+    const state: { [key: string]: any | any[] } = {
+        __elementCache: [],
+        __getElement: function getEl(key: string) {
+            const els = ArrayFrom(host.querySelectorAll(elements[key].selector))
+            return els.length > 1 ? els : els[0]
+        }
     }
 
     for (let key in elements) {
         const elementObject = elements[key]
-        elStates[key] = Observer(getEl(key))
-        elementObject.onChange = elementObject.onChange || emptyFn
+
+        state.__elementCache[key] = state.__getElement(key)
 
         Object.defineProperty(state, key, {
             get: function () {
-                return elStates[key].value
+                return state.__getElement(key)
             },
             set: function (value) {
-                if (value !== elStates[key].value) {
-                    elStates[key].next(value)
-                }
+                WhenState(host).then(() => typeof elementObject.onChange !== 'function' ? undefined : elementObject.onChange(value, host))
             }
-        })
-
-        elStates[key].subscribe(() => {
-            RemoveElementEvents(elStates[key].previous)
-            removeElement(elStates[key].previous)
-
-            WhenState(host).then(() => {
-                elementObject.onChange ? elementObject.onChange(elStates[key].value, host) : undefined
-                win.genesis(`${host.tagName} element ${key} updated - ${host.componentId}`)
-            })
         })
     }
 
@@ -142,33 +144,37 @@ function setStateProperty(host: any, key: string, property: ComponentProperty) {
 
     const initialValue = prop.format(host.getAttribute(key) || (host as any)[key] || prop.initialValue, host)
 
-    host.state[key] = Observer(initialValue, {
-        initialValue,
-        nextOnNew: prop.nextOnNew === false ? false : true,
-        matchType: prop.matchType
-    })
+    if (!host.state[key]) {
+        host.state[key] = Observer(initialValue, {
+            initialValue,
+            nextOnNew: prop.nextOnNew === false ? false : true,
+            matchType: prop.matchType
+        })
+    }
 
-    Object.defineProperty(host, key, {
-        get() {
-            return host.state[key].value
-        },
-        set(value) {
-            if (!host.state[key]) { return }
+    if (!Object.getOwnPropertyDescriptor(host, key)) {
+        Object.defineProperty(host, key, {
+            get() {
+                return host.state[key].value
+            },
+            set(value) {
+                if (!host.state[key]) { return }
 
-            const formattedValue = prop.format(value, host)
+                const formattedValue = prop.format(value, host)
 
-            if (!Equals(host.state[key].value, formattedValue)) {
-                let doReflect = prop.reflect && formattedValue !== host.getAttribute(key) && formattedValue == value
-                host.state[key].next(formattedValue)
+                if (!Equals(host.state[key].value, formattedValue)) {
+                    let doReflect = prop.reflect && formattedValue !== host.getAttribute(key) && formattedValue == value
+                    host.state[key].next(formattedValue)
 
-                if (doReflect) {
-                    host.setAttribute(key, formattedValue)
+                    if (doReflect) {
+                        host.setAttribute(key, formattedValue)
+                    }
+
+                    win.genesis(`${host.tagName} property ${key} updated - ${host.componentId}`)
                 }
-
-                win.genesis(`${host.tagName} property ${key} updated - ${host.componentId}`)
             }
-        }
-    })
+        })
+    }
 
     if (typeof prop.onChange !== 'function') { return }
 
@@ -209,6 +215,8 @@ function ConnectedFn(element: any, params: ComponentArguments) {
         })
     }
 
+    requestAnimationFrame(() => element.setAttribute('ready', 'true'))
+
     win.genesis(`Connected ${element.tagName} - ${element.componentId}`)
 }
 
@@ -231,7 +239,9 @@ function cleanStart(host: any) {
 
 export default function CreateComponent(settings: ComponentArguments) {
     function _CreateComponent(host: any) {
+        // Do not re-init
         if (host.constructed) { return }
+
         win.genesis(`Creating ${settings.tag}`)
 
         // INIT
@@ -241,15 +251,20 @@ export default function CreateComponent(settings: ComponentArguments) {
         // DOM CONNECTION
         host.onConnected = () => ConnectedFn(host, settings)
         host.onDisconnected = function OnDisconnected() {
-            RemoveElementEvents(host)
+            // Gaurd against appendChild and adoptNode reassignments
+            requestAnimationFrame(() => {
+                if (host.parentNode) { return }
 
-            if (typeof settings.onDisconnected == 'function') {
-                settings.onDisconnected(host)
-            }
+                RemoveElementEvents(host)
 
-            if (host.state) {
-                Object.keys(host.state).forEach(k => host.state[k].complete())
-            }
+                if (typeof settings.onDisconnected == 'function') {
+                    settings.onDisconnected(host)
+                }
+
+                if (host.state) {
+                    Object.keys(host.state).forEach(k => host.state[k].complete())
+                }
+            })
 
             win.genesis(`Disconnected ${host.tagName} - ${host.componentId}`)
         }
@@ -282,21 +297,36 @@ export default function CreateComponent(settings: ComponentArguments) {
             }
 
             if (hasChildUpdates) {
-                childMutation(host, settings.slots)
+                childMutation(host, settings)
             }
         })
 
-        const props = Object.keys(settings.properties || {})
+        nodeObserver.observe(host, componentObserverConfig(['events'].concat(Object.keys(settings.properties || {})), settings.slots))
+        host.nodeObserver = nodeObserver
 
-        if (props.length || hasSlots) {
-            nodeObserver.observe(host, componentObserverConfig(props, settings.slots))
-            host.nodeObserver = nodeObserver
+        if (host.events !== undefined) {
+            host.state.__events = Observer({}, {
+                nextOnNew: true,
+                matchType: true
+            })
+
+            Object.defineProperty(host, 'events', {
+                get() {
+                    return host.state.__events.value
+                },
+                set(value) {
+                    Object.keys(host.state.__events.value).forEach((key: string) => {
+                        if (typeof host.state.__events.value[key] == 'function') { host.state.__events.value[key]() }
+                    })
+
+                    host.state.__events.next(value)
+                }
+            })
         }
 
-        host.events = host.events || {}
 
         if (hasSlots && existingChildren.length) {
-            childMutation(host, settings.slots)
+            checkSlots(host, settings.slots)
         }
 
         DispatchEvent(host, 'ready', host)

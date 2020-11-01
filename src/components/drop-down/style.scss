@@ -38,8 +38,12 @@ drop-down {
         .drop-down-label-container {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: flex-start;
             cursor: pointer;
+        }
+
+        .drop-down-label {
+            width: auto;
         }
 
         .drop-down-arrow {
@@ -93,6 +97,8 @@ drop-down {
                     left: 0;
                     top: 0;
                     background-color: theme-color("foreground");
+                    box-shadow: inset 0 0.1em transparentize(theme-color("foreground", "light"), 0.5),
+                        inset 0 0 2em transparentize(theme-color("background", "dark"), 0.5);
                     opacity: 0;
                     transition: opacity 0.2s;
                 }
@@ -102,6 +108,17 @@ drop-down {
                         opacity: 0.1;
                     }
                 }
+            }
+
+            &:before {
+                content: "";
+                position: absolute;
+                top: 0.5em;
+                left: 0.5em;
+                width: calc(100% - 1em);
+                height: calc(100% - 1em);
+                box-shadow: 0 0.125em 0.125em transparentize(theme-color("background", "dark"), 0.5),
+                    0 0.125em 1em -0.5em theme-color("background", "dark");
             }
         }
     }

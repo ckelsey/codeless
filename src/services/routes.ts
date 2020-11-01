@@ -18,7 +18,7 @@ const Routes: { [key: string]: RouteObject } = {
         path: 'pages',
         title: 'Pages',
         content: {
-            'left-section': [],
+            'left-section': [{ tag: 'pages-list' }],
             'right-section': []
         },
     },

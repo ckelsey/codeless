@@ -35,13 +35,13 @@ const ComponentSettings: ComponentArguments = {
         tagInput: {
             selector: 'field-text[name="tag"]',
             onChange: el => el.events = {
-                component: Components.subscribeToCurrent(component => el.value = component.tag)
+                component: Components.subscribeToCurrent((component: any) => el.value = component.tag)
             }
         },
         template: {
             selector: 'field-textarea[name="template"]',
             onChange: el => el.events = {
-                component: Components.subscribeToCurrent(component => el.value = component.template)
+                component: Components.subscribeToCurrent((component: any) => el.value = component.template)
             }
         }
     }

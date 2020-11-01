@@ -24,7 +24,7 @@ const list = Observer(
     }
 )
 
-list.subscribe(projects => Storage.projects = projects)
+list.subscribe((projects: any) => Storage.projects = projects)
 
 function findById(id: string) {
     const currentList = list.value
@@ -67,7 +67,7 @@ const current = Observer(
     }
 )
 
-current.subscribe(project => Storage.currentProject = project.id)
+current.subscribe((project: any) => Storage.currentProject = project.id)
 
 const Projects = {
     subscribeToList: list.subscribe,
@@ -108,8 +108,8 @@ const Projects = {
         if (!id || !findById(id)) { return Promise.reject('Invalid project') }
 
         return new Promise(resolve => {
-            // const index = findIndexById(id)
-            // list.remove(undefined, index)
+            const index = findIndexById(id)
+            list.remove(undefined, index)
 
             return resolve()
         })

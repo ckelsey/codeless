@@ -30,10 +30,7 @@ const FieldTextarea: ComponentArguments = {
     properties,
     methods: InputMethods(),
     slots: { icon: { target: '.icon-container' }, },
-    onConnected(host) {
-        host.setAttribute('resize', host.resize)
-        host.events = { slotChanged: InputIconEvent(host) }
-    }
+    onConnected(host) { host.events = { slotChanged: InputIconEvent(host) } }
 }
 
 CreateComponent(FieldTextarea)

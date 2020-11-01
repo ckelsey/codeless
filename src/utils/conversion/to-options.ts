@@ -26,6 +26,7 @@ export default function ToOptions(
             if (IsObject(currentValue)) {
                 const parsed: { [key: string]: string } = {}
                 Object.keys(currentValue).forEach((key: string) => Try(parsed[keyMap[key] || key] = currentValue[key].toString()))
+                return parsed
             }
         })
         .filter((currentObject) => !!currentObject)

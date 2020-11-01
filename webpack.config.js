@@ -7,7 +7,9 @@ const webpack = require('webpack')
 module.exports = {
     entry: './src/index',
     mode,
-    stats: "normal",
+    stats: {
+        children: false
+    },
     optimization: { minimize: mode === 'production' },
     output: {
         path: path.resolve(__dirname, 'dist'),

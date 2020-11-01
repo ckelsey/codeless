@@ -16,7 +16,11 @@ const properties = Object.assign(
     {
         type: {
             format: (type: any, host: ComponentElement) => Pipe(IndexOf(types), IfInvalid(Get(host, 'value', types[0])))(type),
-            // onChange: (type: any, host: ComponentElement) => (host.elements.input as HTMLElement).setAttribute('type', type)
+            onChange(type: string, host: ComponentElement) {
+                const input = host.elements.input
+                if (!input) { return }
+                input.setAttribute('type', type)
+            }
         }
     },
     AllInputProperties(),

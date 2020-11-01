@@ -7,15 +7,15 @@ export default function Type(value: any) {
     return value === null ?
         'null' :
         IsNonCollection(value) ?
-            typeof value :
+            IsDate(value) ?
+                'date' :
+                typeof value :
             IsDom(value) ?
                 'dom' :
                 Array.isArray(value) ?
                     'array' :
-                    IsDate(value) ?
-                        'date' :
-                        IsObject(value) ?
-                            'object' :
-                            typeof value
+                    IsObject(value) ?
+                        'object' :
+                        typeof value
 
 }

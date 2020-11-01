@@ -1,0 +1,24 @@
+@import "../../styles/vars.scss";
+
+calendar-month {
+    display: block;
+    font-size: inherit;
+
+    .calendar-month-root {
+        display: flex;
+        flex-direction: column;
+
+        .calendar-month-days {
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-start;
+            width: 70em;
+            flex-wrap: wrap;
+            opacity: 1;
+
+            &.calendar-month-days-updating {
+                opacity: 0;
+            }
+        }
+    }
+}

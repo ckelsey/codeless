@@ -1,5 +1,36 @@
+CALENDAR
+    - calendar-day
+    - calendar-week
+    - calendar-month
+    - calendar-year
+
 INPUTS
- - format
+    - field-date
+    - field-time
+    - field-datetime
+
+    - field-color - https://github.com/ckelsey/e1js-components/tree/master/src/colorpicker
+    - field-range
+    - field-wysiwyg
+
+- collapse-menu
+- content-transition
+- accordian
+- tabs
+- grid-layout
+- image-loader
+- progress-bar
+- spinner
+- snack-bar
+- carousel
+- icon
+- ajax-form
+- tool-tip
+- bread-crumbs
+
+
+ - format property
+ - focused state esp for checkbox
  - validation
     * valid url
     * valid email
@@ -20,11 +51,8 @@ BEHAVIOURS
 
 
 OPTIMIZATION
-- global weak set of all observers
-- observers as weak sets
-- check to make sure nodeObserver is getting disconnected
-- Slots: Needs to delay for a microsecond as components inside a slot get messed up. Need to find a better way
-
+- weakmaps of elements and properties
+- cache weakmaps
 
 
 

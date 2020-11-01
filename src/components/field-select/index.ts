@@ -14,6 +14,7 @@ import RemoveChildren from '../../utils/dom/remove-children'
 import Create from '../../utils/dom/create'
 import Get from '../../utils/objects/get'
 import Set from '../../utils/objects/set'
+import SetInputValue from '../../utils/dom/set-input-value'
 
 const elements = Object.assign(
     {},
@@ -21,20 +22,22 @@ const elements = Object.assign(
     {
         select: {
             selector: 'select',
-            onChange(el: ComponentElement, host: ComponentElement) {
-                el.events = {
-                    options: host.state.options.subscribe((options: OptionsObject[]) => {
-                        RemoveChildren(el)
-                        options.forEach(properties => {
-                            const option = Create({ tag: 'option', properties })
-                            if (option) { el.appendChild(option) }
-                        })
+            onChange(el: ComponentElement, host: any) {
+                el.events = el.events || {}
+                el.events.selectOptions = host.state.options.subscribe((options: OptionsObject[]) => {
+                    RemoveChildren(el)
+                    options.forEach(properties => {
+                        const option = Create({ tag: 'option', properties })
+                        if (option) { el.appendChild(option) }
                     })
-                }
+
+                    SetInputValue(el, host.value)
+                })
             }
         }
     }
 )
+
 const properties = Object.assign(
     {},
     AllInputProperties(),

@@ -7,6 +7,12 @@ export default function Equals(value1: any, value2: any) {
     if (Type(value2) !== type) { return false }
 
     if (IsNonCollection(value1)) {
+        if (type === 'date') {
+            let d = value1 === value2
+            d = new Date(value1).getTime() === new Date(value2).getTime()
+            return d
+        }
+
         return value2 === value1
     }
 
@@ -24,12 +30,6 @@ export default function Equals(value1: any, value2: any) {
 
     if (type === 'object' && value1.constructor !== value2.constructor) {
         return false
-    }
-
-    if (type === 'date') {
-        let d = value1 === value2
-        d = new Date(value1).getTime() === new Date(value2).getTime()
-        return d
     }
 
     if (type === 'dom') {

@@ -1,0 +1,143 @@
+@import "../../styles/vars";
+@import "../../styles/vars-input";
+
+field-radio {
+    @include fieldBase;
+    color: inherit;
+
+    @include helptext;
+    @include icon;
+
+    &[hasicon="true"] {
+        .field-radio-container {
+            .field-radio-option-container {
+                input ~ label.field-radio-option-label {
+                    padding: 0;
+                }
+            }
+        }
+    }
+
+    .field-radio-container {
+        @include fieldContainer;
+        color: inherit;
+        margin-top: 1em;
+        margin-bottom: 1em;
+
+        .field-radio-main-label-container {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            color: inherit;
+
+            .icon-container {
+                position: relative;
+                left: 0;
+                top: 0;
+                color: inherit;
+
+                svg,
+                svg * {
+                    fill: currentColor;
+                }
+            }
+
+            label {
+                padding: 0;
+            }
+        }
+
+        .field-radio-inputs {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .field-radio-option-container {
+            display: inline-flex;
+            align-items: center;
+            margin: 0.5em 0;
+            position: relative;
+            width: auto;
+
+            input {
+                @include field;
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                opacity: 0;
+                cursor: pointer;
+
+                & ~ label {
+                    cursor: pointer;
+
+                    &:before,
+                    &:after {
+                        line-height: 0%;
+                        border-radius: 50%;
+                        content: "";
+                        position: relative;
+                        pointer-events: none;
+                        width: 1.5em;
+                        height: 1.5em;
+                        top: 0;
+                        left: 0;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        margin: 0 0.5em 0 0;
+                        text-align: center;
+                        font-weight: bold;
+                        transform-origin: center;
+                        pointer-events: none;
+                    }
+
+                    &:before {
+                        background-color: transparentize(theme-color("foreground"), 0.5);
+                        box-shadow: 0 0 0 100px transparentize(theme-color("foreground", "light"), 0.5) inset;
+                        transition: background-color 0.1s, box-shadow 0.15s;
+                    }
+
+                    &:after {
+                        position: absolute;
+                        transform: scale(0, 1);
+                        font-size: 1.25em;
+                        line-height: 0;
+                        left: 0.15em;
+                        top: 0.06em;
+                        width: 1.25em;
+                        height: 1.25em;
+                        margin: 0;
+                        opacity: 0;
+                        content: "\00ac";
+                        color: theme-color("accent-offset");
+                        transform: rotate(133deg) scale(1, 0);
+                        transition: transform 0.1s linear, opacity 0.2s;
+                    }
+                }
+
+                &:checked {
+                    & ~ label {
+                        &:before {
+                            @include checkedBox;
+                        }
+
+                        &:after {
+                            transform: rotate(133deg) scale(1);
+                            opacity: 1;
+                        }
+                    }
+                }
+            }
+        }
+
+        label.field-radio-option-label {
+            @include label;
+            position: relative;
+            opacity: 1;
+            padding: 0;
+            pointer-events: all;
+            transform: none;
+            color: inherit;
+        }
+    }
+}

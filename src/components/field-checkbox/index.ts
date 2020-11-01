@@ -4,11 +4,21 @@ import { AllInputProperties } from '../../utils/component-builder/input-properti
 import InputElements from '../../utils/component-builder/input-elements'
 import InputMethods from '../../utils/component-builder/input-methods'
 import './style.scss'
+import Pipe from '../../utils/function-helpers/pipe'
+import ToBool from '../../utils/conversion/to-bool'
+import IfInvalid from '../../utils/checks/if-invalid'
 
 const methods = InputMethods()
 const elements = InputElements()
 const properties = Object.assign(
-    AllInputProperties()
+    {},
+    AllInputProperties(),
+    {
+        mixed: {
+            format: Pipe(ToBool, IfInvalid(false)),
+            reflect: true
+        }
+    }
 )
 
 const FieldCheckbox: ComponentArguments = {

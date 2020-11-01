@@ -6,10 +6,11 @@ export interface CreateOptions {
     evaluatedProperties?: { [key: string]: Function }
     attributes?: { [key: string]: string }
     events?: { [key: string]: (event: Event) => void }
-    subscriptions?: { [key: string]: Function }
+    subscriptions?: { [key: string]: Function },
+    children?: HTMLElement[]
 }
 
-export default function Create({ tag = '', properties = {}, evaluatedProperties = {}, attributes = {}, subscriptions = {} }: CreateOptions) {
+export default function Create({ tag = '', properties = {}, evaluatedProperties = {}, attributes = {}, subscriptions = {}, children = [] }: CreateOptions) {
     if (!tag) { return }
 
     const el = document.createElement(tag)
@@ -20,6 +21,8 @@ export default function Create({ tag = '', properties = {}, evaluatedProperties 
     Object.keys(evaluatedProperties).forEach(key => Set(el, key, evaluatedProperties[key]()))
     Object.keys(attributes).forEach(key => el.setAttribute(key, attributes[key]))
     Object.keys(subscriptions).forEach(key => Set(el, `subscriptions.${key}`, subscriptions[key](el)))
+
+    children.forEach(child => el.appendChild(child))
 
     return el
 }

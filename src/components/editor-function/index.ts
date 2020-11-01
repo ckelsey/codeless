@@ -49,9 +49,9 @@ const EditorFunction: ComponentArguments = {
         ast: {
             /** Check for type: "FunctionDeclaration" */
             format: Pipe(ToObject, IfInvalid({})),
-            onChange(ast) {
-                console.log(ast)
-            }
+            // onChange(ast) {
+            //     // console.log(ast)
+            // }
         }
     },
     elements: {

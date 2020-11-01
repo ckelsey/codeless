@@ -40,7 +40,7 @@ const ServicesList: ComponentArguments = {
                         })
                     }),
 
-                    current: Services.subscribeToCurrent(current =>
+                    current: Services.subscribeToCurrent((current: any) =>
                         ArrayFrom(el.querySelectorAll(`.${linkClassname}`)).forEach(el =>
                             el.classList[el.getAttribute('service-id') === current.id ? 'add' : 'remove']('active-bg')
                         )

@@ -4,9 +4,7 @@ import ArrayFrom from '../conversion/array-from'
 import { ComponentArguments } from './component'
 import DOMReady from '../dom/ready'
 
-// const components: { [key: string]: { settings: ComponentArguments, create: (host: any) => any } } = {}
 const components = new WeakMap()
-// const componentKeys: { [key: string]: { tag: string } } = {}
 const componentKeys = new Map()
 let initialized = false
 
@@ -80,31 +78,6 @@ const ComponentObjects = {
 
                 ArrayFrom(document.body.querySelectorAll(settings.tag)).forEach(() => components.get(componentKeys.get(settings.tag)).create)
             })
-
-    // if (!initialized) {
-
-    //     ComponentObjects.init()
-    // }
-
-    // components[settings.tag] = {
-    //     settings,
-    //     create: (node: any) => componentFunction(node) ? node.onConnected(node) : undefined
-    // }
-
-    // DOMReady().then(() =>
-    //     ArrayFrom(document.body.querySelectorAll(settings.tag))
-    //         // .forEach(components[settings.tag].create)
-    // )
-
-    // ,
-
-    // init: () => DOMReady().then(() =>
-    //     new MutationObserver(mutations => ArrayFrom(mutations).forEach(handleChildMutation))
-    //         .observe(document.body, {
-    //             childList: true,
-    //             subtree: true
-    //         })
-    // )
 }
 
 export default ComponentObjects

@@ -13,6 +13,7 @@ import '../components/project-settings'
 import '../components/component-settings'
 import '../components/service-settings'
 import '../components/services-list'
+import '../components/pages-list'
 
 function routeContent(route: RouteObject) {
     if (!route) { return }

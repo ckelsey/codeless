@@ -42,7 +42,7 @@ const ProjectsList: ComponentArguments = {
                         })
                     }),
 
-                    current: Projects.subscribeToCurrent(current =>
+                    current: Projects.subscribeToCurrent((current: any) =>
                         ArrayFrom(el.querySelectorAll(`.${linkClassname}`)).forEach(el =>
                             el.classList[el.getAttribute('project-id') === current.id ? 'add' : 'remove']('active-bg')
                         )

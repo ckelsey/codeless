@@ -14,7 +14,7 @@ export default function ToArray(value: any) {
         return SetValid(value, true)
     }
 
-    const json = Pipe(ToPlainText, FromJSON)
+    const json = Pipe(ToPlainText, FromJSON)(value)
 
     if (Array.isArray(json)) {
         return SetValid(json, true)

@@ -1,0 +1,20 @@
+@import "../../styles/vars-input";
+
+field-number {
+    @include fieldBase;
+
+    .field-number-container {
+        @include fieldContainer;
+
+        input {
+            @include field;
+        }
+
+        label {
+            @include label;
+        }
+    }
+
+    @include helptext;
+    @include icon;
+}
