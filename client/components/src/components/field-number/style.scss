@@ -1,0 +1,22 @@
+@import "../../global-styles/fields.scss";
+
+:host {
+    @include fieldBase;
+
+    .field-number-container {
+        @include fieldContainer;
+
+        input {
+            @include field;
+        }
+
+        label {
+            @include label;
+        }
+    }
+
+    .field-element-container {
+        @include helptext;
+        @include icon;
+    }
+}

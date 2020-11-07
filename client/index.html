@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0" />
+        <title>Stencil Component Starter</title>
+
+
+        <!-- <script type="module" src="/dist/components/components.esm.js"></script> -->
+        <script type="module" src="/dist/components/components.esm.js"></script>
+
+        <style>
+            html {
+                background-color: #232323;
+                font-family: Arial, Helvetica, sans-serif;
+                font-size: 16px;
+            }
+
+            .hide-until-ready {
+                opacity: 0;
+            }
+
+            .hide-until-ready[ready="true"] {
+                opacity: 1;
+            }
+
+            field-button,
+            field-text {
+                opacity: 0;
+                transition: opacity 0.2s ease-in-out 0.2s;
+            }
+
+            field-button.hydrated,
+            field-text.hydrated {
+                opacity: 1;
+            }
+        </style>
+    </head>
+
+    <body>
+        <field-button>A field button</field-button>
+        <field-text label="Text field"></field-text>
+        <field-text label="Another text field" value="hola"></field-text>
+    </body>
+
+</html>

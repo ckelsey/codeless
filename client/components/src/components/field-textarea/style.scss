@@ -1,0 +1,46 @@
+@import "../../global-styles/fields.scss";
+
+:host {
+    @include fieldBase;
+    vertical-align: top;
+
+    .field-textarea-container {
+        @include fieldContainer;
+
+        textarea {
+            @include field;
+            resize: none;
+            height: $inputHeight;
+        }
+
+        label {
+            @include label;
+        }
+
+        &[resize="auto"] textarea,
+        &[resize="none"] textarea {
+            resize: none;
+        }
+
+        &[resize="horizontal"] textarea {
+            resize: horizontal;
+        }
+
+        &[resize="vertical"] textarea {
+            resize: vertical;
+        }
+
+        &[resize="both"] textarea {
+            resize: both;
+        }
+
+        &.w-100 {
+            width: 100%;
+        }
+    }
+
+    .field-element-container {
+        @include helptext;
+        @include icon;
+    }
+}

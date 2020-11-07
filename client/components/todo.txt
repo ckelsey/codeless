@@ -1,0 +1,10 @@
+https://www.hjorthhansen.dev/shadow-dom-form-participation/
+
+- time
+    - error
+    - help
+    - auto move to next input
+    - really needs cleanup
+
+- textarea 
+    - auto resize on input

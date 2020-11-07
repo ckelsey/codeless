@@ -1,0 +1,102 @@
+@import "../../global-styles/vars";
+@import "../../global-styles/animations";
+
+:host {
+    display: inline-flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    color: theme-color("foreground");
+
+    * {
+        box-sizing: border-box;
+    }
+
+    .drop-down-container {
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        animation: delayOverflowIn 1s;
+
+        &:active,
+        &:focus,
+        &:hover {
+            outline: none;
+            box-shadow: none;
+
+            .drop-down-items {
+                pointer-events: all;
+                user-select: unset;
+                opacity: 1;
+                transform: scale(1, 1);
+            }
+        }
+
+        &[align="right"] {
+            align-items: flex-end;
+
+            .drop-down-items {
+                align-items: flex-end;
+                text-align: right;
+            }
+        }
+
+        .drop-down-label-container {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            cursor: pointer;
+        }
+
+        .drop-down-label {
+            width: auto;
+        }
+
+        .drop-down-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            &:after {
+                content: "";
+                border: 0.4em solid transparent;
+                border-top-color: currentColor;
+                position: relative;
+                top: 0.135em;
+                width: 0;
+                height: 0;
+                margin-left: 0.25em;
+            }
+        }
+
+        .drop-down-items {
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            top: 1.5em;
+            width: auto;
+            min-width: 100%;
+            padding: 0.5em;
+            margin: -0.5em;
+            pointer-events: none;
+            user-select: none;
+            opacity: 0;
+            z-index: 99999;
+            transform: scale(1, 0);
+            transform-origin: 0 0;
+            color: theme-color("foreground");
+            transition: opacity 0.3s, transform 0.2s ease-in-out 0.1s;
+
+            &:before {
+                content: "";
+                position: absolute;
+                top: 0.5em;
+                left: 0.5em;
+                width: calc(100% - 1em);
+                height: calc(100% - 1em);
+                background-color: theme-color("background", "light");
+                box-shadow: 0 0.125em 0.125em transparentize(theme-color("background", "dark"), 0.5),
+                    0 0.125em 1em -0.5em theme-color("background", "dark");
+            }
+        }
+    }
+}

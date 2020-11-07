@@ -1,0 +1,179 @@
+@import "../../global-styles/fields.scss";
+
+:host {
+    @include fieldBase;
+
+    .field-time-container {
+        @include fieldContainer;
+        min-height: $inputHeight;
+
+        label {
+            @include label;
+        }
+
+        &[label-up="true"] {
+            label {
+                transform: translateX(0em) translateY(0.125em) translateZ(0) scale(0.7);
+            }
+
+            .field-time-inputs {
+                .field-time-input-container {
+                    opacity: 1;
+                }
+            }
+        }
+
+        &[labelalign="top"] {
+            .field-time-inputs {
+                label {
+                    position: absolute;
+                    top: -1.5em;
+                    left: 0;
+                    margin: 0;
+                    padding: 0;
+                    order: 0;
+                }
+
+                .field-time-input-container {
+                    input {
+                        padding: 0.25em 0 0 0.38em;
+                    }
+
+                    &.field-time-minute-container,
+                    &.field-time-second-container {
+                        &:after {
+                            padding-top: 0.85em;
+                        }
+                    }
+                }
+            }
+
+            input.field-time-hidden-input {
+                padding: 0;
+            }
+        }
+
+        .field-time-inputs {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            background-color: theme-color("foreground");
+            position: relative;
+
+            input {
+                @include field;
+                width: 100%;
+                max-width: 2em;
+                padding-left: 0;
+                padding-right: 0;
+                background-color: transparent;
+                box-shadow: 0 0 0 transparent;
+                text-align: center;
+                height: $inputHeight;
+
+                @mixin inputsPlaceholder {
+                    color: theme-color("background");
+                    opacity: 0.25;
+                    font-size: 80%;
+                    text-align: center;
+                    position: relative;
+                    top: -0.05em;
+                }
+
+                &::-webkit-input-placeholder {
+                    @include inputsPlaceholder;
+                }
+
+                &:-webkit-input-placeholder {
+                    @include inputsPlaceholder;
+                }
+
+                &:-ms-input-placeholder {
+                    @include inputsPlaceholder;
+                }
+
+                &::placeholder {
+                    @include inputsPlaceholder;
+                }
+            }
+
+            .field-time-input-container {
+                max-width: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+                opacity: 0;
+                transition: opacity 0.2s;
+
+                &.hide-input {
+                    display: none;
+                }
+
+                &.field-time-hour-container {
+                    input {
+                        padding-left: 0.38em;
+                    }
+                }
+
+                &.field-time-minute-container,
+                &.field-time-second-container {
+                    &:after {
+                        content: ":";
+                        color: theme-color("background");
+                        opacity: 0.5;
+                        padding-top: 1.4em;
+                        font-size: 80%;
+                        font-weight: bold;
+                        display: block;
+                        position: absolute;
+                        top: 0;
+                        left: -0.1em;
+                        pointer-events: none;
+                    }
+
+                    input {
+                        margin-left: 0.125em;
+                    }
+                }
+            }
+
+            .icon-container {
+                position: absolute;
+            }
+        }
+
+        &[hasicon="true"] {
+            .icon-container {
+                position: relative;
+                top: 0.125em;
+                margin-right: 0.5em;
+            }
+
+            .field-time-inputs {
+                .field-time-input-container.field-time-hour-container {
+                    input {
+                        padding-left: 0em;
+                    }
+                }
+
+                label {
+                    padding-left: 3.5em;
+                }
+            }
+        }
+    }
+
+    .field-time-hidden-input {
+        position: absolute;
+        opacity: 0;
+        z-index: -1;
+        width: 0;
+        height: 0;
+        margin: 0;
+        padding: 0;
+    }
+
+    @include helptext;
+    @include icon;
+}

@@ -1,0 +1,170 @@
+@import "../../global-styles/fields.scss";
+
+:host {
+    display: inline-block;
+    vertical-align: text-bottom;
+    white-space: nowrap;
+
+    .field-button-container {
+        display: inline-block;
+        @include inputMargins;
+
+        button {
+            border-radius: $inputRadius;
+            font-size: inherit;
+            font-weight: bold;
+            line-height: normal;
+            opacity: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            padding: 0.832em;
+            color: theme-color("accent-offset");
+            background-color: theme-color("accent");
+            min-width: 5em;
+            border: none;
+            outline: none !important;
+            max-height: 2.725em;
+            transition: color 0.2s, background-color 0.2s;
+
+            &:hover {
+                color: theme-color("accent-offset", "light");
+                background-color: theme-color("accent", "light");
+            }
+
+            &:before {
+                content: "";
+                margin-right: 0em;
+                width: 0em;
+                height: 0em;
+                border: 0px solid currentColor;
+                border-top-color: transparent;
+                border-radius: 50%;
+                opacity: 0;
+                transition: width 0.2s, height 0.2s, border-width 0.4s, margin-right 0.2s, opacity 0.3s;
+            }
+
+            &[disabled] {
+                cursor: not-allowed;
+                user-select: none;
+                pointer-events: none;
+                opacity: 0.5;
+            }
+
+            &[data-kind="link"] {
+                color: theme-color("accent");
+                background-color: transparent;
+                font-weight: normal;
+
+                &:hover {
+                    color: theme-color("accent", "light");
+                    background-color: transparent;
+                }
+            }
+
+            &[data-theme="danger"] {
+                color: theme-color("danger-offset");
+                background-color: theme-color("danger");
+
+                &:hover {
+                    color: theme-color("danger-offset", "light");
+                    background-color: theme-color("danger", "light");
+                }
+
+                &[data-kind="link"] {
+                    color: theme-color("danger");
+                    background-color: transparent;
+
+                    &:hover {
+                        color: theme-color("danger", "light");
+                        background-color: transparent;
+                    }
+                }
+            }
+
+            &[data-theme="warning"] {
+                color: theme-color("warning-offset");
+                background-color: theme-color("warning");
+
+                &:hover {
+                    color: theme-color("warning-offset", "light");
+                    background-color: theme-color("warning", "light");
+                }
+
+                &[data-kind="link"] {
+                    color: theme-color("warning");
+                    background-color: transparent;
+
+                    &:hover {
+                        color: theme-color("warning", "light");
+                        background-color: transparent;
+                    }
+                }
+            }
+
+            &[data-theme="secondary"] {
+                color: theme-color("background");
+                background-color: theme-color("foreground");
+
+                &:hover {
+                    color: theme-color("background", "light");
+                    background-color: theme-color("foreground", "light");
+                }
+
+                &[data-kind="link"] {
+                    color: theme-color("foreground");
+                    background-color: transparent;
+
+                    &:hover {
+                        color: theme-color("foreground", "light");
+                        background-color: transparent;
+                    }
+                }
+            }
+
+            &[data-size="small"] {
+                font-size: 80%;
+                padding: 0.125em 0.5em;
+                min-width: unset;
+            }
+
+            &[data-size="big"] {
+                font-size: 120%;
+            }
+
+            &[data-spinner="true"] {
+                pointer-events: none;
+
+                &:before {
+                    animation: rotating 1.38s linear infinite;
+                    height: 0.62em;
+                    width: 0.62em;
+                    margin-right: 0.38em;
+                    border-width: 2px;
+                    opacity: 0.75;
+                }
+                & > * {
+                    opacity: 0.5;
+                }
+            }
+
+            .icon-container {
+                position: relative;
+                color: transparentize(theme-color("background"), 0.25);
+                width: 1.5em;
+                height: 1.5em;
+                display: none;
+                align-items: center;
+                justify-content: center;
+                margin-right: 0.5em;
+                margin-top: -0.5em;
+                margin-bottom: -0.5em;
+            }
+        }
+    }
+
+    .field-button-container[hasicon="true"] button .icon-container {
+        display: flex;
+    }
+}

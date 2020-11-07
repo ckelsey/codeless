@@ -1,0 +1,22 @@
+{
+  "name": "codeless",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ckelsey/codeless.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ckelsey/codeless/issues"
+  },
+  "homepage": "https://github.com/ckelsey/codeless#readme",
+  "devDependencies": {
+    "stencil": "0.0.5"
+  }
+}
