@@ -1,0 +1,98 @@
+@import "../../global-styles/vars.scss";
+
+:host {
+    display: inline-block;
+    font-size: inherit;
+    width: 10em;
+    height: 10em;
+    max-width: 10em;
+    max-height: 10em;
+    min-width: 10em;
+    min-height: 10em;
+    box-sizing: border-box;
+
+    .calendar-day-root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        padding: 1em 1.5em;
+        overflow: auto;
+        transition: color;
+        color: inherit;
+        box-sizing: border-box;
+
+        * {
+            box-sizing: border-box;
+        }
+
+        &:before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: theme-color("foreground", "dark");
+            box-shadow: inset 1px 1px 0px theme-color("foreground", "light"),
+                inset -1px -1px 0px transparentize(theme-color("background", "light"), 0.38);
+            opacity: 0.1;
+            transition: background-color 0.62s, opacity 0.62s, box-shadow 0.62s;
+        }
+
+        .calendar-day-number-container {
+            position: relative;
+            font-size: 200%;
+        }
+
+        .calendar-day-number {
+            position: relative;
+            width: 2em;
+            height: 2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: 600;
+            margin: -0.125em 0em 0.25em -0.375em;
+            transition: color 0.38s, background-color 0.38s;
+        }
+
+        .calendar-day-content {
+            opacity: 0.62;
+            position: relative;
+            font-size: 62%;
+            line-height: 150%;
+        }
+
+        &.calendar-day-active {
+            color: theme-color("accent-offset");
+
+            &:before {
+                background: theme-color("accent");
+                opacity: 1;
+                box-shadow: inset 1px 1px 0px theme-color("accent", "light"),
+                    inset -1px -1px 0px theme-color("accent", "dark");
+            }
+        }
+
+        &.calendar-day-disabled {
+            opacity: 0.38;
+            cursor: text;
+        }
+
+        &.calendar-day-clickable:not(.calendar-day-disabled) {
+            cursor: pointer;
+
+            &:hover:not(.calendar-day-active) {
+                color: theme-color("accent-offset");
+
+                &:before {
+                    background: theme-color("accent");
+                    opacity: 0.5;
+                    box-shadow: inset 1px 1px 0px theme-color("accent", "light"),
+                        inset -1px -1px 0px theme-color("accent", "dark");
+                }
+            }
+        }
+    }
+}

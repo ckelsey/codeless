@@ -22,12 +22,18 @@
         align-items: center;
         min-height: 1.62em;
         align-items: flex-start;
+        background: transparent;
+        flex-direction: column;
+
+        &[focused="true"] {
+            background-color: transparent;
+        }
 
         &.required .field-radio-main-label-container label:before {
             @include errorText;
         }
 
-        @include icon;
+        @include iconSlot;
 
         .icon-container {
             position: relative;
@@ -71,16 +77,6 @@
             margin-left: $space1;
             font-style: italic;
             text-transform: none;
-        }
-
-        .field-radio-hidden-input {
-            position: absolute;
-            opacity: 0;
-            z-index: -1;
-            width: 0;
-            height: 0;
-            margin: 0;
-            padding: 0;
         }
 
         .field-radio-option-container {
@@ -128,5 +124,7 @@
                 }
             }
         }
+
+        @include formControl;
     }
 }

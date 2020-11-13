@@ -28,6 +28,11 @@
             max-height: 2.725em;
             transition: color 0.2s, background-color 0.2s;
 
+            .icon-container {
+                color: theme-color("accent-offset");
+                transition: color 0.2s;
+            }
+
             &:hover {
                 color: theme-color("accent-offset", "light");
                 background-color: theme-color("accent", "light");
@@ -57,9 +62,17 @@
                 background-color: transparent;
                 font-weight: normal;
 
+                .icon-container {
+                    color: theme-color("accent");
+                }
+
                 &:hover {
                     color: theme-color("accent", "light");
                     background-color: transparent;
+
+                    .icon-container {
+                        color: theme-color("accent", "light");
+                    }
                 }
             }
 
@@ -67,18 +80,34 @@
                 color: theme-color("danger-offset");
                 background-color: theme-color("danger");
 
+                .icon-container {
+                    color: theme-color("danger-offset");
+                }
+
                 &:hover {
                     color: theme-color("danger-offset", "light");
                     background-color: theme-color("danger", "light");
+
+                    .icon-container {
+                        color: theme-color("danger-offset", "light");
+                    }
                 }
 
                 &[data-kind="link"] {
                     color: theme-color("danger");
                     background-color: transparent;
 
+                    .icon-container {
+                        color: theme-color("danger");
+                    }
+
                     &:hover {
                         color: theme-color("danger", "light");
                         background-color: transparent;
+
+                        .icon-container {
+                            color: theme-color("danger", "light");
+                        }
                     }
                 }
             }
@@ -87,18 +116,34 @@
                 color: theme-color("warning-offset");
                 background-color: theme-color("warning");
 
+                .icon-container {
+                    color: theme-color("warning-offset");
+                }
+
                 &:hover {
                     color: theme-color("warning-offset", "light");
                     background-color: theme-color("warning", "light");
+
+                    .icon-container {
+                        color: theme-color("warning-offset", "light");
+                    }
                 }
 
                 &[data-kind="link"] {
                     color: theme-color("warning");
                     background-color: transparent;
 
+                    .icon-container {
+                        color: theme-color("warning");
+                    }
+
                     &:hover {
                         color: theme-color("warning", "light");
                         background-color: transparent;
+
+                        .icon-container {
+                            color: theme-color("warning", "light");
+                        }
                     }
                 }
             }
@@ -107,18 +152,34 @@
                 color: theme-color("background");
                 background-color: theme-color("foreground");
 
+                .icon-container {
+                    color: theme-color("background");
+                }
+
                 &:hover {
                     color: theme-color("background", "light");
                     background-color: theme-color("foreground", "light");
+
+                    .icon-container {
+                        color: theme-color("background", "light");
+                    }
                 }
 
                 &[data-kind="link"] {
                     color: theme-color("foreground");
                     background-color: transparent;
 
+                    .icon-container {
+                        color: theme-color("foreground");
+                    }
+
                     &:hover {
                         color: theme-color("foreground", "light");
                         background-color: transparent;
+
+                        .icon-container {
+                            color: theme-color("foreground", "light");
+                        }
                     }
                 }
             }
@@ -148,23 +209,13 @@
                     opacity: 0.5;
                 }
             }
-
-            .icon-container {
-                position: relative;
-                color: transparentize(theme-color("background"), 0.25);
-                width: 1.5em;
-                height: 1.5em;
-                display: none;
-                align-items: center;
-                justify-content: center;
-                margin-right: 0.5em;
-                margin-top: -0.5em;
-                margin-bottom: -0.5em;
-            }
         }
     }
 
-    .field-button-container[hasicon="true"] button .icon-container {
-        display: flex;
+    @include formControl;
+    @include iconSlot;
+
+    ::slotted([slot="icon"]) {
+        margin: 0 0.5em 0 0;
     }
 }

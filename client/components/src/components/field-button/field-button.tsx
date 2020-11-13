@@ -1,7 +1,5 @@
 import { Component, Prop, h, Watch, Element } from '@stencil/core'
-import AttributeSetRemove from '../../../../utils/dom/attribute-set-remove'
-import DispatchEvent from '../../../../utils/dom/dispatch-event'
-import EventObserver from '../../../../utils/observe/event-observer'
+import RenderLightDom from '../../../../utils/dom/render-light-dom'
 
 @Component({
     tag: 'field-button',
@@ -36,33 +34,26 @@ export class FieldButton {
     externalForm() { return this.host.closest('form') }
 
     triggerSubmit() {
-        if (this.type !== 'submit') { return }
-        const form = this.externalForm()
-        if (!form) { return }
-        DispatchEvent(form, 'submit')
-    }
-
-    removeEvents(container) { Object.keys(container.events || {}).forEach((key) => container.events[key]()) }
-
-    setEvents() {
-        const container = this.containerElement as any
-        const slot = this.host.shadowRoot.querySelector('slot[name="icon"]')
-
-        this.removeEvents(container)
-
-        container.events = {
-            slot: EventObserver(slot, 'slotchange').subscribe(() => {
-                AttributeSetRemove(this.containerElement, 'hasicon', !!this.host.querySelector('[slot="icon"]'))
-            })
-        }
+        // if (this.type !== 'submit') { return }
+        // const form = this.externalForm()
+        // if (!form) { return }
+        // DispatchEvent(form, 'submit')
+        this.formButton.click()
     }
 
     btn!: HTMLButtonElement
     containerElement!: HTMLElement
-
-    componentDidLoad() { this.setEvents() }
+    formButton!: HTMLButtonElement
 
     render() {
+        this.formButton = RenderLightDom(this.host, 'button.field-button-hidden', {
+            tagName: 'button',
+            type: this.type,
+            disabled: this.disabled,
+            class: 'field-button-hidden',
+            slot: 'form-control'
+        }) as HTMLInputElement
+
         return <div ref={(el) => this.containerElement = el as HTMLElement} class="field-button-container hide-until-ready">
             <button
                 ref={(el) => this.btn = el as HTMLButtonElement}
@@ -76,6 +67,7 @@ export class FieldButton {
             >
                 <span class="icon-container"><slot name="icon"></slot></span>
                 <slot />
+                <div class="form-control"><slot name="form-control"></slot></div>
             </button>
         </div>;
     }

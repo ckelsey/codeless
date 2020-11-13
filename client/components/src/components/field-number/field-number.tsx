@@ -1,16 +1,19 @@
 import { Component, Prop, h, Watch, Element, Method, State } from '@stencil/core'
 import ValidateHtml from '../../../../utils/validate/html'
 import ID from '../../../../utils/id'
-import EventObserver from '../../../../utils/observe/event-observer'
 import AttributeSetRemove from '../../../../utils/dom/attribute-set-remove'
 import DispatchEvent from '../../../../utils/dom/dispatch-event'
+import RenderLightDom from '../../../../utils/dom/render-light-dom'
+import InputName from '../../../../utils/dom/input-name'
+import FormControl from '../../../../utils/dom/form-control'
+import SetAttribute from '../../../../utils/dom/set-attribute'
 
-const iconAlignments = ['left', 'right']
-const labelAlignments = ['inside', 'top']
+const sanitized = (val: string) => !val ? '' : ValidateHtml(val).sanitized as string
 const attachId = (id: string, input: HTMLInputElement, label: any) => {
     input.id = id
-    label.setAttribute('for', id)
+    SetAttribute(label, 'for', id)
 }
+
 
 @Component({
     tag: 'field-number',
@@ -29,34 +32,38 @@ export class FieldNumber {
     @Prop() autowidth: boolean = false
 
     @Prop() disabled: boolean = false
+    @Watch('disabled') disabledWatcher(newVal) { SetAttribute(this.formInput, 'disabled', newVal) }
 
     @Prop({ mutable: true }) error: string = ''
-    @Watch('error') validError(newVal) { AttributeSetRemove(this.labelElement, 'error', this.sanitized(newVal)) }
+    @Watch('error') validError(newVal) { AttributeSetRemove(this.labelElement, 'error', sanitized(newVal)) }
 
     @Prop() helptext: string
-    @Watch('helptext') validHelpText(newVal) { this.sanitizedHelp = this.sanitized(newVal) }
-
-    @Prop() iconalign: string = 'left'
-    @Watch('iconalign') validIconAlign(newVal) { this.containerElement.setAttribute('iconalign', iconAlignments.indexOf(newVal) > -1 ? newVal : iconAlignments[0]) }
+    @Watch('helptext') validHelpText(newVal) { this.sanitizedHelp = sanitized(newVal) }
 
     @Prop({ reflect: true }) inputid: string = ID()
     @Watch('inputid') validId(newVal) { attachId(newVal, this.inputElement, this.labelElement) }
 
     @Prop() label: string = ''
-    @Watch('label') validLabel(newVal) { this.sanitizedLabel = this.sanitized(newVal) }
+    @Watch('label') validLabel(newVal) { this.sanitizedLabel = sanitized(newVal) }
 
-    @Prop() labelalign: string = 'inside'
-    @Watch('labelalign') validLabelAlign(newVal) { this.containerElement.setAttribute('labelalign', labelAlignments.indexOf(newVal) > -1 ? newVal : labelAlignments[0]) }
+    @Prop() labelup: boolean = false
+    @Watch('labelup') validLabelUp() { this.setLabelPosition() }
 
-    @Prop() name: string
+    @Prop() name: string = ''
+    @Watch('name') nameWatcher(newVal) {
+        this.name = InputName(newVal, this.sanitizedLabel, this.inputid)
+        SetAttribute(this.formInput, 'name', this.name)
+    }
 
     @Prop() max: number
 
     @Prop() min: number
 
     @Prop() readonly: boolean = false
+    @Watch('readonly') readonlyWatcher(newVal) { SetAttribute(this.formInput, 'readonly', newVal) }
 
     @Prop() required: boolean = false
+    @Watch('required') requiredWatcher(newVal) { SetAttribute(this.formInput, 'required', newVal) }
 
     @Prop() slim: boolean = false
 
@@ -69,11 +76,15 @@ export class FieldNumber {
     /** STATE */
     @State() sanitizedHelp: string = ''
     @State() sanitizedLabel: string = ''
+    @Watch('sanitizedLabel') validSanitizedLabel(newVal) {
+        SetAttribute(this.containerElement, 'has-label', (!!newVal).toString())
+        this.name = InputName(this.name, newVal, this.inputid)
+    }
 
 
     /** METHODS */
-    @Method() getValidity() { return Promise.resolve(this.inputElement.validity) }
-    @Method() getValidationMessage() { return Promise.resolve(this.inputElement.validationMessage) }
+    @Method() getValidity() { return Promise.resolve(this.formInput.validity) }
+    @Method() getValidationMessage() { return Promise.resolve(this.formInput.validationMessage) }
 
 
     /** ELEMENTS */
@@ -82,31 +93,31 @@ export class FieldNumber {
     iconElement!: HTMLSpanElement
     inputElement!: HTMLInputElement
     labelElement!: HTMLLabelElement
+    formInput!: HTMLInputElement
 
 
     /** INTERNAL METHODS */
     externalForm() { return this.host.closest('form') }
 
-    externalInput() { return this.host.querySelector('input') }
-
     focused() { return this.inputid === (document.activeElement as any).inputid }
 
     isempty() { return this.value == undefined }
 
-    isvalid() { return this.inputElement.validity.valid }
+    isvalid() { return this.formInput.validity.valid }
 
-    removeEvents(container, input) {
-        Object.keys(input.events || {}).forEach((key) => input.events[key]())
-        Object.keys(container.events || {}).forEach((key) => container.events[key]())
+    checkError() { this.error = this.formInput.validationMessage }
+
+    setLabelPosition() {
+        const focused = this.focused()
+        const empty = this.isempty()
+        SetAttribute(SetAttribute(this.host, 'empty', empty), 'focused', focused)
+        SetAttribute(SetAttribute(this.containerElement, 'focused', focused.toString()), 'label-up', focused || !empty || this.labelup ? 'true' : 'false')
     }
 
-    sanitized(val) { return !val ? '' : ValidateHtml(val).sanitized as string }
-
-    updateLabelPosition() { AttributeSetRemove(this.inputElement, 'label-up', this.focused() || this.value !== undefined) }
-
     handleInput() {
-        (this.externalInput() || {}).value = this.value = parseFloat(this.inputElement.value)
-        if (!!this.error && this.isvalid()) { this.error = this.inputElement.validationMessage }
+        this.value = parseFloat(this.inputElement.value)
+        this.formInput.value = (this.value || '').toString()
+        if (!!this.error && this.isvalid()) { this.error = this.formInput.validationMessage }
     }
 
     handleEnter(e) {
@@ -114,76 +125,71 @@ export class FieldNumber {
         DispatchEvent(this.externalForm(), 'submit')
     }
 
-    setEvents() {
-        const container = this.containerElement as any
-        const input = this.inputElement as any
-        const slot = this.host.shadowRoot.querySelector('slot')
-
-        this.removeEvents(container, input)
-
-        input.events = {
-            form: EventObserver(this.externalForm(), 'submit').subscribe((e) => {
-                if (!this.isvalid()) {
-                    e.preventDefault()
-                    this.error = this.inputElement.validationMessage
-                }
-            })
-        }
-
-        container.events = {
-            slot: EventObserver(slot, 'slotchange').subscribe(() => {
-                AttributeSetRemove(this.containerElement, 'hasicon', !!this.host.querySelector('[slot="icon"]'))
-            })
-        }
-    }
-
     /** LIFECYLE */
     componentWillLoad() {
-        this.sanitizedLabel = this.sanitized(this.label)
-        this.sanitizedHelp = this.sanitized(this.helptext)
+        this.sanitizedLabel = sanitized(this.label)
+        this.sanitizedHelp = sanitized(this.helptext)
     }
 
     componentDidLoad() {
-        this.setEvents()
         attachId(this.inputid, this.inputElement, this.labelElement)
+        SetAttribute(this.containerElement, 'has-label', (!!this.sanitizedLabel).toString())
+        this.setLabelPosition()
+        FormControl.apply(this, [this.inputid, this.formInput, this.externalForm()])
     }
 
-    disconnectedCallback() { this.removeEvents(this.containerElement, this.inputElement) }
-
     render() {
+        this.formInput = RenderLightDom(this.host, 'input.field-number-hidden-input', {
+            tagName: 'input',
+            type: 'number',
+            value: this.value,
+            name: this.name,
+            required: this.required,
+            disabled: this.disabled,
+            readonly: this.readonly,
+            max: this.max,
+            min: this.min,
+            class: 'field-number-hidden-input',
+            slot: 'form-control'
+        }) as HTMLInputElement
+
         return <div
             ref={(el) => this.containerElement = el as HTMLElement}
             class={`field-number-container field-element-container${this.slim ? ' slim' : ''}${this.autowidth ? ' w-auto' : ''}`}
         >
-            <input
-                ref={(el) => this.inputElement = el as any}
-                placeholder=" "
-                type="number"
-                autocomplete={this.autocomplete}
-                autofocus={this.autofocus}
-                disabled={this.disabled}
-                name={this.name}
-                readonly={this.readonly}
-                required={this.required}
-                id={this.inputid}
-                max={this.max}
-                min={this.min}
-                form={(this.externalForm() || {}).id}
-                onAnimationStart={() => this.updateLabelPosition()}
-                onFocus={() => this.updateLabelPosition()}
-                onBlur={() => this.updateLabelPosition()}
-                onInput={() => this.handleInput()}
-                onKeyDown={(e) => this.handleEnter(e)}
-                value={this.value}
-            />
+            <span class="icon-container"><slot name="icon" /></span>
+            <div class="field-input-label">
+                <input
+                    ref={(el) => this.inputElement = el as any}
+                    placeholder=" "
+                    type="number"
+                    autocomplete={this.autocomplete}
+                    autofocus={this.autofocus}
+                    disabled={this.disabled}
+                    name={this.name}
+                    readonly={this.readonly}
+                    required={this.required}
+                    id={this.inputid}
+                    max={this.max}
+                    min={this.min}
+                    form={(this.externalForm() || {}).id}
+                    onAnimationStart={() => this.setLabelPosition()}
+                    onFocus={() => this.setLabelPosition()}
+                    onBlur={() => {
+                        this.checkError()
+                        this.setLabelPosition()
+                    }}
+                    onInput={() => this.handleInput()}
+                    onKeyDown={(e) => this.handleEnter(e)}
+                    value={this.value}
+                />
 
-            <label ref={(el) => this.labelElement = el as HTMLLabelElement}>{this.sanitizedLabel}</label>
-
-            <span class="icon-container" ref={(el) => this.iconElement = el as any}><slot name="icon" /></span>
-
+                <label ref={(el) => this.labelElement = el as HTMLLabelElement}>{this.sanitizedLabel}</label>
+            </div>
             <span class="field-input-bottom">
                 <span ref={(el) => this.helpTextElement = el as HTMLElement} class="field-help-text">{this.sanitizedHelp}</span>
             </span>
+            <div class="form-control"><slot name="form-control"></slot></div>
         </div>
     }
 }

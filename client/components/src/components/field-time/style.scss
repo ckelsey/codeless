@@ -5,60 +5,15 @@
 
     .field-time-container {
         @include fieldContainer;
-        min-height: $inputHeight;
 
-        label {
-            @include label;
-        }
-
-        &[label-up="true"] {
-            label {
-                transform: translateX(0em) translateY(0.125em) translateZ(0) scale(0.7);
-            }
-
-            .field-time-inputs {
-                .field-time-input-container {
-                    opacity: 1;
-                }
-            }
-        }
-
-        &[labelalign="top"] {
-            .field-time-inputs {
-                label {
-                    position: absolute;
-                    top: -1.5em;
-                    left: 0;
-                    margin: 0;
-                    padding: 0;
-                    order: 0;
-                }
-
-                .field-time-input-container {
-                    input {
-                        padding: 0.25em 0 0 0.38em;
-                    }
-
-                    &.field-time-minute-container,
-                    &.field-time-second-container {
-                        &:after {
-                            padding-top: 0.85em;
-                        }
-                    }
-                }
-            }
-
-            input.field-time-hidden-input {
-                padding: 0;
-            }
-        }
-
-        .field-time-inputs {
+        .field-time-contents {
             display: flex;
             align-items: center;
             justify-content: flex-start;
             background-color: theme-color("foreground");
             position: relative;
+            width: 100%;
+            border-radius: $inputRadius;
 
             input {
                 @include field;
@@ -110,12 +65,6 @@
                     display: none;
                 }
 
-                &.field-time-hour-container {
-                    input {
-                        padding-left: 0.38em;
-                    }
-                }
-
                 &.field-time-minute-container,
                 &.field-time-second-container {
                     &:after {
@@ -138,42 +87,27 @@
                 }
             }
 
-            .icon-container {
-                position: absolute;
-            }
-        }
-
-        &[hasicon="true"] {
-            .icon-container {
-                position: relative;
-                top: 0.125em;
-                margin-right: 0.5em;
-            }
-
             .field-time-inputs {
-                .field-time-input-container.field-time-hour-container {
-                    input {
-                        padding-left: 0em;
-                    }
-                }
+                display: flex;
+                align-items: center;
+            }
 
-                label {
-                    padding-left: 3.5em;
-                }
+            &.hide-seconds .field-time-second-container,
+            &.hide-meridien .field-time-meridien-container {
+                display: none;
             }
         }
-    }
 
-    .field-time-hidden-input {
-        position: absolute;
-        opacity: 0;
-        z-index: -1;
-        width: 0;
-        height: 0;
-        margin: 0;
-        padding: 0;
+        @include inputLabel;
+
+        &[label-up="true"] {
+            .field-time-input-container {
+                opacity: 1;
+            }
+        }
     }
 
     @include helptext;
-    @include icon;
+    @include iconSlot;
+    @include formControl;
 }

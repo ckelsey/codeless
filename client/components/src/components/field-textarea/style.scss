@@ -13,10 +13,6 @@
             height: $inputHeight;
         }
 
-        label {
-            @include label;
-        }
-
         &[resize="auto"] textarea,
         &[resize="none"] textarea {
             resize: none;
@@ -37,10 +33,19 @@
         &.w-100 {
             width: 100%;
         }
-    }
 
-    .field-element-container {
+        @include inputLabel;
+        @include iconSlot;
         @include helptext;
-        @include icon;
+        @include formControl;
+
+        label {
+            top: 0.6em;
+        }
+
+        .icon-container {
+            align-self: flex-start;
+            top: 0.62em;
+        }
     }
 }

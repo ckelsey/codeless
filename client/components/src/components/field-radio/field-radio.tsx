@@ -1,22 +1,22 @@
 import { Component, Prop, h, Watch, Element, State, Method } from '@stencil/core'
 import ValidateHtml from '../../../../utils/validate/html'
-// import ID from '../../../../utils/id'
-// import EventObserver from '../../../../utils/observe/event-observer'
-// import AttributeSetRemove from '../../../../utils/dom/attribute-set-remove'
 import Pipe from '../../../../utils/function-helpers/pipe'
 import CommasToArray from '../../../../utils/conversion/commas-to-array'
 import ToArray from '../../../../utils/conversion/to-array'
 import IfInvalid from '../../../../utils/checks/if-invalid'
 import ToOptions, { OptionsObject } from '../../../../utils/conversion/to-options'
-// import EventObserver from '../../../../utils/observe/event-observer'
 import DispatchEvent from '../../../../utils/dom/dispatch-event'
 import Get from '../../../../utils/objects/get'
-import EventObserver from '../../../../utils/observe/event-observer'
-import AttributeSetRemove from '../../../../utils/dom/attribute-set-remove'
 import ID from '../../../../utils/id'
+import RenderLightDom from '../../../../utils/dom/render-light-dom'
+import InputName from '../../../../utils/dom/input-name'
+import FormControl from '../../../../utils/dom/form-control'
+import SetAttribute from '../../../../utils/dom/set-attribute'
 
 const optionsToArray = Pipe(ToArray, CommasToArray, ToOptions, IfInvalid([]))
 const processedValue = (internalValue, value, options) => Get((options || []).filter(o => o.value == (internalValue || value)), '0.value')
+const sanitized = (val: string) => !val ? '' : ValidateHtml(val).sanitized as string
+
 
 @Component({
     tag: 'field-radio',
@@ -31,17 +31,24 @@ export class FieldRadio {
     @Prop() autowidth: boolean = false
 
     @Prop() disabled: boolean = false
+    @Watch('disabled') disabledWatcher(newVal) { SetAttribute(this.formInput, 'disabled', newVal) }
 
     @Prop({ mutable: true }) error: string = ''
-    @Watch('error') validError(newVal) { this.sanitizedError = this.sanitized(newVal) || '' }
+    @Watch('error') validError(newVal) { this.sanitizedError = sanitized(newVal) || '' }
 
     @Prop() helptext: string
-    @Watch('helptext') validHelpText(newVal) { this.sanitizedHelp = this.sanitized(newVal) }
+    @Watch('helptext') validHelpText(newVal) { this.sanitizedHelp = sanitized(newVal) }
 
     @Prop({ reflect: true }) inputid: string = ID()
 
     @Prop() label: string = ''
-    @Watch('label') validLabel(newVal) { this.sanitizedLabel = this.sanitized(newVal) }
+    @Watch('label') validLabel(newVal) { this.sanitizedLabel = sanitized(newVal) }
+
+    @Prop() name: string = ''
+    @Watch('name') nameWatcher(newVal) {
+        this.name = InputName(newVal, this.sanitizedLabel, this.inputid)
+        SetAttribute(this.formInput, 'name', this.name)
+    }
 
     @Prop() options: string | any[] = []
     @Watch('options') validOptions(newVal) {
@@ -49,11 +56,11 @@ export class FieldRadio {
         this.internalValue = processedValue(this.internalValue, this.value, this.optionsArray)
     }
 
-    @Prop() name: string = ''
-
     @Prop() readonly: boolean = false
+    @Watch('readonly') readonlyWatcher(newVal) { SetAttribute(this.formInput, 'readonly', newVal) }
 
     @Prop() required: boolean = false
+    @Watch('required') requiredWatcher(newVal) { SetAttribute(this.formInput, 'required', newVal) }
 
     @Prop() slim: boolean = false
 
@@ -63,42 +70,39 @@ export class FieldRadio {
 
     /** STATE */
     @State() sanitizedLabel: string = ''
+    @Watch('sanitizedLabel') validSanitizedLabel(newVal) {
+        SetAttribute(this.containerElement, 'has-label', (!!newVal).toString())
+        this.name = InputName(this.name, newVal, this.inputid)
+    }
+
     @State() sanitizedHelp: string = ''
     @State() sanitizedError: string = ''
     @State() optionsArray: OptionsObject[] = []
     @State() internalValue: string
 
     /** METHODS */
-    @Method() getValidity() { return Promise.resolve(this.inputElement.validity) }
-
-    @Method() getValidationMessage() { return Promise.resolve(this.inputElement.validationMessage) }
+    @Method() getValidity() { return Promise.resolve(this.formInput.validity) }
+    @Method() getValidationMessage() { return Promise.resolve(this.formInput.validationMessage) }
 
 
     /** ELEMENTS */
     containerElement!: HTMLElement
     labelElement!: HTMLLabelElement
-    inputElement!: HTMLInputElement
+    formInput!: HTMLInputElement
 
 
     /** INTERNAL METHODS */
     externalForm() { return this.host.closest('form') }
 
-    externalInput() { return this.host.querySelector('input') }
+    focused() { return this.inputid === (document.activeElement as any).inputid }
 
-    isvalid() { return this.inputElement.validity.valid }
+    isempty() { return this.value === '' || this.value === undefined }
 
-    removeEvents(container, input) {
-        Object.keys(input.events || {}).forEach((key) => input.events[key]())
-        Object.keys(container.events || {}).forEach((key) => container.events[key]())
-    }
-
-    sanitized(val) { return !val ? '' : ValidateHtml(val).sanitized as string }
-
-    setError() { this.error = this.sanitized(this.inputElement.validationMessage) }
+    isvalid() { return this.formInput.validity.valid }
 
     handleInput(value) {
-        (this.externalInput() || {}).value = this.value = this.inputElement.value = value
-        if (!!this.error && this.isvalid()) { this.setError() }
+        this.formInput.value = this.value = value
+        if (!!this.error && this.isvalid()) { this.error = this.formInput.validationMessage }
     }
 
     handleEnter(e) {
@@ -106,42 +110,35 @@ export class FieldRadio {
         DispatchEvent(this.externalForm(), 'submit')
     }
 
-    setEvents() {
-        const container = this.containerElement as any
-        const slot = this.host.shadowRoot.querySelector('slot')
-        const input = this.inputElement as any
 
-        this.removeEvents(container, input)
-
-        input.events = {
-            form: EventObserver(this.externalForm(), 'submit').subscribe((e) => {
-                if (!this.isvalid()) {
-                    e.preventDefault()
-                    this.error = this.inputElement.validationMessage
-                }
-            })
-        }
-
-        container.events = {
-            slot: EventObserver(slot, 'slotchange').subscribe(() => AttributeSetRemove(this.containerElement, 'hasicon', !!this.host.querySelector('[slot="icon"]')))
-        }
-    }
 
     /** LIFECYLE */
     componentWillLoad() {
-        this.sanitizedLabel = this.sanitized(this.label)
-        this.sanitizedHelp = this.sanitized(this.helptext)
-        this.sanitizedError = this.sanitized(this.error)
+        this.sanitizedLabel = sanitized(this.label)
+        this.sanitizedHelp = sanitized(this.helptext)
+        this.sanitizedError = sanitized(this.error)
         this.optionsArray = optionsToArray(this.options)
         this.internalValue = processedValue(this.internalValue, this.value, this.optionsArray)
         this.name = this.name || `field-radio-${this.inputid}`
     }
 
-    componentDidLoad() { this.setEvents() }
-
-    disconnectedCallback() { this.removeEvents(this.containerElement, this.inputElement) }
+    componentDidLoad() {
+        SetAttribute(this.containerElement, 'has-label', (!!this.sanitizedLabel).toString())
+        FormControl.apply(this, [this.inputid, this.formInput, this.externalForm()])
+    }
 
     render() {
+        this.formInput = RenderLightDom(this.host, 'input.field-radio-hidden-input', {
+            tagName: 'input',
+            type: 'text',
+            value: this.value,
+            name: this.name,
+            required: this.required,
+            disabled: this.disabled,
+            class: 'field-radio-hidden-input',
+            slot: 'form-control'
+        }) as HTMLInputElement
+
         return <div
             ref={(el) => this.containerElement = el as HTMLElement}
             class={`field-radio-container field-element-container${this.slim ? ' slim' : ''}${this.autowidth ? ' w-auto' : ''}${this.required ? ' required' : ''}`}
@@ -153,14 +150,6 @@ export class FieldRadio {
                         <span>{this.sanitizedLabel}</span>
                         <span class="field-radio-error-text">{this.sanitizedError}</span>
                     </label>
-                    <input
-                        class="field-radio-hidden-input"
-                        type="text"
-                        name={this.name}
-                        value={this.internalValue}
-                        ref={(el) => this.inputElement = el as HTMLInputElement}
-                        required={this.required}
-                    />
                 </div>
                 <span class="field-help-text"></span>
             </div>
@@ -181,6 +170,7 @@ export class FieldRadio {
                     </div>
                 )}
             </div>
+            <div class="form-control"><slot name="form-control"></slot></div>
         </div>
     }
 }

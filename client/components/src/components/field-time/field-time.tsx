@@ -1,74 +1,44 @@
+/** TODO 
+ * show warning if invalid value, i.e. via max/min
+ * If there's any better way at all to handle the input cycle (internal->external->inputs->internal->external->inputs)
+ */
 import { Component, Prop, h, Watch, Element, Method, State } from '@stencil/core'
 import ValidateHtml from '../../../../utils/validate/html'
 import ID from '../../../../utils/id'
-import EventObserver from '../../../../utils/observe/event-observer'
 import AttributeSetRemove from '../../../../utils/dom/attribute-set-remove'
 import DispatchEvent from '../../../../utils/dom/dispatch-event'
 import GetEventTarget from '../../../../utils/dom/get-event-target'
 import Get from '../../../../utils/objects/get'
-import Equals from '../../../../utils/checks/equals'
+import Debounce from '../../../../utils/timing/debounce'
+import RenderLightDom from '../../../../utils/dom/render-light-dom'
+import InputName from '../../../../utils/dom/input-name'
+import FormControl from '../../../../utils/dom/form-control'
+import SetAttribute from '../../../../utils/dom/set-attribute'
 
-const labelAlignments = ['inside', 'top']
+/** TYPINGS */
+export type InternalValue = [string, string, string, string]
 
+interface EvaluatedTime {
+    evaluatedSeconds: number
+    over: boolean
+    under: boolean
+    string: string
+    array: InternalValue
+    maxString: string
+    maxArray: InternalValue
+    minString: string
+    minArray: InternalValue
+}
+
+
+/** DEFINITIONS */
 const inputKeys = ['hour', 'minute', 'second']
-
-const isEmpty = value => value === '' || value === undefined
-
-const isSubmitting = (key, form) => !!form && key == 'enter'
-
-const keyboardEventKey = event => Get(event, 'key.toLowerCase()')
-
-const getLeadingZeros = (num: number) => isNaN(num) ? '' : `00${num}`.slice(-2)
-
-const addLeadingZeros = (val: number | string) => getLeadingZeros(Number(val as string))
-
-const tag = (target) => Get(target, 'tagName.toLowerCase()')
-
-const shouldAddZeros = (value, index) => !isEmpty(value) && index !== 0 && index !== 3
-
-function internalToExternalValue(value: [string, string, string, string] = ['', '', '', '']) {
-    console.log('internalToExternalValue', value)
-    const proxy = value.slice().map((v) => isEmpty(v) ? '' : v)
-    const meridien = proxy[3]
-    const hour = parseInt(proxy[0])
-
-    if (meridien === 'pm' && !isNaN(hour)) {
-        proxy[0] = (hour + 12).toString()
-    }
-
-    proxy[1] = isEmpty(proxy[1]) ? '' : addLeadingZeros(proxy[1])
-    proxy[2] = isEmpty(proxy[2]) ? '' : addLeadingZeros(proxy[2])
+const defaultArray: InternalValue = ['', '', '', 'am']
+const defaultString = '::'
+const defaultMax = '23:59:59'
+const defaultMin = '0:00:00'
 
 
-    let newExternal = `${proxy[0]}:${proxy[1]}:${proxy[2]}`
-
-    while (newExternal[newExternal.length - 1] === ':') {
-        newExternal = newExternal.slice(0, newExternal.length - 1)
-    }
-
-    return newExternal
-}
-
-function externalToInternalValue(value = '::') {
-    console.log('externalToInternalValue', value)
-    const parts: any[] = value.split(':').map(v => isEmpty(v) ? '' : Number(v))
-    let len = parts.length
-
-    while (len < 3) {
-        parts.push('')
-        len = parts.length
-    }
-
-    if (!isEmpty(parts[0])) {
-        const isPm = parts[0] > 11
-        parts[3] = isPm ? 'pm' : 'am'
-        parts[0] = isPm ? parts[0] - 12 : parts[0]
-    }
-
-    return parts.map((v, i) => shouldAddZeros(v, i) ? addLeadingZeros(v) : v.toString())
-}
-
-function removeEvents(elements) { elements.forEach(el => Object.keys(el.events || {}).forEach((key) => el.events[key]())) }
 
 @Component({
     tag: 'field-time',
@@ -79,36 +49,44 @@ function removeEvents(elements) { elements.forEach(el => Object.keys(el.events |
 export class FieldTime {
     @Element() host
 
+
     /** PROPS */
     @Prop() autowidth: boolean = false
 
     @Prop() disabled: boolean = false
+    @Watch('disabled') disabledWatcher(newVal) { if (this.formInput) { this.formInput.disabled = newVal } }
 
     @Prop({ mutable: true }) error: string = ''
-    @Watch('error') validError(newVal) { AttributeSetRemove(this.labelElement, 'error', this.sanitized(newVal)) }
+    @Watch('error') validError(newVal) { AttributeSetRemove(this.labelElement, 'error', sanitized(newVal)) }
 
     @Prop() helptext: string
-    @Watch('helptext') validHelpText(newVal) { this.sanitizedHelp = this.sanitized(newVal) }
+    @Watch('helptext') validHelpText(newVal) { this.sanitizedHelp = sanitized(newVal) }
 
     @Prop({ reflect: true }) inputid: string = ID()
 
     @Prop() label: string = ''
-    @Watch('label') validLabel(newVal) { this.sanitizedLabel = this.sanitized(newVal) }
+    @Watch('label') validLabel(newVal) { this.sanitizedLabel = sanitized(newVal) }
 
-    @Prop() labelalign: string = 'inside'
-    @Watch('labelalign') validLabelAlign(newVal) { this.setLabelAlign(newVal) }
+    @Prop() labelup: boolean = false
+    @Watch('labelup') validLabelUp() { this.setLabelPosition() }
 
     @Prop() max: string
-    // @Watch('max') validMax() { this.setValues(this.value) }
+    @Watch('max') validMax() { this.valueDebouncer() }
 
     @Prop() min: string
-    // @Watch('max') validMin() { this.setValues(this.value) }
+    @Watch('max') validMin() { this.valueDebouncer() }
 
     @Prop() name: string
+    @Watch('name') nameWatcher(newVal) {
+        this.name = InputName(newVal, this.sanitizedLabel, this.inputid)
+        SetAttribute(this.formInput, 'name', this.name)
+    }
 
     @Prop() readonly: boolean = false
+    @Watch('readonly') readonlyWatcher(newVal) { SetAttribute(this.formInput, 'readonly', newVal) }
 
     @Prop() required: boolean = false
+    @Watch('required') requiredWatcher(newVal) { SetAttribute(this.formInput, 'required', newVal) }
 
     @Prop() showseconds: boolean = false
     @Watch('showseconds') validSHowSeconds() { this.second('00') }
@@ -116,39 +94,28 @@ export class FieldTime {
     @Prop() slim: boolean = false
 
     @Prop() value: string = ''
-    @Watch('value') validValue(newVal) { this.externalToInternal(newVal) }
+    @Watch('value') validValue() { this.valueDebouncer() }
+
 
 
     /** STATE */
     @State() sanitizedHelp: string = ''
 
     @State() sanitizedLabel: string = ''
-
-    @State() internalValue: string[] = ['', '', '', '']
-    @Watch('internalValue') validInternalValue(newVal) {
-        console.log('internalValue', newVal)
-        if (this.isSettingValue) { return this.queuedValue = newVal }
-
-        this.isSettingValue = true
-
-        const newExternal = internalToExternalValue(newVal)
-
-        Promise.resolve(newExternal !== this.value ? this.value = newExternal : undefined)
-
-        if (this.queuedValue) {
-            const queuedValue = this.queuedValue
-            this.isSettingValue = this.queuedValue = undefined
-            return this.validInternalValue(queuedValue)
-        }
-
-        this.isSettingValue = false
+    @Watch('sanitizedLabel') validSanitizedLabel(newVal) {
+        SetAttribute(this.containerElement, 'has-label', (!!newVal).toString())
+        this.name = InputName(this.name, newVal, this.inputid)
     }
+
+    @State() internalValue: InternalValue = defaultArray.slice() as InternalValue
+    @Watch('internalValue') validInternalValue() { this.internalValueDebouncer() }
+
 
 
     /** METHODS */
-    @Method() getValidity() { return Promise.resolve(this.inputElement.validity) }
+    @Method() getValidity() { return Promise.resolve(this.formInput.validity) }
 
-    @Method() getValidationMessage() { return Promise.resolve(this.inputElement.validationMessage) }
+    @Method() getValidationMessage() { return Promise.resolve(this.formInput.validationMessage) }
 
     @Method() hour(value?) { return this.setGetValue(0, value) }
 
@@ -156,83 +123,71 @@ export class FieldTime {
 
     @Method() second(value?) { return this.setGetValue(2, value) }
 
-    @Method() meridien(value?) { return this.setGetValue(undefined, value) }
+    @Method() meridien(value?) { return this.setGetValue(3, value) }
+    @Method() getInternal() { return Promise.resolve(this.internalValue) }
+
 
 
     /** ELEMENTS */
     containerElement!: HTMLElement
     helpTextElement!: HTMLElement
-    inputElement!: HTMLInputElement
     labelElement!: HTMLLabelElement
     hourInputElement!: HTMLInputElement
     minuteInputElement!: HTMLInputElement
     secondInputElement!: HTMLInputElement
     meridienElement!: HTMLFieldSelectElement
+    formInput!: HTMLInputElement
+
 
 
     /** INTERNAL METHODS */
-    isSettingValue: boolean = false
-    queuedValue: any
+    valueDebouncer = Debounce(() => this.externalToInternal(), 0)
+
+    internalValueDebouncer = Debounce(() => this.internalToExternal(), 0)
 
     externalForm() { return this.host.closest('form') }
-
-    externalInput() { return this.host.querySelector('input') }
 
     focused() { return this.inputid === (document.activeElement as any).inputid }
 
     isempty() { return isEmpty(this.value) }
 
-    isvalid() { return this.inputElement.validity.valid }
+    isvalid() { return this.formInput.validity.valid }
 
-    externalToInternal(newVal) {
-        console.log('value', newVal)
-        const newInternal = externalToInternalValue(newVal)
+    getInputs() { return [this.hourInputElement, this.minuteInputElement, this.secondInputElement, this.meridienElement] }
 
-        if (!Equals(newInternal, this.internalValue)) {
-            this.internalValue = newInternal
+    setInputValues() {
+        const inputs = this.getInputs()
+
+        if (!inputs[0]) { return }
+
+        this.internalValue.forEach((v, i) => inputs[i].value !== v ? inputs[i].value = v : undefined)
+    }
+
+    externalToInternal() {
+        const newVal = externalToInternalValue(this.value, this.max, this.min)
+        this.internalValue = newVal.array
+        this.value = newVal.string
+        this.setInputValues()
+        this.setLabelPosition()
+    }
+
+    internalToExternal() {
+        const newVal = internalToExternal(this.internalValue, this.max, this.min)
+        this.value = newVal.string
+        this.internalValue = newVal.array
+        this.setInputValues()
+        this.setLabelPosition()
+
+        if (!!this.value && !!this.error) {
+            this.error = this.formInput.validationMessage
         }
     }
 
     handleValueUpdate(index, value) {
-        if (typeof value === 'undefined') { return }
-
-        const proxy = this.internalValue.slice()
-
-        const setMeridienValue = () => {
-            proxy[3] = value
-            this.internalValue = proxy
-        }
-
-        const setDigitValue = () => {
-            const parsed = isEmpty(value) ? '' : Number(value)
-            const isZeroSeconds = index === 2 && !this.showseconds
-            let val = ''
-
-            if (!isNaN(parsed as number) && !isZeroSeconds) {
-                if (index === 0) {
-                    if (parsed <= 0 || parsed > 12) {
-                        val = (12).toString()
-                    } else {
-                        val = parsed.toString()
-                    }
-                } else {
-                    val = Math.min(59, Math.max(parsed as number, 0)).toString()
-                }
-            }
-
-            proxy[index] = index > 0 && !isEmpty(val) ? addLeadingZeros(val) : val
-            this.internalValue = proxy
-        }
-
-        if (index === undefined) {
-            setMeridienValue()
-        } else {
-            setDigitValue()
-        }
-
-        if (!Equals(this.internalValue, proxy)) {
-            this.internalValue = proxy
-        }
+        const proxy: any = this.getInputs().map(v => v.value)
+        proxy[index] = index < 3 ? value.replace(/[^0-9.]/g, '') : value
+        this.internalValue = proxy
+        this.setInputValues()
     }
 
     setGetValue(index, value) {
@@ -242,33 +197,30 @@ export class FieldTime {
         })
     }
 
-    handleBlur(event) {
-        console.log('j')
-        const target = GetEventTarget(event) as HTMLInputElement
-
-        let key = target.getAttribute('data-key')
-
-        if (key === null && tag(target) === 'select') { key = 'meridien' }
-
-        console.log(key, target)
-
-        if (typeof this[key] === 'function') { this[key](target.value) }
-
-        if (this.containerElement) { this.setLabelPosition() }
-    }
-
     handleKeyDown(event) {
         const key = keyboardEventKey(event)
         const target = GetEventTarget(event) as HTMLInputElement
         const isUpArrow = key == 'arrowup'
 
         if (tag(target) == 'input' && (isUpArrow || key == 'arrowdown')) {
-            // const isHourInput = target.classList.contains('field-time-hour-input')
-            // const ceil = isHourInput ? 12 : 60
-            // const floor = 0
-            // const evaluatedValue = Math.min(ceil, Math.max(floor, Number(target.value)))
-            target.value = (Number(target.value) + (isUpArrow ? 1 : -1)).toString()
-            DispatchEvent(target, 'input')
+            event.preventDefault()
+
+            const isHour = target.getAttribute('data-key') === 'hour'
+            const val = parseInt(target.value, 10)
+
+            let newVal = (isNaN(val) ? 0 : val) + (isUpArrow ? 1 : -1)
+
+            if (isHour) {
+                if (newVal < 1) { newVal = 12 }
+                if (newVal > 12) { newVal = 1 }
+            }
+
+            if (!isHour) {
+                if (newVal < 0) { newVal = 59 }
+                if (newVal > 59) { newVal = 0 }
+            }
+
+            target.value = isHour ? newVal.toString() : addLeadingZeros(newVal)
         }
 
         if (isSubmitting(key, this.externalForm())) {
@@ -276,299 +228,239 @@ export class FieldTime {
         }
     }
 
-    setLabelAlign(val) {
-        this.containerElement.setAttribute('labelalign', labelAlignments.indexOf(val) > -1 ? val : labelAlignments[0])
+    stripNonNumeric(event) {
+        const target = GetEventTarget(event) as HTMLInputElement
+        if (tag(target) == 'input') { target.value = target.value.replace(/[^0-9.]/g, '') }
     }
 
     setLabelPosition() {
-        this.containerElement.setAttribute('label-up', this.focused() || !this.isempty() ? 'true' : 'false')
+        const focused = this.focused()
+        const empty = this.isempty()
+        const forcedUp = this.labelup
+        SetAttribute(
+            SetAttribute(this.host, 'empty', empty),
+            'focused', focused
+        )
+
+        SetAttribute(
+            SetAttribute(this.containerElement, 'focused', focused.toString()),
+            'label-up', focused || !empty || forcedUp ? 'true' : 'false'
+        )
+
     }
 
-    sanitized(val) { return !val ? '' : ValidateHtml(val).sanitized as string }
 
-    setEvents() {
-        const container = this.containerElement as any
-        const input = this.inputElement as any
-        const slot = this.host.shadowRoot.querySelector('slot')
-
-        removeEvents([container, input])
-
-        input.events = {
-            form: EventObserver(this.externalForm(), 'submit').subscribe((e) => {
-                if (!this.isvalid()) {
-                    e.preventDefault()
-                    this.error = this.inputElement.validationMessage
-                }
-            })
-        }
-
-        container.events = {
-            slot: EventObserver(slot, 'slotchange').subscribe(() => {
-                AttributeSetRemove(this.containerElement, 'hasicon', !!this.host.querySelector('[slot="icon"]'))
-            })
-        }
-    }
 
     /** LIFECYLE */
     componentWillLoad() {
-        this.sanitizedLabel = this.sanitized(this.label)
-        this.sanitizedHelp = this.sanitized(this.helptext)
-        this.externalToInternal(this.value)
+        this.sanitizedLabel = sanitized(this.label)
+        this.sanitizedHelp = sanitized(this.helptext)
+        this.externalToInternal()
     }
 
     componentDidLoad() {
-        this.setLabelAlign(this.labelalign)
         this.setLabelPosition()
-        this.setEvents()
+        SetAttribute(this.containerElement, 'has-label', (!!this.sanitizedLabel).toString())
+        FormControl.apply(this, [this.inputid, this.formInput, this.externalForm()])
     }
 
-    disconnectedCallback() { removeEvents([this.containerElement, this.inputElement]) }
-
     render() {
+        this.formInput = RenderLightDom(this.host, 'input.field-time-hidden-input', {
+            tagName: 'input',
+            type: 'text',
+            value: this.value,
+            name: this.name,
+            required: this.required,
+            disabled: this.disabled,
+            readonly: this.readonly,
+            class: 'field-time-hidden-input',
+            slot: 'form-control',
+            oninvalid: "console.log(this.validationMessage())"
+        }) as HTMLInputElement
+
         return <div
             ref={(el) => this.containerElement = el as HTMLElement}
             class="field-time-container field-element-container"
             onClick={() => this.focused() ? undefined : this.hourInputElement.focus()}
         >
-            <input
-                class="field-time-hidden-input"
-                placeholder=" "
-                value={this.value}
-                name={this.name}
-                id={this.inputid}
-                form={(this.externalForm() || {}).id}
-                required={this.required}
-                ref={(el) => this.inputElement = el as any}
-            />
-            <div class="field-time-inputs">
+            <div class={`field-time-contents${this.showseconds ? '' : ' hide-seconds'}${isEmpty(this.internalValue[0]) ? ' hide-meridien' : ''}`}>
                 <span class="icon-container"><slot name="icon" /></span>
-
-                {inputKeys.map((key, index) =>
-                    <div class={`field-time-${key}-container field-time-input-container`}>
-                        <input
-                            type="text"
-                            placeholder={`${key[0]}${key[0]}`}
-                            class={`field-time-${key}-input`}
-                            value={this.internalValue[index]}
-                            ref={(el) => this[`${key}InputElement`] = el as HTMLInputElement}
-                            onFocus={() => this.setLabelPosition()}
-                            onInput={(e) => this.handleBlur(e)}
-                            onKeyDown={(e) => this.handleKeyDown(e)}
-                            data-key={key}
-                            maxlength="2"
-                            pattern="\d*"
-                        />
+                <div class="field-input-label">
+                    <div class="field-time-inputs">
+                        {inputKeys.map((key) =>
+                            <div class={`field-time-${key}-container field-time-input-container`}>
+                                <input
+                                    type="text"
+                                    placeholder={`${key[0]}${key[0]}`}
+                                    class={`field-time-${key}-input`}
+                                    ref={(el) => this[`${key}InputElement`] = el as HTMLInputElement}
+                                    onFocus={() => this.setLabelPosition()}
+                                    onBlur={() => this[key](this[`${key}InputElement`].value)}
+                                    onInput={(e) => this.stripNonNumeric(e)}
+                                    onKeyDown={(e) => this.handleKeyDown(e)}
+                                    data-key={key}
+                                    maxlength="2"
+                                    pattern="\d*"
+                                />
+                            </div>
+                        )}
+                        <div class="field-time-meridien-container field-time-input-container">
+                            <field-select
+                                ref={(el) => this.meridienElement = el as HTMLFieldSelectElement}
+                                options={[{ value: "am", textContent: "AM" }, { value: "pm", textContent: "PM" }]}
+                                slim={true}
+                                autowidth={true}
+                                label=" "
+                                labelup={true}
+                                data-key={'meridien'}
+                                onFocus={() => this.setLabelPosition()}
+                                onInput={() => this.meridien(this.meridienElement.value)}
+                                onKeyDown={(e) => this.handleKeyDown(e)}
+                            ></field-select>
+                        </div>
                     </div>
-                )}
-
-                <div
-                    // class={`field-time-meridien-container field-time-input-container${this.shouldShowMeridien() ? '' : ' hide-input'}`}
-                    class={`field-time-meridien-container field-time-input-container`}
-                >
-                    <field-select
-                        ref={(el) => this.meridienElement = el as HTMLFieldSelectElement}
-                        value={Number(this.internalValue[0]) > 11 ? 'pm' : 'am'}
-                        options='[{"value":"am", "textContent":"AM"},{"value":"pm", "textContent":"PM"}]'
-                        slim={true}
-                        autowidth={true}
-                        data-key={'meridien'}
-                        onFocus={() => this.setLabelPosition()}
-                        onInput={(e) => this.handleBlur(e)}
-                        onKeyDown={(e) => this.handleKeyDown(e)}
-                    ></field-select>
+                    <label class={`field-time-label${this.required ? ' label-required' : ''}`} ref={(el) => this.labelElement = el as HTMLLabelElement}>{this.sanitizedLabel} </label>
                 </div>
-
-                <label class="field-time-label" ref={(el) => this.labelElement = el as HTMLLabelElement}>{this.sanitizedLabel} </label>
             </div>
-
-            <span
-                class="field-help-text"
-                ref={(el) => this.helpTextElement = el as HTMLElement}
-            >{this.sanitizedHelp}</span>
+            <div class="field-input-bottom">
+                <span class="field-help-text" ref={(el) => this.helpTextElement = el as HTMLElement}>{this.sanitizedHelp}</span>
+            </div>
+            <div class="form-control"><slot name="form-control"></slot></div>
         </div>
     }
 }
 
 
 
+/** HELPERS */
 
-// const numberOrEmpty = value => isNaN(value) ? '' : value
+const sanitized = (val: string) => !val ? '' : ValidateHtml(val).sanitized as string
 
+const isEmpty = value => value === '' || value === undefined
 
-// const removeTrailingColon = value => {
-//     if (!value || !value.length) { return '' }
+const isSubmitting = (key, form) => !!form && key == 'enter'
 
-//     while (value[value.length - 1] === ':') { value = value.slice(0, value.length - 1) }
+const keyboardEventKey = event => Get(event, 'key.toLowerCase()')
 
-//     return value
-// }
+const tag = (target) => Get(target, 'tagName.toLowerCase()')
 
-// const parsedToString = parsed => removeTrailingColon(parsed.map(addLeadingZeros).join(':'))
+const getLeadingZeros = (num: number) => isNaN(num) ? '' : `00${num}`.slice(-2)
 
-// const getValidValue = (val: string, showSeconds: boolean) => parsedToString(timeStringToArray(val, showSeconds))
+const addLeadingZeros = (val: number | string) => getLeadingZeros(Number(val as string))
 
-// const getValidValueFormat = (val: string, showSeconds: boolean) => getValidValue(val, showSeconds)
+const internalToExternal = (value: InternalValue = defaultArray.slice() as InternalValue, max: string = defaultMax, min: string = defaultMin): EvaluatedTime => evaluateSeconds(value, max, min)
 
-// const timeStringToArray = (time: string, showSeconds: boolean) => (time || '') .toString() .split(':') .map((v, i) => (i == 2 && !showSeconds) || isEmpty(v) ? '' : parseInt(v) )
+const externalToInternalValue = (value: string = defaultString, max: string = defaultMax, min: string = defaultMin): EvaluatedTime => evaluateSeconds(value, max, min)
 
-// const arrayToSeconds = (array = []) => array.reduce((target, current, i) => {
-//     const currentNumber = !!current ? current : 0
-//     const seconds = i === 0 ?
-//         currentNumber * 60 * 60 :
-//         i === 1 ?
-//             currentNumber * 60 :
-//             currentNumber
+const stringToNumber = (v: string | number) => typeof v === 'string' ? parseInt(v) : v
 
-//     target = target + seconds
-//     return target
-// }, 0)
+const isPM = (v: string | number) => stringToNumber(v) > 11
 
-// const secondsToArray = (secondsArg = 0) => {
-//     const hours = Math.floor(secondsArg / (60 * 60))
-//     const minutes = Math.floor((secondsArg - (hours * (60 * 60))) / 60)
-//     const seconds = (secondsArg - ((hours * (60 * 60)) + (minutes * 60)))
+const hour12MaxMin = (v: string | number) => Math.min(12, Math.max(0, stringToNumber(v)))
 
-//     return [hours, minutes, seconds]
-// }
+const hour24MaxMin = (v: string | number) => Math.max(0, stringToNumber(v))
 
+const validMinuteSecond = (v: string | number) => isEmpty(v) ? '' : addLeadingZeros(Math.min(59, Math.max(0, stringToNumber(v))))
 
+const numberOrZero = (number: any): number => isNaN(number) ? 0 : number
 
+const timeStringToSeconds = (timeString: string) => isEmpty(timeString) ? 0 : timeArrayToSeconds(timeStringToArray(timeString))
 
-
-
-
-
-/*
-formatHour() {
-    if (isEmpty(this.hour)) { return '' }
-    if (this.hour === 0) { return addLeadingZeros(12) }
-    return addLeadingZeros(this.hour as number % 12 || 12)
+const hour24To12 = (v: string | number) => {
+    const number = stringToNumber(v)
+    const adjusted = hour12MaxMin(isPM(number) ? number - 12 : number)
+    return adjusted === 0 || adjusted === 24 ? 12 : adjusted
 }
 
-formatMinute() {
-    return addLeadingZeros(this.minute)
+const hour12To24 = (v: string | number, ampm = 'am') => {
+    let val = numberOrZero(stringToNumber(v))
+    if (ampm === 'am' && val === 12) { val = 0 }
+    if (ampm === 'pm' && val !== 12) { val = val + 12 }
+    return hour24MaxMin(val)
 }
 
-formatSecond() {
-    return this.showseconds ? addLeadingZeros(this.second) : undefined
+const timeStringToArray = (value: string = '') => {
+    const array = value
+        .split(':')
+        .concat(defaultArray.slice())
+        .slice(0, 4)
+
+    array[3] = isPM(array[0]) ? 'pm' : 'am'
+    array[0] = isEmpty(array[0]) ? '' : hour24To12(array[0]).toString()
+    array[1] = validMinuteSecond(array[1])
+    array[2] = validMinuteSecond(array[2])
+
+    return array as InternalValue
 }
 
-formatMeridien() {
-    return isEmpty(this.hour) || this.hour > 11 ? 'pm' : 'am'
+const timeArrayToSeconds = (timeArray: InternalValue) => timeArray
+    .concat(defaultArray.slice())
+    .slice(0, 4) // still need ampm for hour
+    .reduce((target, current, index, array) => {
+        if (isEmpty(current) || index > 2) { return target }
+        if (index === 0) { return target + (hour12To24(current, array[3]) * 3600) }
+        if (index === 1) { return target + (numberOrZero(parseInt(current)) * 60) }
+        if (index === 2) { return target + numberOrZero(parseInt(current)) }
+    }, 0)
+
+const timeArrayToString = array => (array || [])
+    .reduce((target, current, index, arr) => {
+        if (index === 0) { return isEmpty(current) ? target : hour12To24(current, arr[3]).toString() }
+        return index === 3 ? target : `${target}:${validMinuteSecond(current)}`
+    }, '')
+
+const removeExtraColons = (value: string) => {
+    while (value[value.length - 1] === ':') { value = value.slice(0, -1) }
+    return value
 }
 
-shouldShowMeridien() { return !isEmpty(this.hour) }
+function evaluateSeconds(
+    value: string | InternalValue,
+    max: string = defaultMax,
+    min: string = defaultMin
+): EvaluatedTime {
+    const isArray = Array.isArray(value)
+    const valueSeconds = isArray ? timeArrayToSeconds(value as InternalValue) : timeStringToSeconds(value as string)
+    const maxSeconds = timeStringToSeconds(max)
+    const minSeconds = timeStringToSeconds(min)
+    const maxArray = timeStringToArray(max)
+    const minArray = timeStringToArray(min)
 
-setValues(value) {
-    // try and not go crazy on updates
-    if (this.isSettingValue) { return this.queuedValue = value }
-
-    this.isSettingValue = true
-
-    const newVal = getValidValueFormat(value, this.showseconds)
-    const parsed = timeStringToArray(newVal, this.showseconds)
-    const newTimeArray = secondsToArray(
-        Math.max(
-            arrayToSeconds(timeStringToArray(this.min || '0:0:0', this.showseconds)),
-            Math.min(
-                arrayToSeconds(parsed),
-                arrayToSeconds(timeStringToArray(this.max || '23:59:59', this.showseconds))
-            )
-        )
-    ).map(
-        (v, i) => isEmpty(parsed[i]) ? '' : v
-    )
-
-    const valueToSet = parsedToString(newTimeArray)
-    const valueArrayToSet = timeStringToArray(valueToSet, this.showseconds)
-
-    if (valueToSet !== this.value) {
-        this.value = valueToSet
+    const results = {
+        evaluatedSeconds: Math.min(maxSeconds, Math.max(minSeconds, valueSeconds)),
+        maxArray,
+        maxString: removeExtraColons(timeArrayToString(maxArray)),
+        minArray,
+        minString: removeExtraColons(timeArrayToString(minArray))
     }
 
-    if (this.hour !== valueArrayToSet[0]) {
-        this.hour = valueArrayToSet[0] as number
-    }
-
-    if (this.minute !== valueArrayToSet[1]) {
-        this.minute = valueArrayToSet[1] as number
-    }
-
-    if (this.second !== valueArrayToSet[2]) {
-        this.second = valueArrayToSet[2] as number
-    }
-
-    if (this.meridienElement && !isEmpty(valueArrayToSet[0])) {
-        const meridienValue = this.meridienElement.value
-
-        if (valueArrayToSet[0] > 11 && meridienValue !== 'pm') {
-            this.meridienElement.value = 'pm'
-        }
-
-        if (valueArrayToSet[0] < 12 && meridienValue !== 'am') {
-            this.meridienElement.value = 'am'
+    if (valueSeconds === results.evaluatedSeconds) {
+        return {
+            over: false,
+            under: false,
+            string: isArray ? removeExtraColons(timeArrayToString(value)) : value as string,
+            array: isArray ? value as InternalValue : timeStringToArray(value as string),
+            ...results
         }
     }
 
-    if (!!this.error && this.isvalid()) { this.error = this.inputElement.validationMessage }
-
-    if (this.containerElement) { this.setLabelPosition() }
-
-    this.isSettingValue = false
-
-    if (this.queuedValue) {
-        const queued = this.queuedValue
-        this.queuedValue = undefined
-        return queued !== this.value ? this.setValues(queued) : undefined
-    }
-}
-
-getHour(value) {
-    const newVal = numberOrEmpty(parseInt(value))
-
-    if (isNaN(parseInt(newVal))) { return newVal }
-
-    const meridienValue = (this.meridienElement || {}).value
-
-    if (!meridienValue) { return newVal }
-
-    const minMaxed = Math.max(Math.min(24, newVal), 0)
-
-    if (meridienValue === 'pm' && minMaxed < 12) { return minMaxed + 12 }
-
-    return minMaxed
-}
-
-updateTimePart(value, index) {
-    if (index === undefined || index > 2) { return }
-
-    const parsed = timeStringToArray(this.value, this.showseconds)
-    parsed[index] = index === 0 ? this.getHour(value) : numberOrEmpty(parseInt(value))
-
-    this.setValues(
-        parsed.filter(v => !isEmpty(v)).length === 0 ?
-            '' : parsed.join(':')
-    )
-}
-
-updateMeridien(value) {
-    const parsedHour = parseInt(this.hour as string)
-
-    if (isNaN(parsedHour)) { return }
-
-    if (value === 'am') {
-        if (this.hour > 11) {
-            this.updateTimePart(parsedHour - 12, 0)
+    if (maxSeconds === results.evaluatedSeconds) {
+        return {
+            over: true,
+            under: false,
+            string: results.maxString,
+            array: maxArray,
+            ...results
         }
-    } else {
-        if (this.hour < 12) {
-            this.updateTimePart(parsedHour + 12, 0)
+    }
+
+    if (minSeconds === results.evaluatedSeconds) {
+        return {
+            over: false,
+            under: true,
+            string: results.minString,
+            array: minArray,
+            ...results
         }
     }
 }
-
-focusMaybe() {
-    if (this.focused()) { return }
-    this.hourInputElement.focus()
-}
-*/

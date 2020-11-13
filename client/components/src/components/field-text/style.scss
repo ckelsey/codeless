@@ -8,15 +8,26 @@
 
         input {
             @include field;
+            opacity: 0;
+            -webkit-text-fill-color: transparent;
         }
 
-        label {
-            @include label;
+        &[focused="true"],
+        &[empty="false"] {
+            input {
+                opacity: 1;
+            }
         }
-    }
 
-    .field-element-container {
+        &[empty="false"] {
+            input {
+                -webkit-text-fill-color: theme-color("background");
+            }
+        }
+
+        @include inputLabel;
+        @include iconSlot;
         @include helptext;
-        @include icon;
+        @include formControl;
     }
 }

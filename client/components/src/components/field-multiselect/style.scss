@@ -17,6 +17,12 @@
         min-height: 0;
         @include inputMargins;
 
+        background-color: transparent;
+
+        &[focused="true"] {
+            background-color: transparent;
+        }
+
         field-checkbox[slot="item"] {
             padding: 0.5em;
             position: relative;
@@ -40,10 +46,15 @@
     }
 
     @include helptext;
+    @include formControl;
+
+    .field-input-bottom {
+        flex-grow: 0;
+        width: auto;
+    }
 
     .field-help-text {
-        margin: 0;
-        margin-left: 0.5em;
+        margin: 0.25em 0 0.25em 0.5em;
 
         &:empty {
             display: none;

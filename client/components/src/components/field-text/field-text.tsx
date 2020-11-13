@@ -1,16 +1,20 @@
 import { Component, Prop, h, Watch, Element, Method, State } from '@stencil/core'
 import ValidateHtml from '../../../../utils/validate/html'
 import ID from '../../../../utils/id'
-import EventObserver from '../../../../utils/observe/event-observer'
 import AttributeSetRemove from '../../../../utils/dom/attribute-set-remove'
 import DispatchEvent from '../../../../utils/dom/dispatch-event'
+import RenderLightDom from '../../../../utils/dom/render-light-dom'
+import InputName from '../../../../utils/dom/input-name'
+import FormControl from '../../../../utils/dom/form-control'
+import SetAttribute from '../../../../utils/dom/set-attribute'
 
 const types = ['text', 'email', 'tel']
-const labelAlignments = ['inside', 'top']
+const sanitized = (val: string) => !val ? '' : ValidateHtml(val).sanitized as string
 const attachId = (id: string, input: HTMLInputElement, label: any) => {
     input.id = id
     label.setAttribute('for', id)
 }
+
 
 @Component({
     tag: 'field-text',
@@ -31,38 +35,50 @@ export class FieldText {
     @Prop() count: number = 0
 
     @Prop() disabled: boolean = false
+    @Watch('disabled') disabledWatcher(newVal) { SetAttribute(this.formInput, 'disabled', newVal) }
 
     @Prop({ mutable: true }) error: string = ''
-    @Watch('error') validError(newVal) { AttributeSetRemove(this.labelElement, 'error', this.sanitized(newVal)) }
+    @Watch('error') validError(newVal) { AttributeSetRemove(this.labelElement, 'error', sanitized(newVal)) }
 
     @Prop() helptext: string
-    @Watch('helptext') validHelpText(newVal) { this.sanitizedHelp = this.sanitized(newVal) }
+    @Watch('helptext') validHelpText(newVal) { this.sanitizedHelp = sanitized(newVal) }
 
     @Prop({ reflect: true }) inputid: string = ID()
     @Watch('inputid') validId(newVal) { attachId(newVal, this.inputElement, this.labelElement) }
 
     @Prop() label: string = ''
-    @Watch('label') validLabel(newVal) { this.sanitizedLabel = this.sanitized(newVal) }
+    @Watch('label') validLabel(newVal) { this.sanitizedLabel = sanitized(newVal) }
 
-    @Prop() labelalign: string = 'inside'
-    @Watch('labelalign') validLabelAlign(newVal) { this.containerElement.setAttribute('labelalign', labelAlignments.indexOf(newVal) > -1 ? newVal : labelAlignments[0]) }
+    @Prop() labelup: boolean = false
+    @Watch('labelup') validLabelUp() { this.setLabelPosition() }
 
-    @Prop() name: string
+    @Prop() name: string = ''
+    @Watch('name') nameWatcher(newVal) {
+        this.name = InputName(newVal, this.sanitizedLabel, this.inputid)
+        SetAttribute(this.formInput, 'name', this.name)
+    }
 
     @Prop() max: number
+    @Watch('max') maxWatcher(newVal) { SetAttribute(this.formInput, 'maxlength', newVal) }
 
     @Prop() min: number
+    @Watch('min') minWatcher(newVal) { SetAttribute(this.formInput, 'minlength', newVal) }
 
     @Prop() readonly: boolean = false
+    @Watch('readonly') readonlyWatcher(newVal) { SetAttribute(this.formInput, 'readonly', newVal) }
 
     @Prop() required: boolean = false
+    @Watch('required') requiredWatcher(newVal) { SetAttribute(this.formInput, 'required', newVal) }
 
     @Prop() showcount: boolean = false
 
     @Prop() slim: boolean = false
 
     @Prop() type: string = 'text'
-    @Watch('type') validType(newVal) { if (!newVal || types.indexOf(newVal) == -1) { return this.type = types[0] } }
+    @Watch('type') validType(newVal) {
+        if (!newVal || types.indexOf(newVal) == -1) { return this.type = types[0] }
+        SetAttribute(this.formInput, 'type', newVal)
+    }
 
     @Prop() value: string = ''
     @Watch('value') validValue(newVal) { if (typeof newVal == 'undefined') { return this.value = '' } }
@@ -71,11 +87,15 @@ export class FieldText {
     /** STATE */
     @State() sanitizedHelp: string = ''
     @State() sanitizedLabel: string = ''
+    @Watch('sanitizedLabel') validSanitizedLabel(newVal) {
+        SetAttribute(this.containerElement, 'has-label', (!!newVal).toString())
+        this.name = InputName(this.name, newVal, this.inputid)
+    }
 
     /** METHODS */
-    @Method() getValidity() { return Promise.resolve(this.inputElement.validity) }
+    @Method() getValidity() { return Promise.resolve(this.formInput.validity) }
 
-    @Method() getValidationMessage() { return Promise.resolve(this.inputElement.validationMessage) }
+    @Method() getValidationMessage() { return Promise.resolve(this.formInput.validationMessage) }
 
 
     /** ELEMENTS */
@@ -83,32 +103,31 @@ export class FieldText {
     helpTextElement!: HTMLElement
     inputElement!: HTMLInputElement
     labelElement!: HTMLLabelElement
+    formInput!: HTMLInputElement
 
 
     /** INTERNAL METHODS */
     externalForm() { return this.host.closest('form') }
 
-    externalInput() { return this.host.querySelector('input') }
-
     focused() { return this.inputid === (document.activeElement as any).inputid }
 
     isempty() { return this.value == '' || this.value == undefined }
 
-    isvalid() { return this.inputElement.validity.valid }
+    isvalid() { return this.formInput.validity.valid }
 
-    removeEvents(container, input) {
-        Object.keys(input.events || {}).forEach((key) => input.events[key]())
-        Object.keys(container.events || {}).forEach((key) => container.events[key]())
-    }
-
-    sanitized(val) { return !val ? '' : ValidateHtml(val).sanitized as string }
-
-    updateLabelPosition() { AttributeSetRemove(this.inputElement, 'label-up', this.focused() || (this.value !== '' && this.value != 'undefined')) }
+    checkError() { this.error = this.formInput.validationMessage }
 
     handleInput() {
-        (this.externalInput() || {}).value = this.value = this.inputElement.value
+        this.formInput.value = this.value = this.inputElement.value
         this.count = this.inputElement.value.length
-        if (!!this.error && this.isvalid()) { this.error = this.inputElement.validationMessage }
+        if (!!this.error && this.isvalid()) { this.error = this.formInput.validationMessage }
+
+        const empty = this.isempty()
+        this.host.setAttribute('empty', empty)
+
+        if (this.containerElement) {
+            this.containerElement.setAttribute('empty', empty.toString())
+        }
     }
 
     handleEnter(e) {
@@ -116,75 +135,80 @@ export class FieldText {
         DispatchEvent(this.externalForm(), 'submit')
     }
 
-    setEvents() {
-        const container = this.containerElement as any
-        const input = this.inputElement as any
-        const slot = this.host.shadowRoot.querySelector('slot')
+    setLabelPosition() {
+        const focused = this.focused()
+        const empty = this.isempty()
+        const forcedUp = this.labelup
 
-        this.removeEvents(container, input)
-
-        input.events = {
-            form: EventObserver(this.externalForm(), 'submit').subscribe((e) => {
-                if (!this.isvalid()) {
-                    e.preventDefault()
-                    this.error = this.inputElement.validationMessage
-                }
-            })
-        }
-
-        container.events = {
-            slot: EventObserver(slot, 'slotchange').subscribe(() => {
-                AttributeSetRemove(this.containerElement, 'hasicon', !!this.host.querySelector('[slot="icon"]'))
-            })
-        }
+        SetAttribute(SetAttribute(this.host, 'empty', empty), 'focused', focused)
+        SetAttribute(
+            SetAttribute(
+                SetAttribute(this.containerElement, 'empty', empty.toString()),
+                'focused', focused.toString()),
+            'label-up', focused || !empty || forcedUp ? 'true' : 'false'
+        )
     }
 
     /** LIFECYLE */
     componentWillLoad() {
-        this.sanitizedLabel = this.sanitized(this.label)
-        this.sanitizedHelp = this.sanitized(this.helptext)
+        this.sanitizedLabel = sanitized(this.label)
+        this.sanitizedHelp = sanitized(this.helptext)
     }
 
     componentDidLoad() {
-        this.setEvents()
         attachId(this.inputid, this.inputElement, this.labelElement)
-    }
-
-    disconnectedCallback() {
-        this.removeEvents(this.containerElement, this.inputElement)
+        this.containerElement.setAttribute('has-label', (!!this.sanitizedLabel).toString())
+        this.setLabelPosition()
+        FormControl.apply(this, [this.inputid, this.formInput, this.externalForm()])
     }
 
     render() {
+        this.formInput = RenderLightDom(this.host, 'input.field-text-hidden-input', {
+            tagName: 'input',
+            type: this.type,
+            value: this.value,
+            name: this.name,
+            required: this.required,
+            disabled: this.disabled,
+            readonly: this.readonly,
+            maxLength: this.max,
+            minLength: this.min,
+            class: 'field-text-hidden-input',
+            slot: 'form-control'
+        }) as HTMLInputElement
+
         return <div
             ref={(el) => this.containerElement = el as HTMLElement}
             class={`field-text-container field-element-container${this.slim ? ' slim' : ''}${this.autowidth ? ' w-auto' : ''}`}
         >
-            <input
-                ref={(el) => this.inputElement = el as any}
-                placeholder=" "
-                type={this.type}
-                value={this.value}
-                autocomplete={this.autocomplete}
-                autofocus={this.autofocus}
-                disabled={this.disabled}
-                name={this.name}
-                readonly={this.readonly}
-                required={this.required}
-                id={this.inputid}
-                maxLength={this.max}
-                minLength={this.min}
-                form={(this.externalForm() || {}).id}
-                onAnimationStart={() => this.updateLabelPosition()}
-                onFocus={() => this.updateLabelPosition()}
-                onBlur={() => this.updateLabelPosition()}
-                onInput={() => this.handleInput()}
-                onKeyDown={(e) => this.handleEnter(e)}
-            />
-
-            <label ref={(el) => this.labelElement = el as HTMLLabelElement}>{this.sanitizedLabel}</label>
-
             <span class="icon-container"><slot name="icon" /></span>
-
+            <div class="field-input-label">
+                <input
+                    ref={(el) => this.inputElement = el as any}
+                    placeholder=" "
+                    type={this.type}
+                    value={this.value}
+                    autocomplete={this.autocomplete}
+                    autofocus={this.autofocus}
+                    disabled={this.disabled}
+                    readonly={this.readonly}
+                    required={this.required}
+                    id={this.inputid}
+                    maxLength={this.max}
+                    minLength={this.min}
+                    name={this.name}
+                    form={(this.externalForm() || {}).id}
+                    onAnimationStart={() => this.setLabelPosition()}
+                    onFocus={() => this.setLabelPosition()}
+                    onBlur={() => {
+                        this.checkError()
+                        this.setLabelPosition()
+                    }}
+                    onInput={() => this.handleInput()}
+                    onKeyDown={(e) => this.handleEnter(e)}
+                />
+                <label ref={(el) => this.labelElement = el as HTMLLabelElement}>{this.sanitizedLabel}</label>
+            </div>
             <span class="field-input-bottom">
                 <span
                     ref={(el) => this.helpTextElement = el as HTMLElement}
@@ -192,6 +216,7 @@ export class FieldText {
 
                 <span class="field-count-text">{this.showcount ? this.max ? `${this.count}/${this.max}` : this.count : ''}</span>
             </span>
+            <div class="form-control"><slot name="form-control"></slot></div>
         </div>
     }
 }

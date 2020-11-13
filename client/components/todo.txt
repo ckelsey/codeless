@@ -1,10 +1,6 @@
-https://www.hjorthhansen.dev/shadow-dom-form-participation/
+- field-date
+- field-datetime
+- field-color
+- field-wysiwyg
 
-- time
-    - error
-    - help
-    - auto move to next input
-    - really needs cleanup
-
-- textarea 
-    - auto resize on input
+- flash-message

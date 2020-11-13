@@ -9,7 +9,7 @@ $foreground: (
     "dark": #bbb,
 ) !default;
 $accent: (
-    "base": rgb(70, 154, 182),
+    "base": rgb(62, 142, 168),
     "light": rgb(77, 167, 197),
     "dark": rgb(55, 120, 142),
 ) !default;
@@ -100,3 +100,6 @@ $space4: 2em;
     background-color: theme-color("accent");
     color: theme-color("accent-offset");
 }
+
+$fontFamily: Arial, Helvetica, sans-serif;
+$fontSize: 16px;

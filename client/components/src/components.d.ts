@@ -5,7 +5,38 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
+import { InternalValue } from "./components/field-time/field-time";
 export namespace Components {
+    interface CalendarDay {
+        /**
+          * PROPERTIES
+         */
+        "active": boolean;
+        "clickable": boolean;
+        "date": Date;
+        /**
+          * METHODS
+         */
+        "day": (val: any) => Promise<unknown>;
+        "disabled": boolean;
+        "month": (val: any) => Promise<unknown>;
+        "year": (val: any) => Promise<unknown>;
+    }
+    interface CalendarMonth {
+        /**
+          * PROPERTIES
+         */
+        "active": boolean;
+        "clickable": boolean;
+        "date": string | Date;
+        /**
+          * METHODS
+         */
+        "day": (val: any) => Promise<unknown>;
+        "disabled": boolean;
+        "month": (val: any) => Promise<unknown>;
+        "year": (val: any) => Promise<unknown>;
+    }
     interface DropDown {
         "align": string;
     }
@@ -38,10 +69,37 @@ export namespace Components {
         "label": string;
         "mixed": boolean;
         "name": string;
+        "novalidate": boolean;
         "readonly": boolean;
         "required": boolean;
         "slim": boolean;
         "value": boolean;
+    }
+    interface FieldDate {
+        /**
+          * PROPS
+         */
+        "autocomplete": string;
+        "autofocus": boolean;
+        "autowidth": boolean;
+        "disabled": boolean;
+        "error": string;
+        "getValidationMessage": () => Promise<string>;
+        /**
+          * METHODS
+         */
+        "getValidity": () => Promise<ValidityState>;
+        "helptext": string;
+        "inputid": string;
+        "label": string;
+        "labelup": boolean;
+        "max": number;
+        "min": number;
+        "name": string;
+        "readonly": boolean;
+        "required": boolean;
+        "slim": boolean;
+        "value": number | undefined;
     }
     interface FieldMultiselect {
         /**
@@ -57,6 +115,7 @@ export namespace Components {
          */
         "getValidity": () => Promise<ValidityState>;
         "helptext": string;
+        "inputid": string;
         "label": string;
         "name": string;
         "options": string | any[];
@@ -80,10 +139,9 @@ export namespace Components {
          */
         "getValidity": () => Promise<ValidityState>;
         "helptext": string;
-        "iconalign": string;
         "inputid": string;
         "label": string;
-        "labelalign": string;
+        "labelup": boolean;
         "max": number;
         "min": number;
         "name": string;
@@ -130,9 +188,10 @@ export namespace Components {
         "helptext": string;
         "inputid": string;
         "label": string;
-        "labelalign": string;
+        "labelup": boolean;
         "name": string;
         "options": string | any[];
+        "readonly": boolean;
         "required": boolean;
         "slim": boolean;
         "value": string;
@@ -155,7 +214,7 @@ export namespace Components {
         "helptext": string;
         "inputid": string;
         "label": string;
-        "labelalign": string;
+        "labelup": boolean;
         "max": number;
         "min": number;
         "name": string;
@@ -185,7 +244,7 @@ export namespace Components {
         "helptext": string;
         "inputid": string;
         "label": string;
-        "labelalign": string;
+        "labelup": boolean;
         "max": number;
         "min": number;
         "name": string;
@@ -203,6 +262,7 @@ export namespace Components {
         "autowidth": boolean;
         "disabled": boolean;
         "error": string;
+        "getInternal": () => Promise<InternalValue>;
         "getValidationMessage": () => Promise<string>;
         /**
           * METHODS
@@ -212,7 +272,7 @@ export namespace Components {
         "hour": (value?: any) => Promise<unknown>;
         "inputid": string;
         "label": string;
-        "labelalign": string;
+        "labelup": boolean;
         "max": string;
         "meridien": (value?: any) => Promise<unknown>;
         "min": string;
@@ -225,8 +285,22 @@ export namespace Components {
         "slim": boolean;
         "value": string;
     }
+    interface RootElement {
+    }
 }
 declare global {
+    interface HTMLCalendarDayElement extends Components.CalendarDay, HTMLStencilElement {
+    }
+    var HTMLCalendarDayElement: {
+        prototype: HTMLCalendarDayElement;
+        new (): HTMLCalendarDayElement;
+    };
+    interface HTMLCalendarMonthElement extends Components.CalendarMonth, HTMLStencilElement {
+    }
+    var HTMLCalendarMonthElement: {
+        prototype: HTMLCalendarMonthElement;
+        new (): HTMLCalendarMonthElement;
+    };
     interface HTMLDropDownElement extends Components.DropDown, HTMLStencilElement {
     }
     var HTMLDropDownElement: {
@@ -244,6 +318,12 @@ declare global {
     var HTMLFieldCheckboxElement: {
         prototype: HTMLFieldCheckboxElement;
         new (): HTMLFieldCheckboxElement;
+    };
+    interface HTMLFieldDateElement extends Components.FieldDate, HTMLStencilElement {
+    }
+    var HTMLFieldDateElement: {
+        prototype: HTMLFieldDateElement;
+        new (): HTMLFieldDateElement;
     };
     interface HTMLFieldMultiselectElement extends Components.FieldMultiselect, HTMLStencilElement {
     }
@@ -287,10 +367,19 @@ declare global {
         prototype: HTMLFieldTimeElement;
         new (): HTMLFieldTimeElement;
     };
+    interface HTMLRootElementElement extends Components.RootElement, HTMLStencilElement {
+    }
+    var HTMLRootElementElement: {
+        prototype: HTMLRootElementElement;
+        new (): HTMLRootElementElement;
+    };
     interface HTMLElementTagNameMap {
+        "calendar-day": HTMLCalendarDayElement;
+        "calendar-month": HTMLCalendarMonthElement;
         "drop-down": HTMLDropDownElement;
         "field-button": HTMLFieldButtonElement;
         "field-checkbox": HTMLFieldCheckboxElement;
+        "field-date": HTMLFieldDateElement;
         "field-multiselect": HTMLFieldMultiselectElement;
         "field-number": HTMLFieldNumberElement;
         "field-radio": HTMLFieldRadioElement;
@@ -298,9 +387,28 @@ declare global {
         "field-text": HTMLFieldTextElement;
         "field-textarea": HTMLFieldTextareaElement;
         "field-time": HTMLFieldTimeElement;
+        "root-element": HTMLRootElementElement;
     }
 }
 declare namespace LocalJSX {
+    interface CalendarDay {
+        /**
+          * PROPERTIES
+         */
+        "active"?: boolean;
+        "clickable"?: boolean;
+        "date"?: Date;
+        "disabled"?: boolean;
+    }
+    interface CalendarMonth {
+        /**
+          * PROPERTIES
+         */
+        "active"?: boolean;
+        "clickable"?: boolean;
+        "date"?: string | Date;
+        "disabled"?: boolean;
+    }
     interface DropDown {
         "align"?: string;
     }
@@ -328,10 +436,32 @@ declare namespace LocalJSX {
         "label"?: string;
         "mixed"?: boolean;
         "name"?: string;
+        "novalidate"?: boolean;
         "readonly"?: boolean;
         "required"?: boolean;
         "slim"?: boolean;
         "value"?: boolean;
+    }
+    interface FieldDate {
+        /**
+          * PROPS
+         */
+        "autocomplete"?: string;
+        "autofocus"?: boolean;
+        "autowidth"?: boolean;
+        "disabled"?: boolean;
+        "error"?: string;
+        "helptext"?: string;
+        "inputid"?: string;
+        "label"?: string;
+        "labelup"?: boolean;
+        "max"?: number;
+        "min"?: number;
+        "name"?: string;
+        "readonly"?: boolean;
+        "required"?: boolean;
+        "slim"?: boolean;
+        "value"?: number | undefined;
     }
     interface FieldMultiselect {
         /**
@@ -342,6 +472,7 @@ declare namespace LocalJSX {
         "disabled"?: boolean;
         "error"?: string;
         "helptext"?: string;
+        "inputid"?: string;
         "label"?: string;
         "name"?: string;
         "options"?: string | any[];
@@ -360,10 +491,9 @@ declare namespace LocalJSX {
         "disabled"?: boolean;
         "error"?: string;
         "helptext"?: string;
-        "iconalign"?: string;
         "inputid"?: string;
         "label"?: string;
-        "labelalign"?: string;
+        "labelup"?: boolean;
         "max"?: number;
         "min"?: number;
         "name"?: string;
@@ -400,9 +530,10 @@ declare namespace LocalJSX {
         "helptext"?: string;
         "inputid"?: string;
         "label"?: string;
-        "labelalign"?: string;
+        "labelup"?: boolean;
         "name"?: string;
         "options"?: string | any[];
+        "readonly"?: boolean;
         "required"?: boolean;
         "slim"?: boolean;
         "value"?: string;
@@ -420,7 +551,7 @@ declare namespace LocalJSX {
         "helptext"?: string;
         "inputid"?: string;
         "label"?: string;
-        "labelalign"?: string;
+        "labelup"?: boolean;
         "max"?: number;
         "min"?: number;
         "name"?: string;
@@ -445,7 +576,7 @@ declare namespace LocalJSX {
         "helptext"?: string;
         "inputid"?: string;
         "label"?: string;
-        "labelalign"?: string;
+        "labelup"?: boolean;
         "max"?: number;
         "min"?: number;
         "name"?: string;
@@ -466,7 +597,7 @@ declare namespace LocalJSX {
         "helptext"?: string;
         "inputid"?: string;
         "label"?: string;
-        "labelalign"?: string;
+        "labelup"?: boolean;
         "max"?: string;
         "min"?: string;
         "name"?: string;
@@ -476,10 +607,15 @@ declare namespace LocalJSX {
         "slim"?: boolean;
         "value"?: string;
     }
+    interface RootElement {
+    }
     interface IntrinsicElements {
+        "calendar-day": CalendarDay;
+        "calendar-month": CalendarMonth;
         "drop-down": DropDown;
         "field-button": FieldButton;
         "field-checkbox": FieldCheckbox;
+        "field-date": FieldDate;
         "field-multiselect": FieldMultiselect;
         "field-number": FieldNumber;
         "field-radio": FieldRadio;
@@ -487,15 +623,19 @@ declare namespace LocalJSX {
         "field-text": FieldText;
         "field-textarea": FieldTextarea;
         "field-time": FieldTime;
+        "root-element": RootElement;
     }
 }
 export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
+            "calendar-day": LocalJSX.CalendarDay & JSXBase.HTMLAttributes<HTMLCalendarDayElement>;
+            "calendar-month": LocalJSX.CalendarMonth & JSXBase.HTMLAttributes<HTMLCalendarMonthElement>;
             "drop-down": LocalJSX.DropDown & JSXBase.HTMLAttributes<HTMLDropDownElement>;
             "field-button": LocalJSX.FieldButton & JSXBase.HTMLAttributes<HTMLFieldButtonElement>;
             "field-checkbox": LocalJSX.FieldCheckbox & JSXBase.HTMLAttributes<HTMLFieldCheckboxElement>;
+            "field-date": LocalJSX.FieldDate & JSXBase.HTMLAttributes<HTMLFieldDateElement>;
             "field-multiselect": LocalJSX.FieldMultiselect & JSXBase.HTMLAttributes<HTMLFieldMultiselectElement>;
             "field-number": LocalJSX.FieldNumber & JSXBase.HTMLAttributes<HTMLFieldNumberElement>;
             "field-radio": LocalJSX.FieldRadio & JSXBase.HTMLAttributes<HTMLFieldRadioElement>;
@@ -503,6 +643,7 @@ declare module "@stencil/core" {
             "field-text": LocalJSX.FieldText & JSXBase.HTMLAttributes<HTMLFieldTextElement>;
             "field-textarea": LocalJSX.FieldTextarea & JSXBase.HTMLAttributes<HTMLFieldTextareaElement>;
             "field-time": LocalJSX.FieldTime & JSXBase.HTMLAttributes<HTMLFieldTimeElement>;
+            "root-element": LocalJSX.RootElement & JSXBase.HTMLAttributes<HTMLRootElementElement>;
         }
     }
 }

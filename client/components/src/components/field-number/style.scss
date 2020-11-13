@@ -10,13 +10,9 @@
             @include field;
         }
 
-        label {
-            @include label;
-        }
-    }
-
-    .field-element-container {
+        @include inputLabel;
+        @include iconSlot;
         @include helptext;
-        @include icon;
+        @include formControl;
     }
 }
