@@ -1,0 +1,11 @@
+curl \
+  -H "Accept: application/vnd.github.v3+raw" \
+  https://api.github.com/repos/google/material-design-icons/contents/src/toggle/toggle_on/materialiconssharp
+
+
+curl \
+  -H "Accept: application/vnd.github.v3+raw" \
+  https://api.github.com/repos/google/material-design-icons/contents/src/toggle/toggle_on/materialiconssharp/24px.svg?ref=master
+
+
+  curl -H 'Authorization: token acesstoken' https://api.github.com/user/repos

@@ -33,13 +33,7 @@ export class FieldButton {
     /** INTERNAL METHODS */
     externalForm() { return this.host.closest('form') }
 
-    triggerSubmit() {
-        // if (this.type !== 'submit') { return }
-        // const form = this.externalForm()
-        // if (!form) { return }
-        // DispatchEvent(form, 'submit')
-        this.formButton.click()
-    }
+    triggerSubmit() { this.formButton.click() }
 
     btn!: HTMLButtonElement
     containerElement!: HTMLElement

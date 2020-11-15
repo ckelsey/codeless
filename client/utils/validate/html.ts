@@ -259,3 +259,5 @@ const svgTags = [
     'view',
     'vkern'
 ]
+
+export const SantizedHTML = (val: string) => !val ? '' : ValidateHtml(val).sanitized as string

@@ -1,25 +1,13 @@
 
 import { Component, Prop, h, Watch, Element, Method, State } from '@stencil/core'
-import ValidateHtml from '../../../../utils/validate/html'
 import ID from '../../../../utils/id'
 import RenderLightDom from '../../../../utils/dom/render-light-dom'
 import InputName from '../../../../utils/dom/input-name'
 import FormControl from '../../../../utils/dom/form-control'
+import TextareaHeight from '../../../../utils/dom/textarea-height'
 import SetAttribute from '../../../../utils/dom/set-attribute'
-
-const resizeOptions = ['none', 'horizontal', 'vertical', 'both']
-const sanitized = (val: string) => !val ? '' : ValidateHtml(val).sanitized as string
-const attachId = (id: string, input: HTMLInputElement, label: any) => {
-    input.id = id
-    SetAttribute(label, 'for', id)
-}
-
-function textareaHeight(input: HTMLTextAreaElement) {
-    input.style.removeProperty('height')
-    input.style.overflow = 'hidden'
-    input.style.height = `${input.scrollHeight}px`
-}
-
+import InputLabelId from '../../../../utils/dom/input-label-id'
+import { SantizedHTML } from '../../../../utils/validate/html'
 
 @Component({
     tag: 'field-textarea',
@@ -45,16 +33,16 @@ export class FieldTextarea {
     @Watch('disabled') disabledWatcher(newVal) { SetAttribute(this.formInput, 'disabled', newVal) }
 
     @Prop({ mutable: true }) error: string = ''
-    @Watch('error') validError(newVal) { SetAttribute(this.labelElement, 'error', sanitized(newVal)) }
+    @Watch('error') validError(newVal) { SetAttribute(this.labelElement, 'error', SantizedHTML(newVal)) }
 
     @Prop() helptext: string
-    @Watch('helptext') validHelpText(newVal) { this.sanitizedHelp = sanitized(newVal) }
+    @Watch('helptext') validHelpText(newVal) { this.sanitizedHelp = SantizedHTML(newVal) }
 
     @Prop({ reflect: true }) inputid: string = ID()
-    @Watch('inputid') validId(newVal) { attachId(newVal, this.inputElement, this.labelElement) }
+    @Watch('inputid') validId(newVal) { InputLabelId(newVal, this.inputElement, this.labelElement) }
 
     @Prop() label: string = ''
-    @Watch('label') validLabel(newVal) { this.sanitizedLabel = sanitized(newVal) }
+    @Watch('label') validLabel(newVal) { this.sanitizedLabel = SantizedHTML(newVal) }
 
     @Prop() labelup: boolean = false
     @Watch('labelup') validLabelUp() { this.setLabelPosition() }
@@ -76,9 +64,6 @@ export class FieldTextarea {
 
     @Prop() required: boolean = false
     @Watch('required') requiredWatcher(newVal) { SetAttribute(this.formInput, 'required', newVal) }
-
-    @Prop() resize: string = resizeOptions[0]
-    @Watch('resize') validResize(newVal) { SetAttribute(this.containerElement, 'resize', resizeOptions.indexOf(newVal) > -1 ? newVal : resizeOptions[0]) }
 
     @Prop() showcount: boolean = false
 
@@ -122,7 +107,7 @@ export class FieldTextarea {
     checkError() { this.error = this.formInput.validationMessage }
 
     handleInput() {
-        textareaHeight(this.inputElement)
+        TextareaHeight(this.inputElement)
         this.value = this.inputElement.value
         this.count = this.formInput.value.length
         if (!!this.error && this.isvalid()) { this.error = this.formInput.validationMessage }
@@ -137,10 +122,10 @@ export class FieldTextarea {
     }
 
     /** LIFECYLE */
-    componentWillLoad() { this.sanitizedLabel = sanitized(this.label) }
+    componentWillLoad() { this.sanitizedLabel = SantizedHTML(this.label) }
 
     componentDidLoad() {
-        attachId(this.inputid, this.inputElement, this.labelElement)
+        InputLabelId(this.inputid, this.inputElement, this.labelElement)
         SetAttribute(this.containerElement, 'has-label', (!!this.sanitizedLabel).toString())
         FormControl.apply(this, [this.inputid, this.formInput, this.externalForm()])
     }

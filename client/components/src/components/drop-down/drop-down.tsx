@@ -1,11 +1,9 @@
-import { Component, h, Element, Prop, Host } from '@stencil/core'
-import EventObserver from '../../../../utils/observe/event-observer'
+import { Component, h, Element, Prop } from '@stencil/core'
 import AppendStyleElement from '../../../../utils/dom/append-style-element'
 import WasClickedOn from '../../../../utils/dom/was-clicked-on'
 import ArrayFrom from '../../../../utils/conversion/array-from'
 import DispatchEvent from '../../../../utils/dom/dispatch-event'
 
-const alignments = ['left', 'right']
 const itemStyle = 'drop-down [slot="item"]{color:inherit; white-space: nowrap; min-width: 100%; cursor: pointer; position: relative; padding: 0.5em 1em; box-sizing: border-box;} drop-down [slot="item"]::before{content: ""; position: absolute; width: 100%; height: 100%; left:0; top:0; background-color: currentColor; opacity:0; transition: opacity 0.2s;} drop-down [slot="item"]:hover::before{opacity:0.1;}'
 
 @Component({
@@ -17,41 +15,50 @@ const itemStyle = 'drop-down [slot="item"]{color:inherit; white-space: nowrap; m
 export class DropDown {
     @Element() host
 
-    @Prop() align: string = alignments[0]
+    @Prop() closeonclick: boolean = true
+    @Prop() openonhover: boolean = true
+    @Prop({ mutable: true, reflect: true }) open: boolean = false
 
-    containerElement!: HTMLElement
+    clicked(e: Event) {
+        const item = WasClickedOn(ArrayFrom(this.host.querySelectorAll('[slot="item"]')), e)
 
-    removeEvents(containerElement) { Object.keys(containerElement.events || {}).forEach((key) => containerElement.events[key]()) }
+        if (item) { DispatchEvent(this.host, 'itemclicked', item) }
+
+        if (this.closeonclick && this.open) { return this.open = false }
+
+        if (!this.open) { this.open = true }
+    }
 
     /** LIFECYLE */
     componentDidLoad() {
-        const containerElement = this.containerElement as any
-
-        containerElement.events = {
-            click: EventObserver(this.host, 'click').subscribe(e => {
-                const item = WasClickedOn(ArrayFrom(this.host.querySelectorAll('[slot="item"]')), e)[0]
-                if (item) { DispatchEvent(this.host, 'itemclicked', item) }
-            })
-        }
-
         if (!document.head.querySelector('style[name="drop-down-item-style"]')) {
             AppendStyleElement(itemStyle, document.head, 'drop-down-item-style')
         }
-    }
 
-    disconnectedCallback() {
-        this.removeEvents(this.containerElement)
+        if (typeof this.host.clickEvent === 'function') {
+            this.host.clickEvent()
+        }
+
+        const clickFn = (e) => this.clicked(e)
+
+        this.host.addEventListener('click', clickFn)
+        this.host.clickEvent = () => {
+            this.host.removeEventListener('submit', clickFn)
+            delete this.host.clickEvent
+        }
     }
 
     render() {
-        return <Host>
-            <div ref={(el) => this.containerElement = el as HTMLElement} class="drop-down-container">
-                <div class="drop-down-label-container">
-                    <div class="drop-down-label"><slot name="label" /></div>
-                    <div class="drop-down-arrow"></div>
-                </div>
-                <div class="drop-down-items"><slot name="item" /></div>
+        return <div
+            class={`drop-down-container${this.open ? ' open' : ''}`}
+            onMouseOver={() => !this.openonhover ? undefined : this.open = true}
+            onMouseOut={() => !this.openonhover ? undefined : this.open = false}
+        >
+            <div class="drop-down-label-container">
+                <div class="drop-down-label"><slot name="label" /></div>
+                <div class="drop-down-arrow"></div>
             </div>
-        </Host>
+            <div class="drop-down-items"><slot name="item" /></div>
+        </div>
     }
 }

@@ -1,4 +1,6 @@
 - field-date
+    - cleaner month refresh
+    - month allow non-clickable days to be clickable
 - field-datetime
 - field-color
 - field-wysiwyg

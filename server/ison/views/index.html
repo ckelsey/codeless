@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>ISON</title>
+
+        <style>
+            body {
+                font-family: Arial, Helvetica, sans-serif;
+                font-size: 16px;
+                margin: 0;
+                color: #eee;
+                background-color: #222;
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            h1 {
+                margin: 1em 1rem;
+            }
+
+            input,
+            button {
+                border: none;
+                background: #eee;
+                font: inherit;
+                padding: 0.75em;
+                width: 30em;
+                border-radius: 2px;
+                color: #222;
+                box-sizing: border-box;
+                outline: none !important;
+                box-shadow: none !important;
+            }
+
+            button {
+                background-color: #3e8ea8;
+                color: #fff;
+                width: auto;
+            }
+
+            .row {
+                margin: 0.5em 0.5em;
+                display: flex;
+                align-items: center;
+            }
+
+            .row>* {
+                margin: 0em 0.5em;
+            }
+        </style>
+    </head>
+
+    <body>
+        <h1>ISON</h1>
+
+        <div class="row">
+            <h2>Github</h2>
+        </div>
+
+        <div class="row">
+            <input type="text" id="git_owner" placeholder="Owner" value="google">
+            <input type="text" id="git_repo" placeholder="Repo" value="material-design-icons">
+            <input type="text" id="git_path" placeholder="Path to svg's" value="src/">
+            <button id="git_submit">Grab</button>
+        </div>
+
+        <script>
+            var query = window.location.search.substring(1)
+            var token = query.split('access_token=')[1]
+            var submitBtn = document.getElementById('git_submit')
+            var ownerInput = document.getElementById('git_owner')
+            var repoInput = document.getElementById('git_repo')
+            var pathInput = document.getElementById('git_path')
+
+            submitBtn.addEventListener('click', function () {
+                var xhr = new XMLHttpRequest()
+
+                xhr.open('POST', '/git', true)
+                xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8')
+                xhr.onerror = function () {
+                    console.log('error', xhr.response)
+                }
+                xhr.onload = function () {
+                    console.log('load', xhr.response)
+                }
+
+                xhr.send(JSON.stringify({
+                    owner: ownerInput.value,
+                    repo: repoInput.value,
+                    path: pathInput.value
+                }))
+            })
+        </script>
+    </body>
+
+</html>

@@ -3,7 +3,7 @@
  * If there's any better way at all to handle the input cycle (internal->external->inputs->internal->external->inputs)
  */
 import { Component, Prop, h, Watch, Element, Method, State } from '@stencil/core'
-import ValidateHtml from '../../../../utils/validate/html'
+import { SantizedHTML } from '../../../../utils/validate/html'
 import ID from '../../../../utils/id'
 import AttributeSetRemove from '../../../../utils/dom/attribute-set-remove'
 import DispatchEvent from '../../../../utils/dom/dispatch-event'
@@ -57,15 +57,15 @@ export class FieldTime {
     @Watch('disabled') disabledWatcher(newVal) { if (this.formInput) { this.formInput.disabled = newVal } }
 
     @Prop({ mutable: true }) error: string = ''
-    @Watch('error') validError(newVal) { AttributeSetRemove(this.labelElement, 'error', sanitized(newVal)) }
+    @Watch('error') validError(newVal) { AttributeSetRemove(this.labelElement, 'error', SantizedHTML(newVal)) }
 
     @Prop() helptext: string
-    @Watch('helptext') validHelpText(newVal) { this.sanitizedHelp = sanitized(newVal) }
+    @Watch('helptext') validHelpText(newVal) { this.sanitizedHelp = SantizedHTML(newVal) }
 
     @Prop({ reflect: true }) inputid: string = ID()
 
     @Prop() label: string = ''
-    @Watch('label') validLabel(newVal) { this.sanitizedLabel = sanitized(newVal) }
+    @Watch('label') validLabel(newVal) { this.sanitizedLabel = SantizedHTML(newVal) }
 
     @Prop() labelup: boolean = false
     @Watch('labelup') validLabelUp() { this.setLabelPosition() }
@@ -253,8 +253,8 @@ export class FieldTime {
 
     /** LIFECYLE */
     componentWillLoad() {
-        this.sanitizedLabel = sanitized(this.label)
-        this.sanitizedHelp = sanitized(this.helptext)
+        this.sanitizedLabel = SantizedHTML(this.label)
+        this.sanitizedHelp = SantizedHTML(this.helptext)
         this.externalToInternal()
     }
 
@@ -333,9 +333,6 @@ export class FieldTime {
 
 
 /** HELPERS */
-
-const sanitized = (val: string) => !val ? '' : ValidateHtml(val).sanitized as string
-
 const isEmpty = value => value === '' || value === undefined
 
 const isSubmitting = (key, form) => !!form && key == 'enter'

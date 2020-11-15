@@ -1,5 +1,4 @@
 import { Component, Prop, h, Watch, Element, Method, State } from '@stencil/core'
-import ValidateHtml from '../../../../utils/validate/html'
 import ID from '../../../../utils/id'
 import AttributeSetRemove from '../../../../utils/dom/attribute-set-remove'
 import DispatchEvent from '../../../../utils/dom/dispatch-event'
@@ -7,14 +6,10 @@ import RenderLightDom from '../../../../utils/dom/render-light-dom'
 import InputName from '../../../../utils/dom/input-name'
 import FormControl from '../../../../utils/dom/form-control'
 import SetAttribute from '../../../../utils/dom/set-attribute'
+import InputLabelId from '../../../../utils/dom/input-label-id'
+import { SantizedHTML } from '../../../../utils/validate/html'
 
 const types = ['text', 'email', 'tel']
-const sanitized = (val: string) => !val ? '' : ValidateHtml(val).sanitized as string
-const attachId = (id: string, input: HTMLInputElement, label: any) => {
-    input.id = id
-    label.setAttribute('for', id)
-}
-
 
 @Component({
     tag: 'field-text',
@@ -38,16 +33,16 @@ export class FieldText {
     @Watch('disabled') disabledWatcher(newVal) { SetAttribute(this.formInput, 'disabled', newVal) }
 
     @Prop({ mutable: true }) error: string = ''
-    @Watch('error') validError(newVal) { AttributeSetRemove(this.labelElement, 'error', sanitized(newVal)) }
+    @Watch('error') validError(newVal) { AttributeSetRemove(this.labelElement, 'error', SantizedHTML(newVal)) }
 
     @Prop() helptext: string
-    @Watch('helptext') validHelpText(newVal) { this.sanitizedHelp = sanitized(newVal) }
+    @Watch('helptext') validHelpText(newVal) { this.sanitizedHelp = SantizedHTML(newVal) }
 
     @Prop({ reflect: true }) inputid: string = ID()
-    @Watch('inputid') validId(newVal) { attachId(newVal, this.inputElement, this.labelElement) }
+    @Watch('inputid') validId(newVal) { InputLabelId(newVal, this.inputElement, this.labelElement) }
 
     @Prop() label: string = ''
-    @Watch('label') validLabel(newVal) { this.sanitizedLabel = sanitized(newVal) }
+    @Watch('label') validLabel(newVal) { this.sanitizedLabel = SantizedHTML(newVal) }
 
     @Prop() labelup: boolean = false
     @Watch('labelup') validLabelUp() { this.setLabelPosition() }
@@ -151,12 +146,12 @@ export class FieldText {
 
     /** LIFECYLE */
     componentWillLoad() {
-        this.sanitizedLabel = sanitized(this.label)
-        this.sanitizedHelp = sanitized(this.helptext)
+        this.sanitizedLabel = SantizedHTML(this.label)
+        this.sanitizedHelp = SantizedHTML(this.helptext)
     }
 
     componentDidLoad() {
-        attachId(this.inputid, this.inputElement, this.labelElement)
+        InputLabelId(this.inputid, this.inputElement, this.labelElement)
         this.containerElement.setAttribute('has-label', (!!this.sanitizedLabel).toString())
         this.setLabelPosition()
         FormControl.apply(this, [this.inputid, this.formInput, this.externalForm()])

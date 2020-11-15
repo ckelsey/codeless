@@ -38,7 +38,9 @@ export namespace Components {
         "year": (val: any) => Promise<unknown>;
     }
     interface DropDown {
-        "align": string;
+        "closeonclick": boolean;
+        "open": boolean;
+        "openonhover": boolean;
     }
     interface FieldButton {
         "disabled": boolean;
@@ -76,6 +78,7 @@ export namespace Components {
         "value": boolean;
     }
     interface FieldDate {
+        "active": boolean;
         /**
           * PROPS
          */
@@ -99,7 +102,7 @@ export namespace Components {
         "readonly": boolean;
         "required": boolean;
         "slim": boolean;
-        "value": number | undefined;
+        "value": Date | string;
     }
     interface FieldMultiselect {
         /**
@@ -250,7 +253,6 @@ export namespace Components {
         "name": string;
         "readonly": boolean;
         "required": boolean;
-        "resize": string;
         "showcount": boolean;
         "slim": boolean;
         "value": string;
@@ -284,6 +286,9 @@ export namespace Components {
         "showseconds": boolean;
         "slim": boolean;
         "value": string;
+    }
+    interface IconElement {
+        "kind": string;
     }
     interface RootElement {
     }
@@ -367,6 +372,12 @@ declare global {
         prototype: HTMLFieldTimeElement;
         new (): HTMLFieldTimeElement;
     };
+    interface HTMLIconElementElement extends Components.IconElement, HTMLStencilElement {
+    }
+    var HTMLIconElementElement: {
+        prototype: HTMLIconElementElement;
+        new (): HTMLIconElementElement;
+    };
     interface HTMLRootElementElement extends Components.RootElement, HTMLStencilElement {
     }
     var HTMLRootElementElement: {
@@ -387,6 +398,7 @@ declare global {
         "field-text": HTMLFieldTextElement;
         "field-textarea": HTMLFieldTextareaElement;
         "field-time": HTMLFieldTimeElement;
+        "icon-element": HTMLIconElementElement;
         "root-element": HTMLRootElementElement;
     }
 }
@@ -410,7 +422,9 @@ declare namespace LocalJSX {
         "disabled"?: boolean;
     }
     interface DropDown {
-        "align"?: string;
+        "closeonclick"?: boolean;
+        "open"?: boolean;
+        "openonhover"?: boolean;
     }
     interface FieldButton {
         "disabled"?: boolean;
@@ -443,6 +457,7 @@ declare namespace LocalJSX {
         "value"?: boolean;
     }
     interface FieldDate {
+        "active"?: boolean;
         /**
           * PROPS
          */
@@ -461,7 +476,7 @@ declare namespace LocalJSX {
         "readonly"?: boolean;
         "required"?: boolean;
         "slim"?: boolean;
-        "value"?: number | undefined;
+        "value"?: Date | string;
     }
     interface FieldMultiselect {
         /**
@@ -582,7 +597,6 @@ declare namespace LocalJSX {
         "name"?: string;
         "readonly"?: boolean;
         "required"?: boolean;
-        "resize"?: string;
         "showcount"?: boolean;
         "slim"?: boolean;
         "value"?: string;
@@ -607,6 +621,9 @@ declare namespace LocalJSX {
         "slim"?: boolean;
         "value"?: string;
     }
+    interface IconElement {
+        "kind"?: string;
+    }
     interface RootElement {
     }
     interface IntrinsicElements {
@@ -623,6 +640,7 @@ declare namespace LocalJSX {
         "field-text": FieldText;
         "field-textarea": FieldTextarea;
         "field-time": FieldTime;
+        "icon-element": IconElement;
         "root-element": RootElement;
     }
 }
@@ -643,6 +661,7 @@ declare module "@stencil/core" {
             "field-text": LocalJSX.FieldText & JSXBase.HTMLAttributes<HTMLFieldTextElement>;
             "field-textarea": LocalJSX.FieldTextarea & JSXBase.HTMLAttributes<HTMLFieldTextareaElement>;
             "field-time": LocalJSX.FieldTime & JSXBase.HTMLAttributes<HTMLFieldTimeElement>;
+            "icon-element": LocalJSX.IconElement & JSXBase.HTMLAttributes<HTMLIconElementElement>;
             "root-element": LocalJSX.RootElement & JSXBase.HTMLAttributes<HTMLRootElementElement>;
         }
     }

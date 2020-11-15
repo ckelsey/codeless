@@ -7,5 +7,9 @@ import { Component, h } from '@stencil/core'
 })
 
 export class RootElement {
-    render() { return <div class="root-element-container"><slot /></div> }
+    render() {
+        return <div class="root-element-container">
+            <slot />
+        </div>
+    }
 }

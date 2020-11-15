@@ -1,4 +1,5 @@
 import { Component, h, Element, Prop, State, Watch, Method } from '@stencil/core'
+import DispatchEvent from '../../../../utils/dom/dispatch-event'
 
 @Component({
     tag: 'calendar-day',
@@ -77,6 +78,10 @@ export class CalendarDay {
         this._year = date.getFullYear()
     }
 
+    clicked() {
+        DispatchEvent(this.host, 'dayclick', { date: this.date })
+    }
+
 
     /** LIFECYLE */
     componentWillLoad() { this.updateDate(this.date) }
@@ -93,6 +98,7 @@ export class CalendarDay {
                     ' calendar-day-clickable' :
                     ''
                 }`}
+            onClick={() => this.clicked()}
         >
             <div class="calendar-day-number-container">
                 <div class="calendar-day-number">{this._day}</div>

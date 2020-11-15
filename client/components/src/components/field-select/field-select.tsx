@@ -1,5 +1,4 @@
 import { Component, Prop, h, Watch, Element, Method, State } from '@stencil/core'
-import ValidateHtml from '../../../../utils/validate/html'
 import ID from '../../../../utils/id'
 import DispatchEvent from '../../../../utils/dom/dispatch-event'
 import Pipe from '../../../../utils/function-helpers/pipe'
@@ -13,9 +12,9 @@ import RenderLightDom from '../../../../utils/dom/render-light-dom'
 import InputName from '../../../../utils/dom/input-name'
 import FormControl from '../../../../utils/dom/form-control'
 import SetAttribute from '../../../../utils/dom/set-attribute'
+import { SantizedHTML } from '../../../../utils/validate/html'
 
 const optionsToArray = Pipe(ToArray, CommasToArray, ToOptions, IfInvalid([]))
-const sanitized = (val: string) => !val ? '' : ValidateHtml(val).sanitized as string
 const processedValue = (value, options) => Get(
     (options || []).filter(o => o.value == value),
     '0.value',
@@ -41,15 +40,15 @@ export class FieldSelect {
     @Watch('disabled') disabledWatcher(newVal) { SetAttribute(this.formInput, 'disabled', newVal) }
 
     @Prop({ mutable: true }) error: string = ''
-    @Watch('error') validError(newVal) { SetAttribute(this.labelElement, 'error', sanitized(newVal)) }
+    @Watch('error') validError(newVal) { SetAttribute(this.labelElement, 'error', SantizedHTML(newVal)) }
 
     @Prop() helptext: string
-    @Watch('helptext') validHelpText(newVal) { this.sanitizedHelp = sanitized(newVal) }
+    @Watch('helptext') validHelpText(newVal) { this.sanitizedHelp = SantizedHTML(newVal) }
 
     @Prop({ reflect: true }) inputid: string = ID()
 
     @Prop() label: string = ''
-    @Watch('label') validLabel(newVal) { this.sanitizedLabel = sanitized(newVal) }
+    @Watch('label') validLabel(newVal) { this.sanitizedLabel = SantizedHTML(newVal) }
 
     @Prop() labelup: boolean = false
     @Watch('labelup') validLabelUp() { this.setLabelPosition() }
@@ -142,9 +141,9 @@ export class FieldSelect {
 
     /** LIFECYLE */
     componentWillLoad() {
-        this.sanitizedLabel = sanitized(this.label)
-        this.sanitizedHelp = sanitized(this.helptext)
-        this.sanitizedError = sanitized(this.error)
+        this.sanitizedLabel = SantizedHTML(this.label)
+        this.sanitizedHelp = SantizedHTML(this.helptext)
+        this.sanitizedError = SantizedHTML(this.error)
         this.optionsArray = optionsToArray(this.options)
         this.value = processedValue(this.value, this.optionsArray)
     }
@@ -156,14 +155,14 @@ export class FieldSelect {
     }
 
     render() {
-        this.formInput = RenderLightDom(this.host, 'input.field-text-hidden-input', {
+        this.formInput = RenderLightDom(this.host, 'input.field-select-hidden-input', {
             tagName: 'input',
             type: 'text',
             value: this.value,
             name: this.name,
             required: this.required,
             disabled: this.disabled,
-            class: 'field-text-hidden-input',
+            class: 'field-select-hidden-input',
             slot: 'form-control'
         }) as HTMLInputElement
 

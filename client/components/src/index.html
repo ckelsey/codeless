@@ -21,7 +21,6 @@
     </head>
 
     <body>
-
         <root-element>
             <form action="/">
                 <field-time required="true" label="Some time ago" required="true" name="time">
@@ -51,7 +50,9 @@
                 <field-checkbox label="Checkbox" required="true"></field-checkbox>
                 <field-text label="Another text field" value="hola"></field-text>
                 <field-checkbox label="Mixed checkbox" mixed="true"></field-checkbox>
-                <field-date label="Date"></field-date>
+
+                <field-date label="Date" value="10/12/2020"></field-date>
+
                 <div>
                     <field-button type="submit">
                         <span>Submit</span>
@@ -82,6 +83,11 @@
 
             <div style="margin: 2em 0;font-size: 0.25em;">
                 <calendar-month></calendar-month>
+            </div>
+
+            <div style="margin: 2em 0;">
+                <icon-element kind="chevron-left"></icon-element>
+                <icon-element kind="chevron-right"></icon-element>
             </div>
         </root-element>
     </body>

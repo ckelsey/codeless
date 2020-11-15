@@ -1,6 +1,7 @@
 import { Component, h, Element, Prop, State, Watch, Method } from '@stencil/core'
 import ArrayFrom from '../../../../utils/conversion/array-from'
 import Create from '../../../../utils/dom/create'
+import DispatchEvent from '../../../../utils/dom/dispatch-event'
 
 const getDate = (date: Date) => new Date(`${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`)
 
@@ -128,14 +129,18 @@ export class CalendarMonth {
         let len = daysInMonth
 
         while (len--) {
-            daysContainer.appendChild(Create({
+            const dayElement = Create({
                 tag: 'calendar-day',
                 properties: {
                     date: new Date(year, month, daysInMonth - len),
                     clickable: this.clickable,
-                    // active: date.getDate() === (daysInMonth - len)
+                    active: date.getDate() === (daysInMonth - len)
                 }
-            }))
+            })
+
+            dayElement.addEventListener('dayclick', e => DispatchEvent(this.host, 'dayclick', e['detail']))
+
+            daysContainer.appendChild(dayElement)
         }
 
         let lastDay = endOfMonth.getDay()
@@ -160,7 +165,9 @@ export class CalendarMonth {
     /** LIFECYLE */
     componentWillLoad() { this.updateDate(this.date) }
 
-    componentDidLoad() { this.updateDom() }
+    componentDidLoad() {
+        this.updateDom()
+    }
 
     render() {
         return <div class="calendar-month-root">

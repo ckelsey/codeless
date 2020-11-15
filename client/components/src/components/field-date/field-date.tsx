@@ -1,5 +1,4 @@
 import { Component, Prop, h, Watch, Element, Method, State } from '@stencil/core'
-import ValidateHtml from '../../../../utils/validate/html'
 import ID from '../../../../utils/id'
 import AttributeSetRemove from '../../../../utils/dom/attribute-set-remove'
 import DispatchEvent from '../../../../utils/dom/dispatch-event'
@@ -7,13 +6,7 @@ import RenderLightDom from '../../../../utils/dom/render-light-dom'
 import InputName from '../../../../utils/dom/input-name'
 import FormControl from '../../../../utils/dom/form-control'
 import SetAttribute from '../../../../utils/dom/set-attribute'
-
-const sanitized = (val: string) => !val ? '' : ValidateHtml(val).sanitized as string
-const attachId = (id: string, input: HTMLInputElement, label: any) => {
-    input.id = id
-    SetAttribute(label, 'for', id)
-}
-
+import { SantizedHTML } from '../../../../utils/validate/html'
 
 @Component({
     tag: 'field-date',
@@ -35,16 +28,15 @@ export class FieldDate {
     @Watch('disabled') disabledWatcher(newVal) { SetAttribute(this.formInput, 'disabled', newVal) }
 
     @Prop({ mutable: true }) error: string = ''
-    @Watch('error') validError(newVal) { AttributeSetRemove(this.labelElement, 'error', sanitized(newVal)) }
+    @Watch('error') validError(newVal) { AttributeSetRemove(this.labelElement, 'error', SantizedHTML(newVal)) }
 
     @Prop() helptext: string
-    @Watch('helptext') validHelpText(newVal) { this.sanitizedHelp = sanitized(newVal) }
+    @Watch('helptext') validHelpText(newVal) { this.sanitizedHelp = SantizedHTML(newVal) }
 
     @Prop({ reflect: true }) inputid: string = ID()
-    @Watch('inputid') validId(newVal) { attachId(newVal, this.inputElement, this.labelElement) }
 
     @Prop() label: string = ''
-    @Watch('label') validLabel(newVal) { this.sanitizedLabel = sanitized(newVal) }
+    @Watch('label') validLabel(newVal) { this.sanitizedLabel = SantizedHTML(newVal) }
 
     @Prop() labelup: boolean = false
     @Watch('labelup') validLabelUp() { this.setLabelPosition() }
@@ -59,6 +51,8 @@ export class FieldDate {
 
     @Prop() min: number
 
+    @Prop({ mutable: true, reflect: true }) active: boolean = false
+
     @Prop() readonly: boolean = false
     @Watch('readonly') readonlyWatcher(newVal) { SetAttribute(this.formInput, 'readonly', newVal) }
 
@@ -67,13 +61,14 @@ export class FieldDate {
 
     @Prop() slim: boolean = false
 
-    @Prop() value: number | undefined
-    @Watch('value') validValue(newVal) {
-        this.value = isNaN(newVal) ? undefined : newVal
-    }
-
+    @Prop() value: Date | string
+    @Watch('value') valueWatcher(newVal) { this.updateDate(newVal) }
 
     /** STATE */
+    @State() startDate: Date = new Date()
+    @State() localeString: string = ''
+    @State() monthString: string = ''
+    @State() yearString: string = ''
     @State() sanitizedHelp: string = ''
     @State() sanitizedLabel: string = ''
     @Watch('sanitizedLabel') validSanitizedLabel(newVal) {
@@ -91,9 +86,11 @@ export class FieldDate {
     containerElement!: HTMLElement
     helpTextElement!: HTMLElement
     iconElement!: HTMLSpanElement
-    inputElement!: HTMLInputElement
     labelElement!: HTMLLabelElement
     formInput!: HTMLInputElement
+    inputElement!: HTMLInputElement
+    dropdownElement!: HTMLDropDownElement
+    calendarElement!: HTMLCalendarMonthElement
 
 
     /** INTERNAL METHODS */
@@ -107,6 +104,19 @@ export class FieldDate {
 
     checkError() { this.error = this.formInput.validationMessage }
 
+    updateDate(newVal) {
+        const date = new Date(newVal)
+
+        if (date.toString() !== 'Invalid Date') {
+            this.startDate = date
+            this.localeString = date.toLocaleString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })
+            this.monthString = date.toLocaleString(undefined, { month: 'long' })
+            this.yearString = date.toLocaleString(undefined, { year: 'numeric' })
+        }
+
+        this.setLabelPosition()
+    }
+
     setLabelPosition() {
         const focused = this.focused()
         const empty = this.isempty()
@@ -115,9 +125,12 @@ export class FieldDate {
     }
 
     handleInput() {
-        this.value = parseFloat(this.inputElement.value)
         this.formInput.value = (this.value || '').toString()
         if (!!this.error && this.isvalid()) { this.error = this.formInput.validationMessage }
+    }
+
+    handleCalendarClick(date) {
+        this.value = date
     }
 
     handleEnter(e) {
@@ -127,15 +140,17 @@ export class FieldDate {
 
     /** LIFECYLE */
     componentWillLoad() {
-        this.sanitizedLabel = sanitized(this.label)
-        this.sanitizedHelp = sanitized(this.helptext)
+        this.sanitizedLabel = SantizedHTML(this.label)
+        this.sanitizedHelp = SantizedHTML(this.helptext)
+        this.updateDate(this.value)
     }
 
     componentDidLoad() {
-        attachId(this.inputid, this.inputElement, this.labelElement)
         SetAttribute(this.containerElement, 'has-label', (!!this.sanitizedLabel).toString())
         this.setLabelPosition()
         FormControl.apply(this, [this.inputid, this.formInput, this.externalForm()])
+
+        this.calendarElement.addEventListener('dayclick', e => this.handleCalendarClick(e['detail'].date))
     }
 
     render() {
@@ -154,32 +169,36 @@ export class FieldDate {
         return <div
             ref={(el) => this.containerElement = el as HTMLElement}
             class={`field-date-container field-element-container${this.slim ? ' slim' : ''}${this.autowidth ? ' w-auto' : ''}`}
+            onMouseEnter={() => this.dropdownElement.open = true}
+            onMouseLeave={() => this.dropdownElement.open = false}
         >
             <span class="icon-container"><slot name="icon" /></span>
             <div class="field-input-label">
-                <input
-                    ref={(el) => this.inputElement = el as any}
-                    placeholder=" "
-                    autocomplete={this.autocomplete}
-                    autofocus={this.autofocus}
-                    disabled={this.disabled}
-                    name={this.name}
-                    readonly={this.readonly}
-                    required={this.required}
-                    id={this.inputid}
-                    form={(this.externalForm() || {}).id}
-                    onAnimationStart={() => this.setLabelPosition()}
-                    onFocus={() => this.setLabelPosition()}
-                    onBlur={() => {
-                        this.checkError()
-                        this.setLabelPosition()
-                    }}
-                    onInput={() => this.handleInput()}
-                    onKeyDown={(e) => this.handleEnter(e)}
-                    value={this.value}
-                />
+                <drop-down
+                    ref={(el) => this.dropdownElement = el as HTMLDropDownElement}
+                    class="field-date-drop-down"
+                    closeonclick={false}
+                    openonhover={false}
+                >
+                    <div class="field-date-input" slot="label">{this.localeString}</div>
+                    <div class="field-date-overlay" slot="item">
+                        <div class="calendar-header">
+                            <icon-element kind="chevron-left"></icon-element>
+                            <div class="calendar-header-center">
+                                <div class="calendar-header-month">{this.monthString}</div>
+                                <div class="calendar-header-year">{this.yearString}</div>
+                            </div>
+                            <icon-element kind="chevron-right"></icon-element>
+                        </div>
+                        <calendar-month
+                            slot="item"
+                            date={this.startDate}
+                            ref={el => this.calendarElement = el as HTMLCalendarMonthElement}
+                        ></calendar-month>
+                    </div>
+                </drop-down>
 
-                <label ref={(el) => this.labelElement = el as HTMLLabelElement}>{this.sanitizedLabel}</label>
+                <label ref={(el) => this.labelElement = el as HTMLLabelElement} class="field-date-label">{this.sanitizedLabel}</label>
             </div>
             <span class="field-input-bottom">
                 <span ref={(el) => this.helpTextElement = el as HTMLElement} class="field-help-text">{this.sanitizedHelp}</span>

@@ -20,6 +20,7 @@
         transition: color;
         color: inherit;
         box-sizing: border-box;
+        transition: border-radius 0.3s;
 
         * {
             box-sizing: border-box;
@@ -33,10 +34,8 @@
             width: 100%;
             height: 100%;
             background: theme-color("foreground", "dark");
-            box-shadow: inset 1px 1px 0px theme-color("foreground", "light"),
-                inset -1px -1px 0px transparentize(theme-color("background", "light"), 0.38);
             opacity: 0.1;
-            transition: background-color 0.62s, opacity 0.62s, box-shadow 0.62s;
+            transition: background-color 0.62s, opacity 0.62s;
         }
 
         .calendar-day-number-container {
@@ -66,12 +65,11 @@
 
         &.calendar-day-active {
             color: theme-color("accent-offset");
+            border-radius: 2px;
 
             &:before {
                 background: theme-color("accent");
                 opacity: 1;
-                box-shadow: inset 1px 1px 0px theme-color("accent", "light"),
-                    inset -1px -1px 0px theme-color("accent", "dark");
             }
         }
 
@@ -85,12 +83,11 @@
 
             &:hover:not(.calendar-day-active) {
                 color: theme-color("accent-offset");
+                border-radius: 2px;
 
                 &:before {
                     background: theme-color("accent");
-                    opacity: 0.5;
-                    box-shadow: inset 1px 1px 0px theme-color("accent", "light"),
-                        inset -1px -1px 0px theme-color("accent", "dark");
+                    opacity: 1;
                 }
             }
         }

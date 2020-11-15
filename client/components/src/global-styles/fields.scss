@@ -212,6 +212,7 @@ $inputShadowFocused: inset 0 0px 2px 0px transparentize(theme-color("foreground"
         flex-direction: column;
         justify-content: flex-start;
         align-items: flex-start;
+        min-height: $inputHeight;
     }
 
     label {

@@ -169,7 +169,10 @@ export class FieldMultiselect {
                 ref={(el) => this.containerElement = el as HTMLElement}
                 class={`field-multiselect-container field-element-container${this.slim ? ' slim' : ''}${this.autowidth ? ' w-auto' : ''}`}
             >
-                <drop-down ref={(el) => this.dropdownElement = el as HTMLElement} class="field-multiselect-dropdown">
+                <drop-down
+                    ref={(el) => this.dropdownElement = el as HTMLElement} class="field-multiselect-dropdown"
+                    closeonclick={false}
+                >
                     <field-checkbox
                         autofocus={this.autofocus}
                         autowidth={true}

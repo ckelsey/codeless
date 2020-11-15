@@ -17,9 +17,7 @@
         position: relative;
         animation: delayOverflowIn 1s;
 
-        &:active,
-        &:focus,
-        &:hover {
+        &.open {
             outline: none;
             box-shadow: none;
 
@@ -72,7 +70,7 @@
             display: flex;
             flex-direction: column;
             position: absolute;
-            top: 1.5em;
+            top: 100%;
             width: auto;
             min-width: 100%;
             padding: 0.5em;

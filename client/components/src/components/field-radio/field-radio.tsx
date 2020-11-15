@@ -1,5 +1,4 @@
 import { Component, Prop, h, Watch, Element, State, Method } from '@stencil/core'
-import ValidateHtml from '../../../../utils/validate/html'
 import Pipe from '../../../../utils/function-helpers/pipe'
 import CommasToArray from '../../../../utils/conversion/commas-to-array'
 import ToArray from '../../../../utils/conversion/to-array'
@@ -12,11 +11,10 @@ import RenderLightDom from '../../../../utils/dom/render-light-dom'
 import InputName from '../../../../utils/dom/input-name'
 import FormControl from '../../../../utils/dom/form-control'
 import SetAttribute from '../../../../utils/dom/set-attribute'
+import { SantizedHTML } from '../../../../utils/validate/html'
 
 const optionsToArray = Pipe(ToArray, CommasToArray, ToOptions, IfInvalid([]))
 const processedValue = (internalValue, value, options) => Get((options || []).filter(o => o.value == (internalValue || value)), '0.value')
-const sanitized = (val: string) => !val ? '' : ValidateHtml(val).sanitized as string
-
 
 @Component({
     tag: 'field-radio',
@@ -34,15 +32,15 @@ export class FieldRadio {
     @Watch('disabled') disabledWatcher(newVal) { SetAttribute(this.formInput, 'disabled', newVal) }
 
     @Prop({ mutable: true }) error: string = ''
-    @Watch('error') validError(newVal) { this.sanitizedError = sanitized(newVal) || '' }
+    @Watch('error') validError(newVal) { this.sanitizedError = SantizedHTML(newVal) || '' }
 
     @Prop() helptext: string
-    @Watch('helptext') validHelpText(newVal) { this.sanitizedHelp = sanitized(newVal) }
+    @Watch('helptext') validHelpText(newVal) { this.sanitizedHelp = SantizedHTML(newVal) }
 
     @Prop({ reflect: true }) inputid: string = ID()
 
     @Prop() label: string = ''
-    @Watch('label') validLabel(newVal) { this.sanitizedLabel = sanitized(newVal) }
+    @Watch('label') validLabel(newVal) { this.sanitizedLabel = SantizedHTML(newVal) }
 
     @Prop() name: string = ''
     @Watch('name') nameWatcher(newVal) {
@@ -114,9 +112,9 @@ export class FieldRadio {
 
     /** LIFECYLE */
     componentWillLoad() {
-        this.sanitizedLabel = sanitized(this.label)
-        this.sanitizedHelp = sanitized(this.helptext)
-        this.sanitizedError = sanitized(this.error)
+        this.sanitizedLabel = SantizedHTML(this.label)
+        this.sanitizedHelp = SantizedHTML(this.helptext)
+        this.sanitizedError = SantizedHTML(this.error)
         this.optionsArray = optionsToArray(this.options)
         this.internalValue = processedValue(this.internalValue, this.value, this.optionsArray)
         this.name = this.name || `field-radio-${this.inputid}`

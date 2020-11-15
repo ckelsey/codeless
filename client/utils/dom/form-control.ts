@@ -4,7 +4,7 @@ const onSubmit = (input: HTMLInputElement) => () => {
 }
 
 const FormControl = (inputid: string, input: HTMLInputElement, form: HTMLFormElement) => {
-    if (!form) { }
+    if (!form) { return }
 
     const onSub = onSubmit(input).bind(this)
 
