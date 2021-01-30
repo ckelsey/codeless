@@ -44,5 +44,10 @@ html {
         * {
             box-sizing: border-box;
         }
+
+        &[theme="inverse"] {
+            color: theme-color("background");
+            background-color: theme-color("foreground");
+        }
     }
 }

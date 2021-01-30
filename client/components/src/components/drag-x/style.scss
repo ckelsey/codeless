@@ -1,0 +1,9 @@
+drag-x {
+    display: inline-block;
+    position: relative;
+    cursor: grab;
+
+    &:active {
+        cursor: grabbing;
+    }
+}

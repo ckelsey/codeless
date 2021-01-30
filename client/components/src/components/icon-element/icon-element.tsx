@@ -1,10 +1,14 @@
 import { Component, h, Prop, Watch } from '@stencil/core'
 import * as _chevLeft from './paths/chevron-left.json'
 import * as _chevRight from './paths/chevron-right.json'
+import * as _chevDown from './paths/chevron-down.json'
+import * as _arrowLeftRight from './paths/arrow-left-right.json'
 
 const paths = {
+    "arrow-left-right": _arrowLeftRight['default'],
     "chevron-left": _chevLeft['default'],
-    "chevron-right": _chevRight['default']
+    "chevron-right": _chevRight['default'],
+    "chevron-down": _chevDown['default']
 }
 
 @Component({
@@ -14,7 +18,7 @@ const paths = {
 })
 
 export class IconElement {
-    @Prop() kind: string = ''
+    @Prop({ reflect: true }) kind: string = ''
     @Watch('kind') kindWatcher(newVal) { this.updatePath(newVal) }
 
     containerElement!: HTMLElement

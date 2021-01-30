@@ -1,4 +1,4 @@
-import { Component, Prop, h, Watch, Element, Method, State } from '@stencil/core'
+import { Component, Prop, h, Watch, Element, Method, State, Listen } from '@stencil/core'
 import ID from '../../../../utils/id'
 import AttributeSetRemove from '../../../../utils/dom/attribute-set-remove'
 import DispatchEvent from '../../../../utils/dom/dispatch-event'
@@ -53,13 +53,13 @@ export class FieldDate {
 
     @Prop({ mutable: true, reflect: true }) active: boolean = false
 
-    @Prop() readonly: boolean = false
-    @Watch('readonly') readonlyWatcher(newVal) { SetAttribute(this.formInput, 'readonly', newVal) }
-
     @Prop() required: boolean = false
     @Watch('required') requiredWatcher(newVal) { SetAttribute(this.formInput, 'required', newVal) }
 
     @Prop() slim: boolean = false
+
+    @Prop({ reflect: true }) theme: 'inverse' | '' = ''
+    @Watch('theme') themeWatcher(newVal) { this.updateTheme(newVal) }
 
     @Prop() value: Date | string
     @Watch('value') valueWatcher(newVal) { this.updateDate(newVal) }
@@ -82,21 +82,28 @@ export class FieldDate {
     @Method() getValidationMessage() { return Promise.resolve(this.formInput.validationMessage) }
 
 
+    /** LISTEN */
+    @Listen('dayclick') onDayClick(e) {
+        this.value = e.detail.date
+    }
+
+    @Listen('datechange') onDateChange(e) {
+        this.value = e.detail.date
+    }
+
+
     /** ELEMENTS */
     containerElement!: HTMLElement
-    helpTextElement!: HTMLElement
-    iconElement!: HTMLSpanElement
     labelElement!: HTMLLabelElement
     formInput!: HTMLInputElement
     inputElement!: HTMLInputElement
     dropdownElement!: HTMLDropDownElement
-    calendarElement!: HTMLCalendarMonthElement
 
 
     /** INTERNAL METHODS */
     externalForm() { return this.host.closest('form') }
 
-    focused() { return this.inputid === (document.activeElement as any).inputid }
+    focused() { return this.inputid === (document.activeElement as any).inputid || this.host.shadowRoot.activeElement === this.inputElement }
 
     isempty() { return this.value == undefined }
 
@@ -105,16 +112,15 @@ export class FieldDate {
     checkError() { this.error = this.formInput.validationMessage }
 
     updateDate(newVal) {
+        this.setLabelPosition()
         const date = new Date(newVal)
 
-        if (date.toString() !== 'Invalid Date') {
-            this.startDate = date
-            this.localeString = date.toLocaleString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })
-            this.monthString = date.toLocaleString(undefined, { month: 'long' })
-            this.yearString = date.toLocaleString(undefined, { year: 'numeric' })
-        }
+        if (invalidDate(date)) { return }
 
-        this.setLabelPosition()
+        this.startDate = date
+        this.localeString = date.toLocaleString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })
+        this.monthString = date.toLocaleString(undefined, { month: 'long' })
+        this.yearString = date.toLocaleString(undefined, { year: 'numeric' })
     }
 
     setLabelPosition() {
@@ -129,14 +135,14 @@ export class FieldDate {
         if (!!this.error && this.isvalid()) { this.error = this.formInput.validationMessage }
     }
 
-    handleCalendarClick(date) {
-        this.value = date
-    }
-
     handleEnter(e) {
         if (!e || !this.externalForm() || !e.key || e.key.toLowerCase() !== 'enter') { return }
         DispatchEvent(this.externalForm(), 'submit')
     }
+
+    updateTheme(theme) { this.containerElement.setAttribute('theme', theme) }
+
+
 
     /** LIFECYLE */
     componentWillLoad() {
@@ -149,8 +155,7 @@ export class FieldDate {
         SetAttribute(this.containerElement, 'has-label', (!!this.sanitizedLabel).toString())
         this.setLabelPosition()
         FormControl.apply(this, [this.inputid, this.formInput, this.externalForm()])
-
-        this.calendarElement.addEventListener('dayclick', e => this.handleCalendarClick(e['detail'].date))
+        this.updateTheme(this.theme)
     }
 
     render() {
@@ -161,7 +166,6 @@ export class FieldDate {
             name: this.name,
             required: this.required,
             disabled: this.disabled,
-            readonly: this.readonly,
             class: 'field-date-hidden-input',
             slot: 'form-control'
         }) as HTMLInputElement
@@ -179,31 +183,23 @@ export class FieldDate {
                     class="field-date-drop-down"
                     closeonclick={false}
                     openonhover={false}
+                    arrow={false}
                 >
                     <div class="field-date-input" slot="label">{this.localeString}</div>
                     <div class="field-date-overlay" slot="item">
-                        <div class="calendar-header">
-                            <icon-element kind="chevron-left"></icon-element>
-                            <div class="calendar-header-center">
-                                <div class="calendar-header-month">{this.monthString}</div>
-                                <div class="calendar-header-year">{this.yearString}</div>
-                            </div>
-                            <icon-element kind="chevron-right"></icon-element>
-                        </div>
-                        <calendar-month
-                            slot="item"
-                            date={this.startDate}
-                            ref={el => this.calendarElement = el as HTMLCalendarMonthElement}
-                        ></calendar-month>
+                        <calendar-header date={this.value}></calendar-header>
+                        <calendar-month slot="item" date={this.startDate}></calendar-month>
                     </div>
                 </drop-down>
 
                 <label ref={(el) => this.labelElement = el as HTMLLabelElement} class="field-date-label">{this.sanitizedLabel}</label>
             </div>
             <span class="field-input-bottom">
-                <span ref={(el) => this.helpTextElement = el as HTMLElement} class="field-help-text">{this.sanitizedHelp}</span>
+                <span class="field-help-text">{this.sanitizedHelp}</span>
             </span>
             <div class="form-control"><slot name="form-control"></slot></div>
         </div>
     }
 }
+
+const invalidDate = (val: any) => !val || (!!val && val.toString() === 'Invalid Date')

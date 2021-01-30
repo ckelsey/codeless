@@ -5,7 +5,6 @@
     display: inline-flex;
     flex-direction: column;
     box-sizing: border-box;
-    color: theme-color("foreground");
 
     * {
         box-sizing: border-box;
@@ -38,6 +37,16 @@
             }
         }
 
+        .dropdown-hidden-input {
+            position: absolute;
+            z-index: -1;
+            width: 0;
+            height: 0;
+            pointer-events: none;
+            padding: 0;
+            border: none;
+        }
+
         .drop-down-label-container {
             display: flex;
             align-items: center;
@@ -50,19 +59,13 @@
         }
 
         .drop-down-arrow {
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            margin-top: -0.2em;
+            margin-left: 0.2em;
+        }
 
-            &:after {
-                content: "";
-                border: 0.4em solid transparent;
-                border-top-color: currentColor;
-                position: relative;
-                top: 0.135em;
-                width: 0;
-                height: 0;
-                margin-left: 0.25em;
+        &[arrow="false"] {
+            .drop-down-arrow {
+                display: none;
             }
         }
 

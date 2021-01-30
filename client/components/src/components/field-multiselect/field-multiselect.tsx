@@ -11,6 +11,7 @@ import ID from '../../../../utils/id'
 import RenderLightDom from '../../../../utils/dom/render-light-dom'
 import InputName from '../../../../utils/dom/input-name'
 import SetAttribute from '../../../../utils/dom/set-attribute'
+import ArrayFrom from '../../../../utils/conversion/array-from'
 
 const valueToArray = Pipe(CommasToArray, ToArray, IfInvalid([]))
 const optionsToArray = Pipe(CommasToArray, ToArray, ToOptions, IfInvalid([]))
@@ -60,16 +61,13 @@ export class FieldMultiselect {
         this.value = this.valueArray = this.valueArray.filter(v => optionValues.indexOf(v) > -1)
     }
 
-    @Prop() readonly: boolean = false
-    @Watch('readonly') readonlyWatcher(newVal) {
-        SetAttribute(this.formInput, 'readonly', newVal)
-        this.dropdownElement.classList[newVal ? 'add' : 'remove']('readonly')
-    }
-
     @Prop() required: boolean = false
     @Watch('required') requiredWatcher(newVal) { SetAttribute(this.formInput, 'required', newVal) }
 
     @Prop() slim: boolean = false
+
+    @Prop({ reflect: true }) theme: 'inverse' | '' = ''
+    @Watch('theme') themeWatcher(newVal) { this.updateTheme(newVal) }
 
     @Prop() value: any[] = []
     @Watch('value') validValue(newVal) {
@@ -102,7 +100,7 @@ export class FieldMultiselect {
     /** INTERNAL METHODS */
     externalForm() { return this.host.closest('form') }
 
-    focused() { return this.inputid === (document.activeElement as any).inputid }
+    focused() { return this.inputid === (document.activeElement as any).inputid || ArrayFrom(this.host.querySelectorAll('field-checkbox')).indexOf(this.host.shadowRoot.activeElement) > -1 }
 
     isvalid() { return this.formInput.validity.valid }
 
@@ -131,12 +129,13 @@ export class FieldMultiselect {
 
     itemClick(itemValue) { return () => this.updateValues(!this.has(itemValue) ? [...this.valueArray, itemValue] : this.valueArray.filter(v => v !== itemValue)) }
 
+    updateTheme(theme) { this.containerElement.setAttribute('theme', theme) }
+
+
 
     /** ELEMENTS */
     containerElement!: HTMLElement
     dropdownElement!: HTMLElement
-    helpTextElement!: HTMLElement
-    labelElement!: HTMLFieldCheckboxElement
     formInput!: HTMLInputElement
 
 
@@ -149,7 +148,10 @@ export class FieldMultiselect {
         this.valueArray = valueToArray(this.value)
     }
 
-    componentDidLoad() { SetAttribute(this.containerElement, 'has-label', (!!this.sanitizedLabel).toString()) }
+    componentDidLoad() {
+        SetAttribute(this.containerElement, 'has-label', (!!this.sanitizedLabel).toString())
+        this.updateTheme(this.theme)
+    }
 
     render() {
         this.formInput = RenderLightDom(this.host, 'input.field-multiselect-hidden-input', {
@@ -159,7 +161,6 @@ export class FieldMultiselect {
             name: this.name,
             required: this.required,
             disabled: this.disabled,
-            readonly: this.readonly,
             class: 'field-multiselect-hidden-input',
             slot: 'form-control'
         }) as HTMLInputElement
@@ -180,7 +181,6 @@ export class FieldMultiselect {
                         label={this.sanitizedLabel}
                         required={this.required}
                         novalidate={true}
-                        ref={(el) => this.labelElement = el as HTMLFieldCheckboxElement}
                         slim={true}
                         slot="label"
                         mixed={this.isMixed()}
@@ -188,6 +188,7 @@ export class FieldMultiselect {
                         onFocus={() => this.setFocused()}
                         onBlur={() => this.setFocused()}
                         value={!this.isEmpty()}
+                        theme={this.theme}
                     ></field-checkbox>
 
                     {this.optionsArray.map((option) =>
@@ -206,7 +207,7 @@ export class FieldMultiselect {
                 </drop-down>
 
                 <span class="field-input-bottom">
-                    <span ref={(el) => this.helpTextElement = el as HTMLElement} class="field-help-text">{this.sanitizedHelp}</span>
+                    <span class="field-help-text">{this.sanitizedHelp}</span>
                 </span>
             </div>
             <div class="form-control"><slot name="form-control"></slot></div>

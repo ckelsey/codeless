@@ -1,0 +1,142 @@
+@import "../../global-styles/vars.scss";
+
+:host {
+    display: inline-block;
+    position: relative;
+    width: 0;
+    height: 0;
+    max-width: 0;
+    max-height: 0;
+
+    .tool-tip-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        opacity: 0;
+        pointer-events: none;
+        max-height: 0;
+        transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out, top 0.05s, left 0.05s;
+
+        &[data-align="bottom"],
+        &[data-align="top"] {
+            transform: scale(1, 0) translateY(0) translateX(-50%);
+        }
+
+        &[data-align="right"],
+        &[data-align="left"] {
+            transform: scale(0, 1) translateX(-1em) translateY(-50%);
+        }
+
+        &[data-align="bottom"].active,
+        &[data-align="top"].active,
+        &[data-align="right"].active,
+        &[data-align="left"].active {
+            opacity: 1;
+            pointer-events: all;
+            max-height: 100vh;
+            overflow: visible;
+            z-index: 9999;
+
+            &[data-align="bottom"].active {
+                transform: scale(1, 1) translateY(0.5em) translateX(-50%);
+
+                .tool-tip-content .tool-tip-arrow {
+                    top: -0.5em;
+                }
+            }
+
+            &[data-align="top"].active {
+                transform: scale(1, 1) translateY(-0.5em) translateX(-50%);
+
+                .tool-tip-content .tool-tip-arrow {
+                    bottom: -0.5em;
+                }
+            }
+
+            &[data-align="right"].active {
+                transform: scale(1, 1) translateX(0.5em) translateY(-50%);
+            }
+
+            &[data-align="left"].active {
+                transform: scale(1, 1) translateX(-0.5em) translateY(-50%);
+            }
+        }
+
+        .tool-tip-content {
+            position: relative;
+            padding: 0.5em;
+            background-color: theme-color("background", "light");
+            color: theme-color("foreground");
+            font-size: inherit;
+            border-radius: $borderRadius;
+
+            &:before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                box-shadow: 0 0.25em 0.4em -0.2em theme-color("background", "dark"),
+                    0 0.25em 0.25em -0.18em theme-color("background", "dark"),
+                    0 0.125em 0.38em -0.025em theme-color("background", "dark");
+                opacity: 0.38;
+                border-radius: $borderRadius;
+            }
+
+            .tool-tip-arrow {
+                border: 0.25em solid transparent;
+                position: absolute;
+                transition: top 0.38s ease-in-out;
+            }
+        }
+
+        &[data-align="bottom"] {
+            .tool-tip-content {
+                .tool-tip-arrow {
+                    border-bottom-color: theme-color("background", "light");
+                    top: 0;
+                    left: calc(50% - 0.25em);
+                }
+            }
+        }
+
+        &[data-align="top"] {
+            .tool-tip-content {
+                .tool-tip-arrow {
+                    border-top-color: theme-color("background", "light");
+                    bottom: 0;
+                    left: calc(50% - 0.25em);
+                }
+            }
+        }
+
+        &[data-align="right"] {
+            .tool-tip-content {
+                .tool-tip-arrow {
+                    left: -0.5em;
+                    top: calc(50% - 0.25em);
+                    border-right-color: theme-color("background", "light");
+                }
+            }
+        }
+
+        &[data-align="left"] {
+            .tool-tip-content {
+                .tool-tip-arrow {
+                    right: -0.5em;
+                    top: calc(50% - 0.25em);
+                    border-left-color: theme-color("background", "light");
+                }
+            }
+        }
+    }
+
+    ::slotted {
+        position: relative;
+    }
+}

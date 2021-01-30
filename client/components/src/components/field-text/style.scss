@@ -19,12 +19,6 @@
             }
         }
 
-        &[empty="false"] {
-            input {
-                -webkit-text-fill-color: theme-color("background");
-            }
-        }
-
         @include inputLabel;
         @include iconSlot;
         @include helptext;

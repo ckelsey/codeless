@@ -10,7 +10,7 @@
         @include inputMargins;
 
         button {
-            border-radius: $inputRadius;
+            border-radius: $borderRadius;
             font-size: inherit;
             font-weight: bold;
             line-height: normal;

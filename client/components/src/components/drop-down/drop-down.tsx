@@ -1,4 +1,4 @@
-import { Component, h, Element, Prop } from '@stencil/core'
+import { Component, h, Element, Prop, Watch } from '@stencil/core'
 import AppendStyleElement from '../../../../utils/dom/append-style-element'
 import WasClickedOn from '../../../../utils/dom/was-clicked-on'
 import ArrayFrom from '../../../../utils/conversion/array-from'
@@ -15,9 +15,19 @@ const itemStyle = 'drop-down [slot="item"]{color:inherit; white-space: nowrap; m
 export class DropDown {
     @Element() host
 
+    @Prop() arrow: boolean = true
+    @Watch('arrow') arrowWatcher(newVal) { this.updateArrow(newVal) }
+
     @Prop() closeonclick: boolean = true
     @Prop() openonhover: boolean = true
     @Prop({ mutable: true, reflect: true }) open: boolean = false
+    @Watch('open') openWatcher(newVal) {
+        // If any inputs inside, blur them out
+        if (!newVal) { this.inputElement.focus() }
+    }
+
+    inputElement!: HTMLInputElement
+    containerElement!: HTMLElement
 
     clicked(e: Event) {
         const item = WasClickedOn(ArrayFrom(this.host.querySelectorAll('[slot="item"]')), e)
@@ -27,6 +37,10 @@ export class DropDown {
         if (this.closeonclick && this.open) { return this.open = false }
 
         if (!this.open) { this.open = true }
+    }
+
+    updateArrow(show) {
+        this.containerElement.setAttribute('arrow', show ? 'true' : 'false')
     }
 
     /** LIFECYLE */
@@ -46,17 +60,21 @@ export class DropDown {
             this.host.removeEventListener('submit', clickFn)
             delete this.host.clickEvent
         }
+
+        this.updateArrow(this.arrow)
     }
 
     render() {
         return <div
             class={`drop-down-container${this.open ? ' open' : ''}`}
-            onMouseOver={() => !this.openonhover ? undefined : this.open = true}
-            onMouseOut={() => !this.openonhover ? undefined : this.open = false}
+            onMouseOver={() => !this.openonhover || this.open === true ? undefined : this.open = true}
+            onMouseLeave={() => !this.openonhover || this.open === false ? undefined : this.open = false}
+            ref={el => this.containerElement = el}
         >
+            <input ref={el => this.inputElement = el} class="dropdown-hidden-input" />
             <div class="drop-down-label-container">
                 <div class="drop-down-label"><slot name="label" /></div>
-                <div class="drop-down-arrow"></div>
+                <icon-element kind="chevron-down" class="drop-down-arrow"></icon-element>
             </div>
             <div class="drop-down-items"><slot name="item" /></div>
         </div>

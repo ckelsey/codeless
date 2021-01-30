@@ -23,7 +23,8 @@
         min-height: 1.62em;
         background: transparent;
 
-        &[focused="true"] {
+        &[focused="true"],
+        &[theme="inverse"] {
             background-color: transparent;
         }
 
@@ -161,6 +162,19 @@
                     text-transform: none;
                     font-size: 80%;
                     line-height: 100%;
+                }
+            }
+        }
+
+        &[theme="inverse"] {
+            .field-input-label {
+                label {
+                    color: theme-color("background");
+
+                    &:before {
+                        background-color: theme-color("background", "light");
+                        box-shadow: 0 0 0 100px transparentize(theme-color("background", "light"), 0.5) inset;
+                    }
                 }
             }
         }

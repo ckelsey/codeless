@@ -1,8 +1,18 @@
-- field-date
-    - cleaner month refresh
-    - month allow non-clickable days to be clickable
-- field-datetime
 - field-color
 - field-wysiwyg
-
 - flash-message
+- snack-bar
+- image-loader
+
+** NICE TO HAVES **
+    - calendar-header
+        - Make month name a dropdown
+        - Make year a number field
+
+    - field-time
+        - show warning when reached max/min
+
+    - fields to have enter==submit
+
+    - tool-tip
+        - bottom-right, bottom-left, top-right, top-left, left-top, left-bottom, right-top, right-bottom

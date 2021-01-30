@@ -1,0 +1,63 @@
+@import "../../global-styles/fields.scss";
+
+:host {
+    @include fieldBase;
+
+    .field-datetime-container {
+        @include fieldContainer;
+        position: relative;
+
+        input {
+            @include field;
+            opacity: 0;
+            -webkit-text-fill-color: transparent;
+        }
+
+        &[focused="true"],
+        &[empty="false"] {
+            input {
+                opacity: 1;
+            }
+        }
+
+        @include inputLabel;
+        @include iconSlot;
+        @include helptext;
+        @include formControl;
+
+        .field-datetime-overlay {
+            width: auto;
+            display: inline-flex;
+            flex-direction: column;
+            min-width: unset;
+
+            calendar-month {
+                font-size: 0.25em;
+            }
+
+            field-time {
+                width: 100%;
+            }
+        }
+
+        .field-datetime-input {
+            color: theme-color("background");
+            min-height: $inputHeight;
+            width: 100%;
+            padding: $inputPadding;
+            line-height: 100%;
+        }
+
+        .field-datetime-drop-down {
+            min-height: $inputHeight;
+        }
+
+        &[theme="inverse"] {
+            .field-input-label {
+                .field-datetime-input {
+                    color: theme-color("foreground");
+                }
+            }
+        }
+    }
+}

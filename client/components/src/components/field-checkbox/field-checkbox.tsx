@@ -49,13 +49,13 @@ export class FieldCheckbox {
 
     @Prop() novalidate: boolean = false
 
-    @Prop() readonly: boolean = false
-    @Watch('readonly') readonlyWatcher(newVal) { SetAttribute(this.formInput, 'readonly', newVal) }
-
     @Prop() required: boolean = false
     @Watch('required') requiredWatcher(newVal) { SetAttribute(this.formInput, 'required', newVal) }
 
     @Prop() slim: boolean = false
+
+    @Prop({ reflect: true }) theme: 'inverse' | '' = ''
+    @Watch('theme') themeWatcher(newVal) { this.updateTheme(newVal) }
 
     @Prop() value: boolean = false
     @Watch('value') validValue(newVal) { if (typeof newVal == 'undefined') { return this.value = false } }
@@ -85,7 +85,7 @@ export class FieldCheckbox {
     /** INTERNAL METHODS */
     externalForm() { return this.host.closest('form') }
 
-    focused() { return this.inputid === (document.activeElement as any).inputid }
+    focused() { return this.inputid === (document.activeElement as any).inputid || this.host.shadowRoot.activeElement === this.inputElement }
 
     isvalid() { return this.formInput.validity.valid }
 
@@ -101,6 +101,10 @@ export class FieldCheckbox {
         DispatchEvent(this.externalForm(), 'submit')
     }
 
+    updateTheme(theme) { this.containerElement.setAttribute('theme', theme) }
+
+
+
     /** LIFECYLE */
     componentWillLoad() {
         this.sanitizedLabel = SantizedHTML(this.label)
@@ -113,6 +117,7 @@ export class FieldCheckbox {
         AttributeSetRemove(this.containerElement, 'mixed', this.mixed)
         SetAttribute(this.containerElement, 'has-label', (!!this.sanitizedLabel).toString())
         FormControl.apply(this, [this.inputid, this.formInput, this.externalForm()])
+        this.updateTheme(this.theme)
     }
 
     render() {
@@ -123,7 +128,6 @@ export class FieldCheckbox {
             name: this.name,
             required: this.required,
             disabled: this.disabled,
-            readonly: this.readonly,
             class: 'field-checkbox-hidden-input',
             slot: 'form-control'
         }) as HTMLInputElement
@@ -141,7 +145,6 @@ export class FieldCheckbox {
                     checked={this.value}
                     disabled={this.disabled}
                     name={this.name}
-                    readonly={this.readonly}
                     required={this.required}
                     id={this.inputid}
                     form={(this.externalForm() || {}).id}

@@ -19,7 +19,9 @@
 
         background-color: transparent;
 
-        &[focused="true"] {
+        &[focused="true"],
+        &[theme="inverse"],
+        &[focused="true"][theme="inverse"] {
             background-color: transparent;
         }
 

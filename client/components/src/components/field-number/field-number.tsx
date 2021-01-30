@@ -53,13 +53,13 @@ export class FieldNumber {
 
     @Prop() min: number
 
-    @Prop() readonly: boolean = false
-    @Watch('readonly') readonlyWatcher(newVal) { SetAttribute(this.formInput, 'readonly', newVal) }
-
     @Prop() required: boolean = false
     @Watch('required') requiredWatcher(newVal) { SetAttribute(this.formInput, 'required', newVal) }
 
     @Prop() slim: boolean = false
+
+    @Prop({ reflect: true }) theme: 'inverse' | '' = ''
+    @Watch('theme') themeWatcher(newVal) { this.updateTheme(newVal) }
 
     @Prop() value: number | undefined
     @Watch('value') validValue(newVal) {
@@ -83,8 +83,6 @@ export class FieldNumber {
 
     /** ELEMENTS */
     containerElement!: HTMLElement
-    helpTextElement!: HTMLElement
-    iconElement!: HTMLSpanElement
     inputElement!: HTMLInputElement
     labelElement!: HTMLLabelElement
     formInput!: HTMLInputElement
@@ -93,7 +91,7 @@ export class FieldNumber {
     /** INTERNAL METHODS */
     externalForm() { return this.host.closest('form') }
 
-    focused() { return this.inputid === (document.activeElement as any).inputid }
+    focused() { return this.inputid === (document.activeElement as any).inputid || this.host.shadowRoot.activeElement === this.inputElement }
 
     isempty() { return this.value == undefined }
 
@@ -119,6 +117,10 @@ export class FieldNumber {
         DispatchEvent(this.externalForm(), 'submit')
     }
 
+    updateTheme(theme) { this.containerElement.setAttribute('theme', theme) }
+
+
+
     /** LIFECYLE */
     componentWillLoad() {
         this.sanitizedLabel = SantizedHTML(this.label)
@@ -130,6 +132,7 @@ export class FieldNumber {
         SetAttribute(this.containerElement, 'has-label', (!!this.sanitizedLabel).toString())
         this.setLabelPosition()
         FormControl.apply(this, [this.inputid, this.formInput, this.externalForm()])
+        this.updateTheme(this.theme)
     }
 
     render() {
@@ -140,7 +143,6 @@ export class FieldNumber {
             name: this.name,
             required: this.required,
             disabled: this.disabled,
-            readonly: this.readonly,
             max: this.max,
             min: this.min,
             class: 'field-number-hidden-input',
@@ -161,7 +163,6 @@ export class FieldNumber {
                     autofocus={this.autofocus}
                     disabled={this.disabled}
                     name={this.name}
-                    readonly={this.readonly}
                     required={this.required}
                     id={this.inputid}
                     max={this.max}
@@ -181,7 +182,7 @@ export class FieldNumber {
                 <label ref={(el) => this.labelElement = el as HTMLLabelElement}>{this.sanitizedLabel}</label>
             </div>
             <span class="field-input-bottom">
-                <span ref={(el) => this.helpTextElement = el as HTMLElement} class="field-help-text">{this.sanitizedHelp}</span>
+                <span class="field-help-text">{this.sanitizedHelp}</span>
             </span>
             <div class="form-control"><slot name="form-control"></slot></div>
         </div>

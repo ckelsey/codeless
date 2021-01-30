@@ -12,6 +12,7 @@ import InputName from '../../../../utils/dom/input-name'
 import FormControl from '../../../../utils/dom/form-control'
 import SetAttribute from '../../../../utils/dom/set-attribute'
 import { SantizedHTML } from '../../../../utils/validate/html'
+import ArrayFrom from '../../../../utils/conversion/array-from'
 
 const optionsToArray = Pipe(ToArray, CommasToArray, ToOptions, IfInvalid([]))
 const processedValue = (internalValue, value, options) => Get((options || []).filter(o => o.value == (internalValue || value)), '0.value')
@@ -54,13 +55,13 @@ export class FieldRadio {
         this.internalValue = processedValue(this.internalValue, this.value, this.optionsArray)
     }
 
-    @Prop() readonly: boolean = false
-    @Watch('readonly') readonlyWatcher(newVal) { SetAttribute(this.formInput, 'readonly', newVal) }
-
     @Prop() required: boolean = false
     @Watch('required') requiredWatcher(newVal) { SetAttribute(this.formInput, 'required', newVal) }
 
     @Prop() slim: boolean = false
+
+    @Prop({ reflect: true }) theme: 'inverse' | '' = ''
+    @Watch('theme') themeWatcher(newVal) { this.updateTheme(newVal) }
 
     @Prop() value: string | undefined
     @Watch('value') validValue(newVal) { this.internalValue = processedValue(this.internalValue, newVal, this.optionsArray) }
@@ -85,14 +86,13 @@ export class FieldRadio {
 
     /** ELEMENTS */
     containerElement!: HTMLElement
-    labelElement!: HTMLLabelElement
     formInput!: HTMLInputElement
 
 
     /** INTERNAL METHODS */
     externalForm() { return this.host.closest('form') }
 
-    focused() { return this.inputid === (document.activeElement as any).inputid }
+    focused() { return this.inputid === (document.activeElement as any).inputid || ArrayFrom(this.host.querySelectorAll('.field-radio-option')).indexOf(this.host.shadowRoot.activeElement) > -1 }
 
     isempty() { return this.value === '' || this.value === undefined }
 
@@ -108,6 +108,7 @@ export class FieldRadio {
         DispatchEvent(this.externalForm(), 'submit')
     }
 
+    updateTheme(theme) { this.containerElement.setAttribute('theme', theme) }
 
 
     /** LIFECYLE */
@@ -117,12 +118,13 @@ export class FieldRadio {
         this.sanitizedError = SantizedHTML(this.error)
         this.optionsArray = optionsToArray(this.options)
         this.internalValue = processedValue(this.internalValue, this.value, this.optionsArray)
-        this.name = this.name || `field-radio-${this.inputid}`
+        this.name = InputName(this.name, this.sanitizedLabel, this.inputid)
     }
 
     componentDidLoad() {
         SetAttribute(this.containerElement, 'has-label', (!!this.sanitizedLabel).toString())
         FormControl.apply(this, [this.inputid, this.formInput, this.externalForm()])
+        this.updateTheme(this.theme)
     }
 
     render() {
@@ -144,7 +146,7 @@ export class FieldRadio {
             <div class="field-radio-main-label-container">
                 <div class="field-radio-main-label-right">
                     <span class="icon-container"><slot name="icon" /></span>
-                    <label ref={(el) => this.labelElement = el as any}>
+                    <label>
                         <span>{this.sanitizedLabel}</span>
                         <span class="field-radio-error-text">{this.sanitizedError}</span>
                     </label>
@@ -162,7 +164,6 @@ export class FieldRadio {
                             value={option.value}
                             onInput={() => this.handleInput(option.value)}
                             disabled={this.disabled}
-                            readOnly={this.readonly}
                         />
                         <label class="field-radio-option-label" htmlFor={`field-radio-input-${index}-${this.inputid}`}>{option.textContent}</label>
                     </div>

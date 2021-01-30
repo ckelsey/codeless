@@ -20,12 +20,6 @@
             }
         }
 
-        &[empty="false"] {
-            input {
-                -webkit-text-fill-color: theme-color("background");
-            }
-        }
-
         @include inputLabel;
         @include iconSlot;
         @include helptext;
@@ -40,46 +34,6 @@
             calendar-month {
                 font-size: 0.25em;
             }
-
-            .calendar-header {
-                position: relative;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                margin: 0.5em 0;
-
-                icon-element {
-                    font-size: 1.25em;
-                    cursor: pointer;
-                    padding: 0.125em;
-                    border-radius: 50%;
-                    margin: 0 0.25em;
-                    transition: background-color 0.2s, color 0.2s;
-
-                    &:hover {
-                        background-color: theme-color("accent");
-                        color: theme-color("accent-offset");
-                    }
-                }
-
-                .calendar-header-center {
-                    flex-grow: 1;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                }
-
-                .calendar-header-month {
-                    font-weight: bold;
-                    margin: 0 0.25em;
-                }
-
-                .calendar-header-year {
-                    font-weight: lighter;
-                    opacity: 0.75;
-                    margin: 0 0.25em;
-                }
-            }
         }
 
         .field-date-input {
@@ -92,6 +46,14 @@
 
         .field-date-drop-down {
             min-height: $inputHeight;
+        }
+
+        &[theme="inverse"] {
+            .field-input-label {
+                .field-date-input {
+                    color: theme-color("foreground");
+                }
+            }
         }
     }
 }

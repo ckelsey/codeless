@@ -22,6 +22,12 @@ export namespace Components {
         "month": (val: any) => Promise<unknown>;
         "year": (val: any) => Promise<unknown>;
     }
+    interface CalendarHeader {
+        /**
+          * PROPS
+         */
+        "date": Date | string;
+    }
     interface CalendarMonth {
         /**
           * PROPERTIES
@@ -37,7 +43,17 @@ export namespace Components {
         "month": (val: any) => Promise<unknown>;
         "year": (val: any) => Promise<unknown>;
     }
+    interface DragX {
+        "contained": boolean;
+    }
+    interface DragXy {
+        "contained": boolean;
+    }
+    interface DragY {
+        "contained": boolean;
+    }
     interface DropDown {
+        "arrow": boolean;
         "closeonclick": boolean;
         "open": boolean;
         "openonhover": boolean;
@@ -72,10 +88,34 @@ export namespace Components {
         "mixed": boolean;
         "name": string;
         "novalidate": boolean;
-        "readonly": boolean;
         "required": boolean;
         "slim": boolean;
+        "theme": 'inverse' | '';
         "value": boolean;
+    }
+    interface FieldColor {
+        /**
+          * PROPS
+         */
+        "autocomplete": string;
+        "autofocus": boolean;
+        "autowidth": boolean;
+        "disabled": boolean;
+        "error": string;
+        "getValidationMessage": () => Promise<string>;
+        /**
+          * METHODS
+         */
+        "getValidity": () => Promise<ValidityState>;
+        "helptext": string;
+        "inputid": string;
+        "label": string;
+        "labelup": boolean;
+        "name": string;
+        "required": boolean;
+        "slim": boolean;
+        "theme": 'inverse' | '';
+        "value": string;
     }
     interface FieldDate {
         "active": boolean;
@@ -99,9 +139,37 @@ export namespace Components {
         "max": number;
         "min": number;
         "name": string;
-        "readonly": boolean;
         "required": boolean;
         "slim": boolean;
+        "theme": 'inverse' | '';
+        "value": Date | string;
+    }
+    interface FieldDatetime {
+        "active": boolean;
+        /**
+          * PROPS
+         */
+        "autocomplete": string;
+        "autofocus": boolean;
+        "autowidth": boolean;
+        "disabled": boolean;
+        "error": string;
+        "getValidationMessage": () => Promise<string>;
+        /**
+          * METHODS
+         */
+        "getValidity": () => Promise<ValidityState>;
+        "helptext": string;
+        "inputid": string;
+        "label": string;
+        "labelup": boolean;
+        "max": number;
+        "min": number;
+        "name": string;
+        "required": boolean;
+        "showseconds": boolean;
+        "slim": boolean;
+        "theme": 'inverse' | '';
         "value": Date | string;
     }
     interface FieldMultiselect {
@@ -122,9 +190,9 @@ export namespace Components {
         "label": string;
         "name": string;
         "options": string | any[];
-        "readonly": boolean;
         "required": boolean;
         "slim": boolean;
+        "theme": 'inverse' | '';
         "value": any[];
     }
     interface FieldNumber {
@@ -148,9 +216,9 @@ export namespace Components {
         "max": number;
         "min": number;
         "name": string;
-        "readonly": boolean;
         "required": boolean;
         "slim": boolean;
+        "theme": 'inverse' | '';
         "value": number | undefined;
     }
     interface FieldRadio {
@@ -170,10 +238,31 @@ export namespace Components {
         "label": string;
         "name": string;
         "options": string | any[];
-        "readonly": boolean;
         "required": boolean;
         "slim": boolean;
+        "theme": 'inverse' | '';
         "value": string | undefined;
+    }
+    interface FieldRange {
+        /**
+          * PROPS
+         */
+        "autowidth": boolean;
+        "disabled": boolean;
+        "error": string;
+        "getInternal": () => Promise<[number, number]>;
+        "helptext": string;
+        "inputid": string;
+        "label": string;
+        "maxvalue": number;
+        "minvalue": number;
+        "name": string;
+        "required": boolean;
+        "slim": boolean;
+        "step": number;
+        "theme": 'inverse' | '';
+        "value": string;
+        "valueinlabel": boolean;
     }
     interface FieldSelect {
         /**
@@ -194,10 +283,30 @@ export namespace Components {
         "labelup": boolean;
         "name": string;
         "options": string | any[];
-        "readonly": boolean;
         "required": boolean;
         "slim": boolean;
+        "theme": 'inverse' | '';
         "value": string;
+    }
+    interface FieldSlider {
+        /**
+          * PROPS
+         */
+        "autowidth": boolean;
+        "disabled": boolean;
+        "error": string;
+        "helptext": string;
+        "inputid": string;
+        "label": string;
+        "maxvalue": number;
+        "minvalue": number;
+        "name": string;
+        "required": boolean;
+        "slim": boolean;
+        "step": number;
+        "theme": 'inverse' | '';
+        "value": number;
+        "valueinlabel": boolean;
     }
     interface FieldText {
         /**
@@ -221,10 +330,10 @@ export namespace Components {
         "max": number;
         "min": number;
         "name": string;
-        "readonly": boolean;
         "required": boolean;
         "showcount": boolean;
         "slim": boolean;
+        "theme": 'inverse' | '';
         "type": string;
         "value": string;
     }
@@ -251,10 +360,10 @@ export namespace Components {
         "max": number;
         "min": number;
         "name": string;
-        "readonly": boolean;
         "required": boolean;
         "showcount": boolean;
         "slim": boolean;
+        "theme": 'inverse' | '';
         "value": string;
     }
     interface FieldTime {
@@ -271,26 +380,39 @@ export namespace Components {
          */
         "getValidity": () => Promise<ValidityState>;
         "helptext": string;
-        "hour": (value?: any) => Promise<unknown>;
         "inputid": string;
         "label": string;
         "labelup": boolean;
         "max": string;
-        "meridien": (value?: any) => Promise<unknown>;
         "min": string;
-        "minute": (value?: any) => Promise<unknown>;
         "name": string;
-        "readonly": boolean;
         "required": boolean;
-        "second": (value?: any) => Promise<unknown>;
         "showseconds": boolean;
         "slim": boolean;
+        "theme": 'inverse' | '';
         "value": string;
     }
     interface IconElement {
         "kind": string;
     }
+    interface OverlayElement {
+        /**
+          * PROPS
+         */
+        "active": boolean;
+    }
     interface RootElement {
+        "theme": 'inverse' | '';
+    }
+    interface ToolTip {
+        /**
+          * PROPS
+         */
+        "active": boolean;
+        "align": 'top' | 'bottom' | 'left' | 'right';
+        "container": string | HTMLElement;
+        "off": string;
+        "on": string;
     }
 }
 declare global {
@@ -300,11 +422,35 @@ declare global {
         prototype: HTMLCalendarDayElement;
         new (): HTMLCalendarDayElement;
     };
+    interface HTMLCalendarHeaderElement extends Components.CalendarHeader, HTMLStencilElement {
+    }
+    var HTMLCalendarHeaderElement: {
+        prototype: HTMLCalendarHeaderElement;
+        new (): HTMLCalendarHeaderElement;
+    };
     interface HTMLCalendarMonthElement extends Components.CalendarMonth, HTMLStencilElement {
     }
     var HTMLCalendarMonthElement: {
         prototype: HTMLCalendarMonthElement;
         new (): HTMLCalendarMonthElement;
+    };
+    interface HTMLDragXElement extends Components.DragX, HTMLStencilElement {
+    }
+    var HTMLDragXElement: {
+        prototype: HTMLDragXElement;
+        new (): HTMLDragXElement;
+    };
+    interface HTMLDragXyElement extends Components.DragXy, HTMLStencilElement {
+    }
+    var HTMLDragXyElement: {
+        prototype: HTMLDragXyElement;
+        new (): HTMLDragXyElement;
+    };
+    interface HTMLDragYElement extends Components.DragY, HTMLStencilElement {
+    }
+    var HTMLDragYElement: {
+        prototype: HTMLDragYElement;
+        new (): HTMLDragYElement;
     };
     interface HTMLDropDownElement extends Components.DropDown, HTMLStencilElement {
     }
@@ -324,11 +470,23 @@ declare global {
         prototype: HTMLFieldCheckboxElement;
         new (): HTMLFieldCheckboxElement;
     };
+    interface HTMLFieldColorElement extends Components.FieldColor, HTMLStencilElement {
+    }
+    var HTMLFieldColorElement: {
+        prototype: HTMLFieldColorElement;
+        new (): HTMLFieldColorElement;
+    };
     interface HTMLFieldDateElement extends Components.FieldDate, HTMLStencilElement {
     }
     var HTMLFieldDateElement: {
         prototype: HTMLFieldDateElement;
         new (): HTMLFieldDateElement;
+    };
+    interface HTMLFieldDatetimeElement extends Components.FieldDatetime, HTMLStencilElement {
+    }
+    var HTMLFieldDatetimeElement: {
+        prototype: HTMLFieldDatetimeElement;
+        new (): HTMLFieldDatetimeElement;
     };
     interface HTMLFieldMultiselectElement extends Components.FieldMultiselect, HTMLStencilElement {
     }
@@ -348,11 +506,23 @@ declare global {
         prototype: HTMLFieldRadioElement;
         new (): HTMLFieldRadioElement;
     };
+    interface HTMLFieldRangeElement extends Components.FieldRange, HTMLStencilElement {
+    }
+    var HTMLFieldRangeElement: {
+        prototype: HTMLFieldRangeElement;
+        new (): HTMLFieldRangeElement;
+    };
     interface HTMLFieldSelectElement extends Components.FieldSelect, HTMLStencilElement {
     }
     var HTMLFieldSelectElement: {
         prototype: HTMLFieldSelectElement;
         new (): HTMLFieldSelectElement;
+    };
+    interface HTMLFieldSliderElement extends Components.FieldSlider, HTMLStencilElement {
+    }
+    var HTMLFieldSliderElement: {
+        prototype: HTMLFieldSliderElement;
+        new (): HTMLFieldSliderElement;
     };
     interface HTMLFieldTextElement extends Components.FieldText, HTMLStencilElement {
     }
@@ -378,28 +548,50 @@ declare global {
         prototype: HTMLIconElementElement;
         new (): HTMLIconElementElement;
     };
+    interface HTMLOverlayElementElement extends Components.OverlayElement, HTMLStencilElement {
+    }
+    var HTMLOverlayElementElement: {
+        prototype: HTMLOverlayElementElement;
+        new (): HTMLOverlayElementElement;
+    };
     interface HTMLRootElementElement extends Components.RootElement, HTMLStencilElement {
     }
     var HTMLRootElementElement: {
         prototype: HTMLRootElementElement;
         new (): HTMLRootElementElement;
     };
+    interface HTMLToolTipElement extends Components.ToolTip, HTMLStencilElement {
+    }
+    var HTMLToolTipElement: {
+        prototype: HTMLToolTipElement;
+        new (): HTMLToolTipElement;
+    };
     interface HTMLElementTagNameMap {
         "calendar-day": HTMLCalendarDayElement;
+        "calendar-header": HTMLCalendarHeaderElement;
         "calendar-month": HTMLCalendarMonthElement;
+        "drag-x": HTMLDragXElement;
+        "drag-xy": HTMLDragXyElement;
+        "drag-y": HTMLDragYElement;
         "drop-down": HTMLDropDownElement;
         "field-button": HTMLFieldButtonElement;
         "field-checkbox": HTMLFieldCheckboxElement;
+        "field-color": HTMLFieldColorElement;
         "field-date": HTMLFieldDateElement;
+        "field-datetime": HTMLFieldDatetimeElement;
         "field-multiselect": HTMLFieldMultiselectElement;
         "field-number": HTMLFieldNumberElement;
         "field-radio": HTMLFieldRadioElement;
+        "field-range": HTMLFieldRangeElement;
         "field-select": HTMLFieldSelectElement;
+        "field-slider": HTMLFieldSliderElement;
         "field-text": HTMLFieldTextElement;
         "field-textarea": HTMLFieldTextareaElement;
         "field-time": HTMLFieldTimeElement;
         "icon-element": HTMLIconElementElement;
+        "overlay-element": HTMLOverlayElementElement;
         "root-element": HTMLRootElementElement;
+        "tool-tip": HTMLToolTipElement;
     }
 }
 declare namespace LocalJSX {
@@ -411,6 +603,17 @@ declare namespace LocalJSX {
         "clickable"?: boolean;
         "date"?: Date;
         "disabled"?: boolean;
+        /**
+          * EVENTS
+         */
+        "onDayclick"?: (event: CustomEvent<any>) => void;
+    }
+    interface CalendarHeader {
+        /**
+          * PROPS
+         */
+        "date"?: Date | string;
+        "onDatechange"?: (event: CustomEvent<any>) => void;
     }
     interface CalendarMonth {
         /**
@@ -421,7 +624,17 @@ declare namespace LocalJSX {
         "date"?: string | Date;
         "disabled"?: boolean;
     }
+    interface DragX {
+        "contained"?: boolean;
+    }
+    interface DragXy {
+        "contained"?: boolean;
+    }
+    interface DragY {
+        "contained"?: boolean;
+    }
     interface DropDown {
+        "arrow"?: boolean;
         "closeonclick"?: boolean;
         "open"?: boolean;
         "openonhover"?: boolean;
@@ -451,10 +664,29 @@ declare namespace LocalJSX {
         "mixed"?: boolean;
         "name"?: string;
         "novalidate"?: boolean;
-        "readonly"?: boolean;
         "required"?: boolean;
         "slim"?: boolean;
+        "theme"?: 'inverse' | '';
         "value"?: boolean;
+    }
+    interface FieldColor {
+        /**
+          * PROPS
+         */
+        "autocomplete"?: string;
+        "autofocus"?: boolean;
+        "autowidth"?: boolean;
+        "disabled"?: boolean;
+        "error"?: string;
+        "helptext"?: string;
+        "inputid"?: string;
+        "label"?: string;
+        "labelup"?: boolean;
+        "name"?: string;
+        "required"?: boolean;
+        "slim"?: boolean;
+        "theme"?: 'inverse' | '';
+        "value"?: string;
     }
     interface FieldDate {
         "active"?: boolean;
@@ -473,9 +705,32 @@ declare namespace LocalJSX {
         "max"?: number;
         "min"?: number;
         "name"?: string;
-        "readonly"?: boolean;
         "required"?: boolean;
         "slim"?: boolean;
+        "theme"?: 'inverse' | '';
+        "value"?: Date | string;
+    }
+    interface FieldDatetime {
+        "active"?: boolean;
+        /**
+          * PROPS
+         */
+        "autocomplete"?: string;
+        "autofocus"?: boolean;
+        "autowidth"?: boolean;
+        "disabled"?: boolean;
+        "error"?: string;
+        "helptext"?: string;
+        "inputid"?: string;
+        "label"?: string;
+        "labelup"?: boolean;
+        "max"?: number;
+        "min"?: number;
+        "name"?: string;
+        "required"?: boolean;
+        "showseconds"?: boolean;
+        "slim"?: boolean;
+        "theme"?: 'inverse' | '';
         "value"?: Date | string;
     }
     interface FieldMultiselect {
@@ -491,9 +746,9 @@ declare namespace LocalJSX {
         "label"?: string;
         "name"?: string;
         "options"?: string | any[];
-        "readonly"?: boolean;
         "required"?: boolean;
         "slim"?: boolean;
+        "theme"?: 'inverse' | '';
         "value"?: any[];
     }
     interface FieldNumber {
@@ -512,9 +767,9 @@ declare namespace LocalJSX {
         "max"?: number;
         "min"?: number;
         "name"?: string;
-        "readonly"?: boolean;
         "required"?: boolean;
         "slim"?: boolean;
+        "theme"?: 'inverse' | '';
         "value"?: number | undefined;
     }
     interface FieldRadio {
@@ -529,10 +784,30 @@ declare namespace LocalJSX {
         "label"?: string;
         "name"?: string;
         "options"?: string | any[];
-        "readonly"?: boolean;
         "required"?: boolean;
         "slim"?: boolean;
+        "theme"?: 'inverse' | '';
         "value"?: string | undefined;
+    }
+    interface FieldRange {
+        /**
+          * PROPS
+         */
+        "autowidth"?: boolean;
+        "disabled"?: boolean;
+        "error"?: string;
+        "helptext"?: string;
+        "inputid"?: string;
+        "label"?: string;
+        "maxvalue"?: number;
+        "minvalue"?: number;
+        "name"?: string;
+        "required"?: boolean;
+        "slim"?: boolean;
+        "step"?: number;
+        "theme"?: 'inverse' | '';
+        "value"?: string;
+        "valueinlabel"?: boolean;
     }
     interface FieldSelect {
         /**
@@ -548,10 +823,30 @@ declare namespace LocalJSX {
         "labelup"?: boolean;
         "name"?: string;
         "options"?: string | any[];
-        "readonly"?: boolean;
         "required"?: boolean;
         "slim"?: boolean;
+        "theme"?: 'inverse' | '';
         "value"?: string;
+    }
+    interface FieldSlider {
+        /**
+          * PROPS
+         */
+        "autowidth"?: boolean;
+        "disabled"?: boolean;
+        "error"?: string;
+        "helptext"?: string;
+        "inputid"?: string;
+        "label"?: string;
+        "maxvalue"?: number;
+        "minvalue"?: number;
+        "name"?: string;
+        "required"?: boolean;
+        "slim"?: boolean;
+        "step"?: number;
+        "theme"?: 'inverse' | '';
+        "value"?: number;
+        "valueinlabel"?: boolean;
     }
     interface FieldText {
         /**
@@ -570,10 +865,10 @@ declare namespace LocalJSX {
         "max"?: number;
         "min"?: number;
         "name"?: string;
-        "readonly"?: boolean;
         "required"?: boolean;
         "showcount"?: boolean;
         "slim"?: boolean;
+        "theme"?: 'inverse' | '';
         "type"?: string;
         "value"?: string;
     }
@@ -595,10 +890,10 @@ declare namespace LocalJSX {
         "max"?: number;
         "min"?: number;
         "name"?: string;
-        "readonly"?: boolean;
         "required"?: boolean;
         "showcount"?: boolean;
         "slim"?: boolean;
+        "theme"?: 'inverse' | '';
         "value"?: string;
     }
     interface FieldTime {
@@ -615,33 +910,65 @@ declare namespace LocalJSX {
         "max"?: string;
         "min"?: string;
         "name"?: string;
-        "readonly"?: boolean;
+        "onTimechange"?: (event: CustomEvent<any>) => void;
+        /**
+          * EVENTS
+         */
+        "onValuechange"?: (event: CustomEvent<any>) => void;
         "required"?: boolean;
         "showseconds"?: boolean;
         "slim"?: boolean;
+        "theme"?: 'inverse' | '';
         "value"?: string;
     }
     interface IconElement {
         "kind"?: string;
     }
+    interface OverlayElement {
+        /**
+          * PROPS
+         */
+        "active"?: boolean;
+    }
     interface RootElement {
+        "theme"?: 'inverse' | '';
+    }
+    interface ToolTip {
+        /**
+          * PROPS
+         */
+        "active"?: boolean;
+        "align"?: 'top' | 'bottom' | 'left' | 'right';
+        "container"?: string | HTMLElement;
+        "off"?: string;
+        "on"?: string;
     }
     interface IntrinsicElements {
         "calendar-day": CalendarDay;
+        "calendar-header": CalendarHeader;
         "calendar-month": CalendarMonth;
+        "drag-x": DragX;
+        "drag-xy": DragXy;
+        "drag-y": DragY;
         "drop-down": DropDown;
         "field-button": FieldButton;
         "field-checkbox": FieldCheckbox;
+        "field-color": FieldColor;
         "field-date": FieldDate;
+        "field-datetime": FieldDatetime;
         "field-multiselect": FieldMultiselect;
         "field-number": FieldNumber;
         "field-radio": FieldRadio;
+        "field-range": FieldRange;
         "field-select": FieldSelect;
+        "field-slider": FieldSlider;
         "field-text": FieldText;
         "field-textarea": FieldTextarea;
         "field-time": FieldTime;
         "icon-element": IconElement;
+        "overlay-element": OverlayElement;
         "root-element": RootElement;
+        "tool-tip": ToolTip;
     }
 }
 export { LocalJSX as JSX };
@@ -649,20 +976,30 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "calendar-day": LocalJSX.CalendarDay & JSXBase.HTMLAttributes<HTMLCalendarDayElement>;
+            "calendar-header": LocalJSX.CalendarHeader & JSXBase.HTMLAttributes<HTMLCalendarHeaderElement>;
             "calendar-month": LocalJSX.CalendarMonth & JSXBase.HTMLAttributes<HTMLCalendarMonthElement>;
+            "drag-x": LocalJSX.DragX & JSXBase.HTMLAttributes<HTMLDragXElement>;
+            "drag-xy": LocalJSX.DragXy & JSXBase.HTMLAttributes<HTMLDragXyElement>;
+            "drag-y": LocalJSX.DragY & JSXBase.HTMLAttributes<HTMLDragYElement>;
             "drop-down": LocalJSX.DropDown & JSXBase.HTMLAttributes<HTMLDropDownElement>;
             "field-button": LocalJSX.FieldButton & JSXBase.HTMLAttributes<HTMLFieldButtonElement>;
             "field-checkbox": LocalJSX.FieldCheckbox & JSXBase.HTMLAttributes<HTMLFieldCheckboxElement>;
+            "field-color": LocalJSX.FieldColor & JSXBase.HTMLAttributes<HTMLFieldColorElement>;
             "field-date": LocalJSX.FieldDate & JSXBase.HTMLAttributes<HTMLFieldDateElement>;
+            "field-datetime": LocalJSX.FieldDatetime & JSXBase.HTMLAttributes<HTMLFieldDatetimeElement>;
             "field-multiselect": LocalJSX.FieldMultiselect & JSXBase.HTMLAttributes<HTMLFieldMultiselectElement>;
             "field-number": LocalJSX.FieldNumber & JSXBase.HTMLAttributes<HTMLFieldNumberElement>;
             "field-radio": LocalJSX.FieldRadio & JSXBase.HTMLAttributes<HTMLFieldRadioElement>;
+            "field-range": LocalJSX.FieldRange & JSXBase.HTMLAttributes<HTMLFieldRangeElement>;
             "field-select": LocalJSX.FieldSelect & JSXBase.HTMLAttributes<HTMLFieldSelectElement>;
+            "field-slider": LocalJSX.FieldSlider & JSXBase.HTMLAttributes<HTMLFieldSliderElement>;
             "field-text": LocalJSX.FieldText & JSXBase.HTMLAttributes<HTMLFieldTextElement>;
             "field-textarea": LocalJSX.FieldTextarea & JSXBase.HTMLAttributes<HTMLFieldTextareaElement>;
             "field-time": LocalJSX.FieldTime & JSXBase.HTMLAttributes<HTMLFieldTimeElement>;
             "icon-element": LocalJSX.IconElement & JSXBase.HTMLAttributes<HTMLIconElementElement>;
+            "overlay-element": LocalJSX.OverlayElement & JSXBase.HTMLAttributes<HTMLOverlayElementElement>;
             "root-element": LocalJSX.RootElement & JSXBase.HTMLAttributes<HTMLRootElementElement>;
+            "tool-tip": LocalJSX.ToolTip & JSXBase.HTMLAttributes<HTMLToolTipElement>;
         }
     }
 }

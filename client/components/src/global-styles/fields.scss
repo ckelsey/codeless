@@ -8,14 +8,8 @@ $inputPadding: 1.3em 0.7em 0.3em;
 $inputLabelTopPadding: 0.8em 0.7em;
 $inputIconPadding: 1.3em 0.7em 0.3em 2.3em;
 $inputLabelTopIconPadding: 0.8em 0.7em 0.8em 2.3em;
-$inputRadius: 2px;
 $inputWidth: 30em;
 $inputHeight: 2.725em;
-
-$inputShadow: inset 0 0px 2px 0px transparentize(theme-color("foreground", "light"), 0.5),
-    0 0 0 100px theme-color("foreground") inset;
-$inputShadowFocused: inset 0 0px 2px 0px transparentize(theme-color("foreground", "light"), 0.5),
-    0 0 0 100px theme-color("foreground", "light") inset;
 
 @mixin inputMargins {
     margin-top: $space2;
@@ -76,9 +70,8 @@ $inputShadowFocused: inset 0 0px 2px 0px transparentize(theme-color("foreground"
     justify-content: flex-start;
     flex-wrap: wrap;
     box-sizing: border-box;
-    color: theme-color("foreground");
     background-color: theme-color("foreground");
-    border-radius: $inputRadius;
+    border-radius: $borderRadius;
     transition: background-color 0.2s;
     @include inputMargins;
 
@@ -106,6 +99,42 @@ $inputShadowFocused: inset 0 0px 2px 0px transparentize(theme-color("foreground"
             padding: $inputLabelTopPadding;
         }
     }
+
+    &[empty="false"] {
+        input {
+            -webkit-text-fill-color: theme-color("background");
+        }
+    }
+
+    &[theme="inverse"] {
+        background-color: theme-color("background");
+
+        &[focused="true"] {
+            background-color: theme-color("background", "light");
+        }
+
+        &[empty="false"] {
+            input {
+                -webkit-text-fill-color: theme-color("foreground");
+            }
+        }
+
+        .icon-container {
+            color: transparentize(theme-color("foreground"), 0.25);
+        }
+
+        .field-input-label {
+            input,
+            select,
+            textarea {
+                color: theme-color("foreground");
+            }
+
+            label {
+                color: transparentize(theme-color("foreground"), 0.38);
+            }
+        }
+    }
 }
 
 @mixin field {
@@ -114,7 +143,7 @@ $inputShadowFocused: inset 0 0px 2px 0px transparentize(theme-color("foreground"
     margin: 0;
     height: auto;
     width: 100%;
-    border-radius: $inputRadius;
+    border-radius: $borderRadius;
     background-color: transparent;
     color: theme-color("background");
     border: none !important;
@@ -122,6 +151,7 @@ $inputShadowFocused: inset 0 0px 2px 0px transparentize(theme-color("foreground"
     font-family: inherit;
     line-height: initial;
     outline: none !important;
+    appearance: none;
     transition: color 0.2s, background-color 0.2s, background-position 0.2s, transform 0.2s;
 
     &:focus {
@@ -156,11 +186,6 @@ $inputShadowFocused: inset 0 0px 2px 0px transparentize(theme-color("foreground"
         @include placeholder;
     }
 
-    &[readonly]:not([readonly="false"]),
-    &[readonly="true"] {
-        cursor: not-allowed;
-    }
-
     &[disabled] {
         @include disabled;
 
@@ -191,6 +216,7 @@ $inputShadowFocused: inset 0 0px 2px 0px transparentize(theme-color("foreground"
         padding: 0 0.125em;
         flex-grow: 1;
         width: 100%;
+        color: inherit;
     }
 
     .field-help-text,
@@ -202,6 +228,7 @@ $inputShadowFocused: inset 0 0px 2px 0px transparentize(theme-color("foreground"
         font-weight: 100;
         opacity: 0.62;
         line-height: 100%;
+        color: inherit;
     }
 }
 
@@ -225,14 +252,13 @@ $inputShadowFocused: inset 0 0px 2px 0px transparentize(theme-color("foreground"
         text-transform: capitalize;
         font-size: inherit;
         pointer-events: none;
-        color: transparentize(theme-color("background"), 0.38);
-        transition: transform 0.2s, opacity 0.2s ease-in 0.062s, padding 0.2s;
         position: relative;
         height: 0;
         line-height: 150%;
         padding: 0 0 0 0.75em;
         top: -2.125em;
         color: transparentize(theme-color("background"), 0.38);
+        transition: transform 0.2s, opacity 0.2s ease-in 0.062s, padding 0.2s;
 
         &[error]:not([error=""]) {
             &:after {

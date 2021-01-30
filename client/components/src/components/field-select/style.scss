@@ -1,7 +1,5 @@
 @import "../../global-styles/fields.scss";
 
-$selectArrow: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="270" height="240"><path fill="dimGray" d="M5,5H265L135,230"/></svg>');
-
 :host {
     @include fieldBase;
 
@@ -11,10 +9,6 @@ $selectArrow: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/sv
         select {
             @include field;
             appearance: none;
-            background-image: $selectArrow;
-            background-size: 0.6em 0.45em;
-            background-repeat: no-repeat;
-            background-position: calc(100% - 0.25em) 55%;
             padding: 1.238em 0.7em 0.3em;
             min-height: 2.725em;
         }
@@ -22,6 +16,27 @@ $selectArrow: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/sv
         &[label-up="true"].w-auto {
             select {
                 background-position: calc(100% - 0.25em) 72%;
+            }
+
+            .field-select-arrow {
+                transform: translateY(-12%);
+                right: -0.2em;
+            }
+        }
+
+        .field-select-arrow {
+            position: absolute;
+            right: 0.125em;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.25em;
+            pointer-events: none;
+            color: theme-color("background");
+        }
+
+        &[theme="inverse"] {
+            .field-select-arrow {
+                color: theme-color("foreground");
             }
         }
 

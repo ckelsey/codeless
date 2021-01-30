@@ -1,7 +1,4 @@
 import { Component, h, Element, Prop, State, Watch, Method } from '@stencil/core'
-import ArrayFrom from '../../../../utils/conversion/array-from'
-import Create from '../../../../utils/dom/create'
-import DispatchEvent from '../../../../utils/dom/dispatch-event'
 
 const getDate = (date: Date) => new Date(`${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`)
 
@@ -26,6 +23,15 @@ export class CalendarMonth {
     @State() _day: number
     @State() _month: number
     @State() _year: number
+    @State() days: {
+        preMonthDays: Date[]
+        currentMonthDays: Date[]
+        postMonthDays: Date[]
+    } = {
+            preMonthDays: [],
+            currentMonthDays: [],
+            postMonthDays: []
+        }
 
 
     /** METHODS */
@@ -94,14 +100,10 @@ export class CalendarMonth {
 
     updateDom() {
         const date = typeof this.date === 'string' ? new Date(this.date) : this.date
-
-        const daysContainer = this.daysElement
-
-        if (!daysContainer) { return }
-
-        daysContainer.classList.add('calendar-month-days-updating')
-
-        ArrayFrom(daysContainer.children).forEach(el => daysContainer.removeChild(el))
+        const time = [date.getHours(), date.getMinutes(), date.getSeconds()]
+        const preMonthDays = []
+        const currentMonthDays = []
+        const postMonthDays = []
 
         const year = date.getFullYear()
         const month = date.getMonth()
@@ -116,56 +118,32 @@ export class CalendarMonth {
 
         let lastMonthDay = startOfMonth.getDate()
 
-        while (firstDay--) {
-            daysContainer.appendChild(Create({
-                tag: 'calendar-day',
-                properties: {
-                    date: new Date(year, month, lastMonthDay - firstDay),
-                    disabled: true
-                }
-            }))
-        }
+        while (firstDay--) { preMonthDays.push(new Date(year, month - 1, lastMonthDay - firstDay, ...time)) }
 
         let len = daysInMonth
 
-        while (len--) {
-            const dayElement = Create({
-                tag: 'calendar-day',
-                properties: {
-                    date: new Date(year, month, daysInMonth - len),
-                    clickable: this.clickable,
-                    active: date.getDate() === (daysInMonth - len)
-                }
-            })
-
-            dayElement.addEventListener('dayclick', e => DispatchEvent(this.host, 'dayclick', e['detail']))
-
-            daysContainer.appendChild(dayElement)
-        }
+        while (len--) { currentMonthDays.push(new Date(year, month, daysInMonth - len, ...time)) }
 
         let lastDay = endOfMonth.getDay()
         let nextDay = 1
 
         while (lastDay < 6) {
-            daysContainer.appendChild(Create({
-                tag: 'calendar-day',
-                properties: {
-                    date: new Date(year, month, nextDay),
-                    disabled: true
-                }
-            }))
+            postMonthDays.push(new Date(year, month + 1, nextDay, ...time))
             lastDay = lastDay + 1
             nextDay = nextDay + 1
         }
 
-        daysContainer.classList.remove('calendar-month-days-updating')
+        this.days = {
+            preMonthDays,
+            currentMonthDays,
+            postMonthDays
+        }
     }
 
 
     /** LIFECYLE */
-    componentWillLoad() { this.updateDate(this.date) }
-
-    componentDidLoad() {
+    componentWillLoad() {
+        this.updateDate(this.date)
         this.updateDom()
     }
 
@@ -174,7 +152,31 @@ export class CalendarMonth {
             <div
                 class="calendar-month-days"
                 ref={(el) => this.daysElement = el as HTMLElement}
-            ></div>
+            >
+                {this.days.preMonthDays.map(d =>
+                    <calendar-day
+                        disabled={true}
+                        clickable={true}
+                        date={d}
+                    ></calendar-day>
+                )}
+
+                {this.days.currentMonthDays.map((d, i) =>
+                    <calendar-day
+                        clickable={true}
+                        date={d}
+                        active={(i + 1) === this._day}
+                    ></calendar-day>
+                )}
+
+                {this.days.postMonthDays.map(d =>
+                    <calendar-day
+                        disabled={true}
+                        clickable={true}
+                        date={d}
+                    ></calendar-day>
+                )}
+            </div>
         </div>
     }
 }

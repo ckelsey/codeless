@@ -1,4 +1,4 @@
-import { Component, h } from '@stencil/core'
+import { Component, h, Prop } from '@stencil/core'
 
 @Component({
     tag: 'root-element',
@@ -7,8 +7,11 @@ import { Component, h } from '@stencil/core'
 })
 
 export class RootElement {
+    @Prop() theme: 'inverse' | '' = ''
+
+
     render() {
-        return <div class="root-element-container">
+        return <div class="root-element-container" data-theme={this.theme}>
             <slot />
         </div>
     }

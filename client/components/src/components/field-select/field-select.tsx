@@ -65,20 +65,18 @@ export class FieldSelect {
         this.value = processedValue(this.value, this.optionsArray)
     }
 
-    @Prop() readonly: boolean = false
-    @Watch('readonly') readonlyWatcher(newVal) { SetAttribute(this.formInput, 'readonly', newVal) }
-
     @Prop() required: boolean = false
     @Watch('required') requiredWatcher(newVal) { SetAttribute(this.formInput, 'required', newVal) }
 
     @Prop() slim: boolean = false
 
+    @Prop({ reflect: true }) theme: 'inverse' | '' = ''
+    @Watch('theme') themeWatcher(newVal) { this.updateTheme(newVal) }
+
     @Prop() value: string = ''
     @Watch('value') validValue(newVal) {
         const processed = processedValue(newVal, this.optionsArray)
-        if (processed !== newVal) {
-            this.value = processed
-        }
+        if (processed !== newVal) { this.value = processed }
     }
 
 
@@ -90,7 +88,7 @@ export class FieldSelect {
     }
     @State() sanitizedHelp: string = ''
     @State() sanitizedError: string = ''
-    @State() optionsArray: OptionsObject[] = []
+    @State() optionsArray: OptionsObject[] = optionsToArray(this.options)
 
     /** METHODS */
     @Method() getValidity() { return Promise.resolve(this.formInput.validity) }
@@ -99,7 +97,6 @@ export class FieldSelect {
 
     /** ELEMENTS */
     containerElement!: HTMLElement
-    helpTextElement!: HTMLElement
     inputElement!: HTMLInputElement
     labelElement!: HTMLLabelElement
     formInput!: HTMLInputElement
@@ -108,7 +105,7 @@ export class FieldSelect {
     /** INTERNAL METHODS */
     externalForm() { return this.host.closest('form') }
 
-    focused() { return this.inputid === (document.activeElement as any).inputid }
+    focused() { return this.inputid === (document.activeElement as any).inputid || this.host.shadowRoot.activeElement === this.inputElement }
 
     isempty() { return this.value === '' || this.value === undefined }
 
@@ -139,6 +136,10 @@ export class FieldSelect {
         )
     }
 
+    updateTheme(theme) { this.containerElement.setAttribute('theme', theme) }
+
+
+
     /** LIFECYLE */
     componentWillLoad() {
         this.sanitizedLabel = SantizedHTML(this.label)
@@ -152,6 +153,7 @@ export class FieldSelect {
         SetAttribute(this.containerElement, 'has-label', (!!this.sanitizedLabel).toString())
         this.setLabelPosition()
         FormControl.apply(this, [this.inputid, this.formInput, this.externalForm()])
+        this.updateTheme(this.theme)
     }
 
     render() {
@@ -195,12 +197,12 @@ export class FieldSelect {
 
                 <label ref={(el) => this.labelElement = el as HTMLLabelElement}>{this.sanitizedLabel}</label>
 
+                <icon-element kind="chevron-down" class="field-select-arrow"></icon-element>
+
             </div>
 
             <span class="field-input-bottom">
-                <span
-                    ref={(el) => this.helpTextElement = el as HTMLElement}
-                    class="field-help-text">{this.sanitizedHelp}</span>
+                <span class="field-help-text">{this.sanitizedHelp}</span>
             </span>
             <div class="form-control"><slot name="form-control"></slot></div>
         </div>

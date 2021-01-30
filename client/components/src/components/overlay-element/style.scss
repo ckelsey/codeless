@@ -1,0 +1,30 @@
+overlay-element {
+    position: relative;
+    width: 0;
+    height: 0;
+    display: block;
+
+    &:before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #000;
+        opacity: 0;
+        z-index: -1;
+        transition: opacity 0.3s;
+    }
+
+    &[active] {
+        &:before {
+            z-index: 1;
+            opacity: 0.8;
+        }
+    }
+
+    .overlay-element-content {
+        z-index: 10;
+    }
+}

@@ -59,15 +59,15 @@ export class FieldTextarea {
     @Prop() min: number
     @Watch('min') minWatcher(newVal) { SetAttribute(this.formInput, 'min', newVal) }
 
-    @Prop() readonly: boolean = false
-    @Watch('readonly') readonlyWatcher(newVal) { SetAttribute(this.formInput, 'readonly', newVal) }
-
     @Prop() required: boolean = false
     @Watch('required') requiredWatcher(newVal) { SetAttribute(this.formInput, 'required', newVal) }
 
     @Prop() showcount: boolean = false
 
     @Prop() slim: boolean = false
+
+    @Prop({ reflect: true }) theme: 'inverse' | '' = ''
+    @Watch('theme') themeWatcher(newVal) { this.updateTheme(newVal) }
 
     @Prop() value: string = ''
     @Watch('value') validValue(newVal) { if (typeof newVal == 'undefined') { return this.value = '' } }
@@ -89,7 +89,6 @@ export class FieldTextarea {
 
     /** ELEMENTS */
     containerElement!: HTMLElement
-    helpTextElement!: HTMLElement
     inputElement!: any
     labelElement!: HTMLLabelElement
     formInput!: HTMLTextAreaElement
@@ -98,7 +97,7 @@ export class FieldTextarea {
     /** INTERNAL METHODS */
     externalForm() { return this.host.closest('form') }
 
-    focused() { return this.inputid === (document.activeElement as any).inputid }
+    focused() { return this.inputid === (document.activeElement as any).inputid || this.host.shadowRoot.activeElement === this.inputElement }
 
     isempty() { return this.value == '' || this.value == undefined }
 
@@ -121,6 +120,10 @@ export class FieldTextarea {
         SetAttribute(SetAttribute(this.containerElement, 'focused', focused.toString()), 'label-up', focused || !empty || forcedUp ? 'true' : 'false')
     }
 
+    updateTheme(theme) { this.containerElement.setAttribute('theme', theme) }
+
+
+
     /** LIFECYLE */
     componentWillLoad() { this.sanitizedLabel = SantizedHTML(this.label) }
 
@@ -128,6 +131,7 @@ export class FieldTextarea {
         InputLabelId(this.inputid, this.inputElement, this.labelElement)
         SetAttribute(this.containerElement, 'has-label', (!!this.sanitizedLabel).toString())
         FormControl.apply(this, [this.inputid, this.formInput, this.externalForm()])
+        this.updateTheme(this.theme)
     }
 
     render() {
@@ -137,7 +141,6 @@ export class FieldTextarea {
             name: this.name,
             required: this.required,
             disabled: this.disabled,
-            readonly: this.readonly,
             class: 'field-textarea-hidden-input',
             maxlength: !!this.max ? this.max : undefined,
             minlength: !!this.min ? this.min : undefined,
@@ -158,7 +161,6 @@ export class FieldTextarea {
                     autofocus={this.autofocus}
                     disabled={this.disabled}
                     name={this.name}
-                    readonly={this.readonly}
                     required={this.required}
                     id={this.inputid}
                     maxLength={this.max}
@@ -175,10 +177,7 @@ export class FieldTextarea {
             </div>
 
             <span class="field-input-bottom">
-                <span
-                    ref={(el) => this.helpTextElement = el as HTMLElement}
-                    class="field-help-text">{this.sanitizedHelp}</span>
-
+                <span class="field-help-text">{this.sanitizedHelp}</span>
                 <span class="field-count-text">{this.showcount ? this.max ? `${this.count}/${this.max}` : this.count : ''}</span>
             </span>
             <div class="form-control"><slot name="form-control"></slot></div>

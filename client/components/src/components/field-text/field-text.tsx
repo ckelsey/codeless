@@ -59,15 +59,15 @@ export class FieldText {
     @Prop() min: number
     @Watch('min') minWatcher(newVal) { SetAttribute(this.formInput, 'minlength', newVal) }
 
-    @Prop() readonly: boolean = false
-    @Watch('readonly') readonlyWatcher(newVal) { SetAttribute(this.formInput, 'readonly', newVal) }
-
     @Prop() required: boolean = false
     @Watch('required') requiredWatcher(newVal) { SetAttribute(this.formInput, 'required', newVal) }
 
     @Prop() showcount: boolean = false
 
     @Prop() slim: boolean = false
+
+    @Prop({ reflect: true }) theme: 'inverse' | '' = ''
+    @Watch('theme') themeWatcher(newVal) { this.updateTheme(newVal) }
 
     @Prop() type: string = 'text'
     @Watch('type') validType(newVal) {
@@ -95,7 +95,6 @@ export class FieldText {
 
     /** ELEMENTS */
     containerElement!: HTMLElement
-    helpTextElement!: HTMLElement
     inputElement!: HTMLInputElement
     labelElement!: HTMLLabelElement
     formInput!: HTMLInputElement
@@ -104,7 +103,7 @@ export class FieldText {
     /** INTERNAL METHODS */
     externalForm() { return this.host.closest('form') }
 
-    focused() { return this.inputid === (document.activeElement as any).inputid }
+    focused() { return this.inputid === (document.activeElement as any).inputid || this.host.shadowRoot.activeElement === this.inputElement }
 
     isempty() { return this.value == '' || this.value == undefined }
 
@@ -144,6 +143,9 @@ export class FieldText {
         )
     }
 
+    updateTheme(theme) { this.containerElement.setAttribute('theme', theme) }
+
+
     /** LIFECYLE */
     componentWillLoad() {
         this.sanitizedLabel = SantizedHTML(this.label)
@@ -155,6 +157,7 @@ export class FieldText {
         this.containerElement.setAttribute('has-label', (!!this.sanitizedLabel).toString())
         this.setLabelPosition()
         FormControl.apply(this, [this.inputid, this.formInput, this.externalForm()])
+        this.updateTheme(this.theme)
     }
 
     render() {
@@ -165,7 +168,6 @@ export class FieldText {
             name: this.name,
             required: this.required,
             disabled: this.disabled,
-            readonly: this.readonly,
             maxLength: this.max,
             minLength: this.min,
             class: 'field-text-hidden-input',
@@ -186,7 +188,6 @@ export class FieldText {
                     autocomplete={this.autocomplete}
                     autofocus={this.autofocus}
                     disabled={this.disabled}
-                    readonly={this.readonly}
                     required={this.required}
                     id={this.inputid}
                     maxLength={this.max}
@@ -205,10 +206,7 @@ export class FieldText {
                 <label ref={(el) => this.labelElement = el as HTMLLabelElement}>{this.sanitizedLabel}</label>
             </div>
             <span class="field-input-bottom">
-                <span
-                    ref={(el) => this.helpTextElement = el as HTMLElement}
-                    class="field-help-text">{this.sanitizedHelp}</span>
-
+                <span class="field-help-text">{this.sanitizedHelp}</span>
                 <span class="field-count-text">{this.showcount ? this.max ? `${this.count}/${this.max}` : this.count : ''}</span>
             </span>
             <div class="form-control"><slot name="form-control"></slot></div>

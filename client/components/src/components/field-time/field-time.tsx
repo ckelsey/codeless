@@ -2,7 +2,7 @@
  * show warning if invalid value, i.e. via max/min
  * If there's any better way at all to handle the input cycle (internal->external->inputs->internal->external->inputs)
  */
-import { Component, Prop, h, Watch, Element, Method, State } from '@stencil/core'
+import { Component, Prop, h, Watch, Element, Method, State, Event } from '@stencil/core'
 import { SantizedHTML } from '../../../../utils/validate/html'
 import ID from '../../../../utils/id'
 import AttributeSetRemove from '../../../../utils/dom/attribute-set-remove'
@@ -82,16 +82,16 @@ export class FieldTime {
         SetAttribute(this.formInput, 'name', this.name)
     }
 
-    @Prop() readonly: boolean = false
-    @Watch('readonly') readonlyWatcher(newVal) { SetAttribute(this.formInput, 'readonly', newVal) }
-
     @Prop() required: boolean = false
     @Watch('required') requiredWatcher(newVal) { SetAttribute(this.formInput, 'required', newVal) }
 
     @Prop() showseconds: boolean = false
-    @Watch('showseconds') validSHowSeconds() { this.second('00') }
+    @Watch('showseconds') validSHowSeconds() { this.handleValueUpdate(2, '00') }
 
     @Prop() slim: boolean = false
+
+    @Prop({ reflect: true }) theme: 'inverse' | '' = ''
+    @Watch('theme') themeWatcher(newVal) { this.updateTheme(newVal) }
 
     @Prop() value: string = ''
     @Watch('value') validValue() { this.valueDebouncer() }
@@ -100,7 +100,6 @@ export class FieldTime {
 
     /** STATE */
     @State() sanitizedHelp: string = ''
-
     @State() sanitizedLabel: string = ''
     @Watch('sanitizedLabel') validSanitizedLabel(newVal) {
         SetAttribute(this.containerElement, 'has-label', (!!newVal).toString())
@@ -117,20 +116,16 @@ export class FieldTime {
 
     @Method() getValidationMessage() { return Promise.resolve(this.formInput.validationMessage) }
 
-    @Method() hour(value?) { return this.setGetValue(0, value) }
-
-    @Method() minute(value?) { return this.setGetValue(1, value) }
-
-    @Method() second(value?) { return this.setGetValue(2, value) }
-
-    @Method() meridien(value?) { return this.setGetValue(3, value) }
     @Method() getInternal() { return Promise.resolve(this.internalValue) }
 
+
+    /** EVENTS */
+    @Event() valuechange
+    @Event() timechange
 
 
     /** ELEMENTS */
     containerElement!: HTMLElement
-    helpTextElement!: HTMLElement
     labelElement!: HTMLLabelElement
     hourInputElement!: HTMLInputElement
     minuteInputElement!: HTMLInputElement
@@ -141,13 +136,18 @@ export class FieldTime {
 
 
     /** INTERNAL METHODS */
+    changeEventDebouncer = Debounce(() => {
+        this.valuechange.emit(this.value)
+        this.timechange.emit(this.value)
+    })
+
     valueDebouncer = Debounce(() => this.externalToInternal(), 0)
 
     internalValueDebouncer = Debounce(() => this.internalToExternal(), 0)
 
     externalForm() { return this.host.closest('form') }
 
-    focused() { return this.inputid === (document.activeElement as any).inputid }
+    focused() { return this.inputid === (document.activeElement as any).inputid || this.getInputs().indexOf(this.host.shadowRoot.activeElement) > -1 }
 
     isempty() { return isEmpty(this.value) }
 
@@ -155,19 +155,21 @@ export class FieldTime {
 
     getInputs() { return [this.hourInputElement, this.minuteInputElement, this.secondInputElement, this.meridienElement] }
 
-    setInputValues() {
+    setInputValues(vals = []) {
+        if (!this.meridienElement) { return }
+
         const inputs = this.getInputs()
 
         if (!inputs[0]) { return }
 
-        this.internalValue.forEach((v, i) => inputs[i].value !== v ? inputs[i].value = v : undefined)
+        vals.forEach((v, i) => inputs[i] && inputs[i].value !== v ? inputs[i].value = v : undefined)
     }
 
     externalToInternal() {
         const newVal = externalToInternalValue(this.value, this.max, this.min)
         this.internalValue = newVal.array
         this.value = newVal.string
-        this.setInputValues()
+        this.setInputValues(newVal.array)
         this.setLabelPosition()
     }
 
@@ -175,26 +177,24 @@ export class FieldTime {
         const newVal = internalToExternal(this.internalValue, this.max, this.min)
         this.value = newVal.string
         this.internalValue = newVal.array
-        this.setInputValues()
+        this.setInputValues(newVal.array)
         this.setLabelPosition()
 
         if (!!this.value && !!this.error) {
             this.error = this.formInput.validationMessage
         }
+
+        this.changeEventDebouncer()
     }
 
     handleValueUpdate(index, value) {
+        if (value === undefined) { return }
+
         const proxy: any = this.getInputs().map(v => v.value)
         proxy[index] = index < 3 ? value.replace(/[^0-9.]/g, '') : value
-        this.internalValue = proxy
-        this.setInputValues()
-    }
 
-    setGetValue(index, value) {
-        return new Promise(resolve => {
-            this.handleValueUpdate(index, value)
-            return resolve(this.internalValue[index])
-        })
+        this.internalValue = proxy
+        this.setInputValues(proxy)
     }
 
     handleKeyDown(event) {
@@ -230,7 +230,7 @@ export class FieldTime {
 
     stripNonNumeric(event) {
         const target = GetEventTarget(event) as HTMLInputElement
-        if (tag(target) == 'input') { target.value = target.value.replace(/[^0-9.]/g, '') }
+        if (tag(target) == 'input' && target.value) { target.value = target.value.replace(/[^0-9.]/g, '') }
     }
 
     setLabelPosition() {
@@ -249,6 +249,8 @@ export class FieldTime {
 
     }
 
+    updateTheme(theme) { this.containerElement.setAttribute('theme', theme) }
+
 
 
     /** LIFECYLE */
@@ -262,6 +264,7 @@ export class FieldTime {
         this.setLabelPosition()
         SetAttribute(this.containerElement, 'has-label', (!!this.sanitizedLabel).toString())
         FormControl.apply(this, [this.inputid, this.formInput, this.externalForm()])
+        this.updateTheme(this.theme)
     }
 
     render() {
@@ -272,22 +275,20 @@ export class FieldTime {
             name: this.name,
             required: this.required,
             disabled: this.disabled,
-            readonly: this.readonly,
             class: 'field-time-hidden-input',
-            slot: 'form-control',
-            oninvalid: "console.log(this.validationMessage())"
+            slot: 'form-control'
         }) as HTMLInputElement
 
         return <div
             ref={(el) => this.containerElement = el as HTMLElement}
-            class="field-time-container field-element-container"
+            class={`field-time-container field-element-container${this.slim ? ' slim' : ''}${this.autowidth ? ' w-auto' : ''}`}
             onClick={() => this.focused() ? undefined : this.hourInputElement.focus()}
         >
             <div class={`field-time-contents${this.showseconds ? '' : ' hide-seconds'}${isEmpty(this.internalValue[0]) ? ' hide-meridien' : ''}`}>
                 <span class="icon-container"><slot name="icon" /></span>
                 <div class="field-input-label">
                     <div class="field-time-inputs">
-                        {inputKeys.map((key) =>
+                        {inputKeys.map((key, index) =>
                             <div class={`field-time-${key}-container field-time-input-container`}>
                                 <input
                                     type="text"
@@ -295,7 +296,7 @@ export class FieldTime {
                                     class={`field-time-${key}-input`}
                                     ref={(el) => this[`${key}InputElement`] = el as HTMLInputElement}
                                     onFocus={() => this.setLabelPosition()}
-                                    onBlur={() => this[key](this[`${key}InputElement`].value)}
+                                    onBlur={() => this.handleValueUpdate(index, this[`${key}InputElement`].value)}
                                     onInput={(e) => this.stripNonNumeric(e)}
                                     onKeyDown={(e) => this.handleKeyDown(e)}
                                     data-key={key}
@@ -314,8 +315,9 @@ export class FieldTime {
                                 labelup={true}
                                 data-key={'meridien'}
                                 onFocus={() => this.setLabelPosition()}
-                                onInput={() => this.meridien(this.meridienElement.value)}
+                                onInput={() => this.handleValueUpdate(3, this.meridienElement.value)}
                                 onKeyDown={(e) => this.handleKeyDown(e)}
+                                theme={this.theme}
                             ></field-select>
                         </div>
                     </div>
@@ -323,7 +325,7 @@ export class FieldTime {
                 </div>
             </div>
             <div class="field-input-bottom">
-                <span class="field-help-text" ref={(el) => this.helpTextElement = el as HTMLElement}>{this.sanitizedHelp}</span>
+                <span class="field-help-text">{this.sanitizedHelp}</span>
             </div>
             <div class="form-control"><slot name="form-control"></slot></div>
         </div>
@@ -345,17 +347,23 @@ const getLeadingZeros = (num: number) => isNaN(num) ? '' : `00${num}`.slice(-2)
 
 const addLeadingZeros = (val: number | string) => getLeadingZeros(Number(val as string))
 
-const internalToExternal = (value: InternalValue = defaultArray.slice() as InternalValue, max: string = defaultMax, min: string = defaultMin): EvaluatedTime => evaluateSeconds(value, max, min)
+const internalToExternal = (
+    value: InternalValue = defaultArray.slice() as InternalValue,
+    max: string = defaultMax,
+    min: string = defaultMin
+): EvaluatedTime => evaluateSeconds(value, max, min)
 
-const externalToInternalValue = (value: string = defaultString, max: string = defaultMax, min: string = defaultMin): EvaluatedTime => evaluateSeconds(value, max, min)
+const externalToInternalValue = (
+    value: string = defaultString,
+    max: string = defaultMax,
+    min: string = defaultMin
+): EvaluatedTime => evaluateSeconds(value, max, min)
 
 const stringToNumber = (v: string | number) => typeof v === 'string' ? parseInt(v) : v
 
 const isPM = (v: string | number) => stringToNumber(v) > 11
 
 const hour12MaxMin = (v: string | number) => Math.min(12, Math.max(0, stringToNumber(v)))
-
-const hour24MaxMin = (v: string | number) => Math.max(0, stringToNumber(v))
 
 const validMinuteSecond = (v: string | number) => isEmpty(v) ? '' : addLeadingZeros(Math.min(59, Math.max(0, stringToNumber(v))))
 
@@ -365,15 +373,18 @@ const timeStringToSeconds = (timeString: string) => isEmpty(timeString) ? 0 : ti
 
 const hour24To12 = (v: string | number) => {
     const number = stringToNumber(v)
-    const adjusted = hour12MaxMin(isPM(number) ? number - 12 : number)
+    const adjusted = hour12MaxMin(isPM(number) && number !== 12 ? number - 12 : number)
     return adjusted === 0 || adjusted === 24 ? 12 : adjusted
 }
 
 const hour12To24 = (v: string | number, ampm = 'am') => {
     let val = numberOrZero(stringToNumber(v))
-    if (ampm === 'am' && val === 12) { val = 0 }
+    if (ampm === 'am' && (val === 12 || val === 24)) { val = 0 }
     if (ampm === 'pm' && val !== 12) { val = val + 12 }
-    return hour24MaxMin(val)
+    return val < 0 || val > 23 ?
+        0 :
+        val
+
 }
 
 const timeStringToArray = (value: string = '') => {
@@ -402,7 +413,28 @@ const timeArrayToSeconds = (timeArray: InternalValue) => timeArray
 
 const timeArrayToString = array => (array || [])
     .reduce((target, current, index, arr) => {
-        if (index === 0) { return isEmpty(current) ? target : hour12To24(current, arr[3]).toString() }
+        if (index === 0) {
+            const isAM = isEmpty(arr[3]) || arr[3] === 'am'
+
+            if (isEmpty(current)) { return target }
+
+            let val = stringToNumber(current)
+
+            if (val === 12) {
+                if (isAM) { return '0' }
+                return current
+            }
+
+            if (isAM) {
+                return current
+            }
+
+            if (!isAM) {
+                return (val + 12).toString()
+            }
+
+            return current
+        }
         return index === 3 ? target : `${target}:${validMinuteSecond(current)}`
     }, '')
 
@@ -417,6 +449,18 @@ function evaluateSeconds(
     min: string = defaultMin
 ): EvaluatedTime {
     const isArray = Array.isArray(value)
+
+    // Intervine for a minute and adjust if value is string and hour is or above 24
+    if (!isArray) {
+        const temp: any[] = (value as string || '').split(':')
+        const tempHour = parseInt(temp[0])
+
+        if (!isNaN(tempHour) && tempHour > 23) {
+            temp[0] = tempHour % 24
+            value = temp.join(':')
+        }
+    }
+
     const valueSeconds = isArray ? timeArrayToSeconds(value as InternalValue) : timeStringToSeconds(value as string)
     const maxSeconds = timeStringToSeconds(max)
     const minSeconds = timeStringToSeconds(min)
