@@ -3,12 +3,14 @@ import * as _chevLeft from './paths/chevron-left.json'
 import * as _chevRight from './paths/chevron-right.json'
 import * as _chevDown from './paths/chevron-down.json'
 import * as _arrowLeftRight from './paths/arrow-left-right.json'
+import * as _eyedropper from './paths/eyedropper.json'
 
 const paths = {
     "arrow-left-right": _arrowLeftRight['default'],
     "chevron-left": _chevLeft['default'],
     "chevron-right": _chevRight['default'],
-    "chevron-down": _chevDown['default']
+    "chevron-down": _chevDown['default'],
+    "eyedropper": _eyedropper['default'],
 }
 
 @Component({

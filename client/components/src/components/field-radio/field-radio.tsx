@@ -1,4 +1,4 @@
-import { Component, Prop, h, Watch, Element, State, Method } from '@stencil/core'
+import { Component, Prop, h, Watch, Element, State, Method, Event } from '@stencil/core'
 import Pipe from '../../../../utils/function-helpers/pipe'
 import CommasToArray from '../../../../utils/conversion/commas-to-array'
 import ToArray from '../../../../utils/conversion/to-array'
@@ -13,6 +13,7 @@ import FormControl from '../../../../utils/dom/form-control'
 import SetAttribute from '../../../../utils/dom/set-attribute'
 import { SantizedHTML } from '../../../../utils/validate/html'
 import ArrayFrom from '../../../../utils/conversion/array-from'
+import Debounce from '../../../../utils/timing/debounce'
 
 const optionsToArray = Pipe(ToArray, CommasToArray, ToOptions, IfInvalid([]))
 const processedValue = (internalValue, value, options) => Get((options || []).filter(o => o.value == (internalValue || value)), '0.value')
@@ -25,6 +26,9 @@ const processedValue = (internalValue, value, options) => Get((options || []).fi
 
 export class FieldRadio {
     @Element() host
+
+    @Event() changed
+    debounceChanged = Debounce(() => this.changed.emit({ element: this, value: this.value }))
 
     /** PROPS */
     @Prop() autowidth: boolean = false
@@ -43,7 +47,7 @@ export class FieldRadio {
     @Prop() label: string = ''
     @Watch('label') validLabel(newVal) { this.sanitizedLabel = SantizedHTML(newVal) }
 
-    @Prop() name: string = ''
+    @Prop({ mutable: true, reflect: true }) name: string = ''
     @Watch('name') nameWatcher(newVal) {
         this.name = InputName(newVal, this.sanitizedLabel, this.inputid)
         SetAttribute(this.formInput, 'name', this.name)
@@ -58,12 +62,12 @@ export class FieldRadio {
     @Prop() required: boolean = false
     @Watch('required') requiredWatcher(newVal) { SetAttribute(this.formInput, 'required', newVal) }
 
-    @Prop() slim: boolean = false
+    @Prop() nomargin: boolean = false
 
     @Prop({ reflect: true }) theme: 'inverse' | '' = ''
     @Watch('theme') themeWatcher(newVal) { this.updateTheme(newVal) }
 
-    @Prop() value: string | undefined
+    @Prop({ mutable: true, reflect: true }) value: string | undefined
     @Watch('value') validValue(newVal) { this.internalValue = processedValue(this.internalValue, newVal, this.optionsArray) }
 
 
@@ -101,6 +105,7 @@ export class FieldRadio {
     handleInput(value) {
         this.formInput.value = this.value = value
         if (!!this.error && this.isvalid()) { this.error = this.formInput.validationMessage }
+        this.debounceChanged()
     }
 
     handleEnter(e) {
@@ -141,7 +146,7 @@ export class FieldRadio {
 
         return <div
             ref={(el) => this.containerElement = el as HTMLElement}
-            class={`field-radio-container field-element-container${this.slim ? ' slim' : ''}${this.autowidth ? ' w-auto' : ''}${this.required ? ' required' : ''}`}
+            class={`field-radio-container field-element-container${this.nomargin ? ' nomargin' : ''}${this.autowidth ? ' w-auto' : ''}${this.required ? ' required' : ''}`}
         >
             <div class="field-radio-main-label-container">
                 <div class="field-radio-main-label-right">

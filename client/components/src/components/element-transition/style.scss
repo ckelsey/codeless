@@ -1,0 +1,56 @@
+:host,
+element-transition {
+    display: block;
+    width: 100%;
+    position: relative;
+    transition: opacity 0.2s;
+}
+
+.element-transition {
+    position: relative;
+
+    .current-slot {
+        opacity: 1;
+    }
+
+    .next-slot {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        opacity: 0;
+    }
+
+    .hidden-slot {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        opacity: 0;
+        pointer-events: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: -1;
+        visibility: hidden;
+        user-select: none;
+
+        .hidden-slot-inner {
+            width: 100%;
+            height: 100%;
+            display: inline-block;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+    }
+}
+
+.unsorted-content {
+    display: inline-block;
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+}

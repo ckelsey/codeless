@@ -100,4 +100,8 @@
             }
         }
     }
+
+    ::slotted(*) {
+        position: relative;
+    }
 }

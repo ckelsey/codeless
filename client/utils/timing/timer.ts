@@ -91,8 +91,8 @@ const emptySubscription = (): TimerSubscription => ({
 const Timer = (function TimerIFEE() {
     return function TimerInner(stepFn: Function, frameValues: number[]) {
 
-
         if (!Array.isArray(frameValues) || frameValues.length === 0) { return emptySubscription() }
+
         if (typeof stepFn !== 'function') { return emptySubscription() }
 
         const id = ID()

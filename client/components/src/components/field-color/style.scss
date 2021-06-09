@@ -23,5 +23,14 @@
         @include iconSlot;
         @include helptext;
         @include formControl;
+
+        .field-color-drop-down {
+            width: 100%;
+
+            color-picker {
+                padding: 1em;
+                width: 100%;
+            }
+        }
     }
 }

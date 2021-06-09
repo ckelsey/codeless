@@ -1,4 +1,4 @@
-import { Component, Prop, h, Watch, Element, State, Method } from '@stencil/core'
+import { Component, Prop, h, Watch, Element, State, Method, Event } from '@stencil/core'
 import ValidateHtml from '../../../../utils/validate/html'
 import Pipe from '../../../../utils/function-helpers/pipe'
 import CommasToArray from '../../../../utils/conversion/commas-to-array'
@@ -12,6 +12,7 @@ import RenderLightDom from '../../../../utils/dom/render-light-dom'
 import InputName from '../../../../utils/dom/input-name'
 import SetAttribute from '../../../../utils/dom/set-attribute'
 import ArrayFrom from '../../../../utils/conversion/array-from'
+import Debounce from '../../../../utils/timing/debounce'
 
 const valueToArray = Pipe(CommasToArray, ToArray, IfInvalid([]))
 const optionsToArray = Pipe(CommasToArray, ToArray, ToOptions, IfInvalid([]))
@@ -25,6 +26,9 @@ const sanitized = (val: string) => !val ? '' : ValidateHtml(val).sanitized as st
 
 export class FieldMultiselect {
     @Element() host
+
+    @Event() changed
+    debounceChanged = Debounce(() => this.changed.emit({ element: this, value: this.value }))
 
     /** PROPS */
     @Prop() autofocus: boolean = false
@@ -64,12 +68,12 @@ export class FieldMultiselect {
     @Prop() required: boolean = false
     @Watch('required') requiredWatcher(newVal) { SetAttribute(this.formInput, 'required', newVal) }
 
-    @Prop() slim: boolean = false
+    @Prop() nomargin: boolean = false
 
     @Prop({ reflect: true }) theme: 'inverse' | '' = ''
     @Watch('theme') themeWatcher(newVal) { this.updateTheme(newVal) }
 
-    @Prop() value: any[] = []
+    @Prop({ mutable: true, reflect: true }) value: any[] = []
     @Watch('value') validValue(newVal) {
         this.valueArray = valueToArray(newVal)
         this.handleInput()
@@ -113,6 +117,7 @@ export class FieldMultiselect {
     handleInput() {
         this.formInput.value = ToJSON(this.valueArray)
         if (!!this.error && this.isvalid()) { this.error = sanitized(this.formInput.validationMessage) }
+        this.debounceChanged()
     }
 
     updateValues(value) {
@@ -168,7 +173,7 @@ export class FieldMultiselect {
         return <div class="field-multiselect-outer-container">
             <div
                 ref={(el) => this.containerElement = el as HTMLElement}
-                class={`field-multiselect-container field-element-container${this.slim ? ' slim' : ''}${this.autowidth ? ' w-auto' : ''}`}
+                class={`field-multiselect-container field-element-container${this.nomargin ? ' nomargin' : ''}${this.autowidth ? ' w-auto' : ''}`}
             >
                 <drop-down
                     ref={(el) => this.dropdownElement = el as HTMLElement} class="field-multiselect-dropdown"
@@ -181,7 +186,7 @@ export class FieldMultiselect {
                         label={this.sanitizedLabel}
                         required={this.required}
                         novalidate={true}
-                        slim={true}
+                        nomargin={true}
                         slot="label"
                         mixed={this.isMixed()}
                         onInput={this.labelClick()}
@@ -196,7 +201,7 @@ export class FieldMultiselect {
                             autowidth={true}
                             label={option.textContent}
                             name={option.value}
-                            slim={true}
+                            nomargin={true}
                             slot="item"
                             onInput={this.itemClick(option.value)}
                             onFocus={() => this.setFocused()}

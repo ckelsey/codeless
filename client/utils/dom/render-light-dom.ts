@@ -1,8 +1,11 @@
-const RenderLightDom = (host: HTMLElement, selector: string, attributes) => {
+import Try from "../try"
+import EventObserver from '../observe/event-observer'
+
+const RenderLightDom = (host: HTMLElement, selector: string, attributes = {}, events = {}) => {
     let element = host.querySelector(selector)
     const exists = !!element
 
-    if (!exists) { element = host.ownerDocument.createElement(attributes.tagName) }
+    if (!exists) { element = host.ownerDocument.createElement(attributes['tagName']) }
 
     Object.keys(attributes).forEach((key: string) => {
         if (key === 'tagName' || !key) { return }
@@ -12,6 +15,13 @@ const RenderLightDom = (host: HTMLElement, selector: string, attributes) => {
         }
 
         element[key] = attributes[key]
+    })
+
+    if (!element['events']) { element['events'] = {} }
+
+    Object.keys(events).forEach((key: string) => {
+        Try(element['events'][key])
+        element['events'][key] = EventObserver(element, key).subscribe(e => events[key](e))
     })
 
     if (!exists) { host.appendChild(element) }

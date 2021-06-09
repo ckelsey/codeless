@@ -1,4 +1,4 @@
-import { Component, Prop, h, Watch, Element, Method, State } from '@stencil/core'
+import { Component, Prop, h, Watch, Element, Method, State, Event } from '@stencil/core'
 import ID from '../../../../utils/id'
 import AttributeSetRemove from '../../../../utils/dom/attribute-set-remove'
 import DispatchEvent from '../../../../utils/dom/dispatch-event'
@@ -8,6 +8,7 @@ import FormControl from '../../../../utils/dom/form-control'
 import SetAttribute from '../../../../utils/dom/set-attribute'
 import InputLabelId from '../../../../utils/dom/input-label-id'
 import { SantizedHTML } from '../../../../utils/validate/html'
+import Debounce from '../../../../utils/timing/debounce'
 
 @Component({
     tag: 'field-color',
@@ -17,6 +18,9 @@ import { SantizedHTML } from '../../../../utils/validate/html'
 
 export class FieldColor {
     @Element() host
+
+    @Event() changed
+    debounceChanged = Debounce(() => this.changed.emit({ element: this, value: this.value }))
 
     /** PROPS */
     @Prop() autocomplete: string = 'on'
@@ -43,7 +47,7 @@ export class FieldColor {
     @Prop() labelup: boolean = false
     @Watch('labelup') validLabelUp() { this.setLabelPosition() }
 
-    @Prop() name: string = ''
+    @Prop({ mutable: true, reflect: true }) name: string = ''
     @Watch('name') nameWatcher(newVal) {
         this.name = InputName(newVal, this.sanitizedLabel, this.inputid)
         SetAttribute(this.formInput, 'name', this.name)
@@ -52,12 +56,12 @@ export class FieldColor {
     @Prop() required: boolean = false
     @Watch('required') requiredWatcher(newVal) { SetAttribute(this.formInput, 'required', newVal) }
 
-    @Prop() slim: boolean = false
+    @Prop() nomargin: boolean = false
 
     @Prop({ reflect: true }) theme: 'inverse' | '' = ''
     @Watch('theme') themeWatcher(newVal) { this.updateTheme(newVal) }
 
-    @Prop() value: string = ''
+    @Prop({ mutable: true, reflect: true }) value: string = ''
     @Watch('value') validValue(newVal) { if (typeof newVal == 'undefined') { return this.value = '' } }
 
 
@@ -80,6 +84,8 @@ export class FieldColor {
     inputElement!: HTMLInputElement
     labelElement!: HTMLLabelElement
     formInput!: HTMLInputElement
+    dropdownElement!: HTMLDropDownElement
+    colorPickerElement!: HTMLColorPickerElement
 
 
     /** INTERNAL METHODS */
@@ -103,6 +109,8 @@ export class FieldColor {
         if (this.containerElement) {
             this.containerElement.setAttribute('empty', empty.toString())
         }
+
+        this.debounceChanged()
     }
 
     handleEnter(e) {
@@ -155,7 +163,9 @@ export class FieldColor {
 
         return <div
             ref={(el) => this.containerElement = el as HTMLElement}
-            class={`field-color-container field-element-container${this.slim ? ' slim' : ''}${this.autowidth ? ' w-auto' : ''}`}
+            class={`field-color-container field-element-container${this.nomargin ? ' nomargin' : ''}${this.autowidth ? ' w-auto' : ''}`}
+            onMouseEnter={() => this.dropdownElement.open = true}
+            onMouseLeave={() => this.dropdownElement.open = false}
         >
             <span class="icon-container"><slot name="icon" /></span>
             <div class="field-input-label">
@@ -181,7 +191,15 @@ export class FieldColor {
                     onKeyDown={(e) => this.handleEnter(e)}
                 />
                 <label ref={(el) => this.labelElement = el as HTMLLabelElement}>{this.sanitizedLabel}</label>
-                <div class="field-color-overlay"></div>
+                <drop-down
+                    ref={(el) => this.dropdownElement = el as HTMLDropDownElement}
+                    class="field-color-drop-down"
+                    closeonclick={false}
+                    openonhover={false}
+                    arrow={false}
+                >
+                    <color-picker slot="item" ref={(el) => this.colorPickerElement = el as HTMLColorPickerElement}></color-picker>
+                </drop-down>
             </div>
             <span class="field-input-bottom">
                 <span class="field-help-text">{this.sanitizedHelp}</span>

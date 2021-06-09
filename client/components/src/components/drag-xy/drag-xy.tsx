@@ -1,4 +1,4 @@
-import { Component, Element, h, Prop, Watch } from '@stencil/core'
+import { Component, Element, Event, h, Prop, Watch } from '@stencil/core'
 import Drag from '../../../../utils/behaviors/drag'
 
 
@@ -13,6 +13,8 @@ export class DragXy {
     @Prop() contained: boolean = true
     @Watch('contained') containedWatcher() { this.initializeDrag() }
 
+    @Event() moved
+
     initializeDrag() {
         Drag({
             target: this.host,
@@ -20,6 +22,7 @@ export class DragXy {
             onMove: (position) => {
                 this.host.style.left = `${position.percentX}%`
                 this.host.style.top = `${position.y}px`
+                this.moved.emit(position)
             }
         })
     }

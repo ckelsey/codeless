@@ -1,4 +1,4 @@
-import { Component, Element, h, Prop, Watch } from '@stencil/core'
+import { Component, h, Prop, Watch } from '@stencil/core'
 import Overlay, { OverlayApi } from '../../../../utils/behaviors/overlay'
 
 @Component({
@@ -8,13 +8,10 @@ import Overlay, { OverlayApi } from '../../../../utils/behaviors/overlay'
 })
 
 export class OverlayElement {
-    @Element() host
-
     /** PROPS */
     @Prop({ reflect: true }) active: boolean = false
 
     @Watch('active') activeWatcher(newVal) {
-        console.log('active', newVal)
         this.overlay.active = newVal
     }
 

@@ -1,4 +1,4 @@
-import { Component, Element, h, Method, Prop, State, Watch } from '@stencil/core'
+import { Component, Element, Event, h, Method, Prop, State, Watch } from '@stencil/core'
 import IfInvalid from '../../../../utils/checks/if-invalid'
 import CommasToArray from '../../../../utils/conversion/commas-to-array'
 import FormControl from '../../../../utils/dom/form-control'
@@ -61,6 +61,9 @@ const getPercent = (el: HTMLElement, x: number) => percent(el.getBoundingClientR
 })
 
 export class FieldRange {
+    @Event() changed
+    debounceChanged = Debounce(() => this.changed.emit({ element: this, value: this.value }))
+
     /** PROPS */
     @Prop() autowidth: boolean = false
 
@@ -78,7 +81,7 @@ export class FieldRange {
     @Prop() label: string = ''
     @Watch('label') validLabel(newVal) { this.sanitizedLabel = SantizedHTML(newVal) }
 
-    @Prop() name: string = ''
+    @Prop({ mutable: true, reflect: true }) name: string = ''
     @Watch('name') nameWatcher(newVal) { this.updateName(newVal) }
 
     @Prop() maxvalue: number = 100
@@ -90,7 +93,7 @@ export class FieldRange {
     @Prop() required: boolean = false
     @Watch('required') requiredWatcher(newVal) { SetAttribute(this.formInput, 'required', newVal) }
 
-    @Prop() slim: boolean = false
+    @Prop() nomargin: boolean = false
 
     @Prop() step: number = 0.01
     @Watch('step') stepWatcher(newVal) { this.updateDecimalSpaces(newVal) }
@@ -98,7 +101,7 @@ export class FieldRange {
     @Prop({ reflect: true }) theme: 'inverse' | '' = ''
     @Watch('theme') themeWatcher(newVal) { this.updateTheme(newVal) }
 
-    @Prop() value: string
+    @Prop({ mutable: true, reflect: true }) value: string
     @Watch('value') valueWatcher(newVal) { this.externalToInternal(newVal) }
 
     @Prop() valueinlabel: boolean = true
@@ -153,6 +156,7 @@ export class FieldRange {
         if (Equals(newInternal, this.internalValue)) { return }
 
         this.internalValue = newInternal
+        this.debounceChanged()
     }
 
     internalToExternal(value) {
@@ -284,7 +288,7 @@ export class FieldRange {
 
         return <div
             ref={(el) => this.containerElement = el as HTMLElement}
-            class={`field-range-container field-element-container${this.slim ? ' slim' : ''}${this.autowidth ? ' w-auto' : ''}${this.required ? ' required' : ''}${this.dragging ? ' dragging' : ''}`}
+            class={`field-range-container field-element-container${this.nomargin ? ' nomargin' : ''}${this.autowidth ? ' w-auto' : ''}${this.required ? ' required' : ''}${this.dragging ? ' dragging' : ''}`}
         >
             <div class="field-range-main-label-container">
                 <div class="field-range-main-label-right">

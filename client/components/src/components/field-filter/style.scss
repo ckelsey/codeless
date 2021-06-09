@@ -1,0 +1,79 @@
+@import "../../global-styles/fields.scss";
+
+:host {
+    @include fieldBase;
+
+    .field-filter-container {
+        @include fieldContainer;
+
+        input {
+            @include field;
+            appearance: none;
+            padding: 1.238em 1.25em 0.3em 0.7em;
+            min-height: 2.725em;
+        }
+
+        .field-filter-arrow {
+            position: absolute;
+            right: 0.125em;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.25em;
+            pointer-events: none;
+            color: theme-color("background");
+        }
+
+        &[theme="inverse"] {
+            .field-filter-arrow {
+                color: theme-color("foreground");
+            }
+        }
+
+        &[arrow="false"] {
+            .field-filter-arrow {
+                display: none;
+            }
+        }
+
+        @include inputLabel;
+        @include iconSlot;
+        @include helptext;
+        @include formControl;
+
+        drop-down {
+            position: absolute;
+            width: 100%;
+            bottom: 0;
+            display: block;
+
+            [slot="label"] {
+                opacity: 0;
+                pointer-events: none;
+            }
+
+            [slot="item"] {
+                padding: 0.125em 0.5em;
+                cursor: pointer;
+                position: relative;
+
+                &:before {
+                    opacity: 0;
+                    content: "";
+                    background-color: currentColor;
+                    transition: opacity 0.2s;
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                }
+
+                &:hover {
+                    &:before {
+                        opacity: 0.125;
+                    }
+                }
+            }
+        }
+    }
+}

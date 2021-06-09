@@ -10,4 +10,4 @@
  */
 export default function IsDom(value: any) {
     return (value instanceof Element) || (value instanceof Node)
-} 
+}

@@ -79,7 +79,7 @@ $inputHeight: 2.725em;
         box-sizing: border-box;
     }
 
-    &.slim {
+    &.nomargin {
         margin-top: 0;
         margin-bottom: 0;
     }
@@ -221,7 +221,7 @@ $inputHeight: 2.725em;
 
     .field-help-text,
     .field-count-text {
-        font-size: 75%;
+        font-size: 62%;
         margin-bottom: -2em;
         display: block;
         font-style: italic;
@@ -234,7 +234,7 @@ $inputHeight: 2.725em;
 
 @mixin inputLabel {
     .field-input-label {
-        flex-grow: 1;
+        flex: 1 0 50%;
         display: flex;
         flex-direction: column;
         justify-content: flex-start;

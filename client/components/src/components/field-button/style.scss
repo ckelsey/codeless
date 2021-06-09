@@ -9,6 +9,11 @@
         display: inline-block;
         @include inputMargins;
 
+        &.nomargin {
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+
         button {
             border-radius: $borderRadius;
             font-size: inherit;
@@ -186,6 +191,12 @@
 
             &[data-size="small"] {
                 font-size: 80%;
+                padding: 0.125em 0.5em;
+                min-width: unset;
+            }
+
+            &[data-size="medium"] {
+                font-size: 100%;
                 padding: 0.125em 0.5em;
                 min-width: unset;
             }

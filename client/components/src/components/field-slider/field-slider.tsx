@@ -9,7 +9,7 @@
  * - helptext
  */
 
-import { Component, Element, h, Prop, State, Watch } from '@stencil/core'
+import { Component, Element, Event, h, Prop, State, Watch } from '@stencil/core'
 import FormControl from '../../../../utils/dom/form-control'
 import InputName from '../../../../utils/dom/input-name'
 import RenderLightDom from '../../../../utils/dom/render-light-dom'
@@ -28,6 +28,9 @@ const inputWidth = (input: HTMLInputElement) => `${!input ? inputCharacterWidth 
 })
 
 export class FieldSlider {
+    @Event() changed
+    debounceChanged = Debounce(() => this.changed.emit({ element: this, value: this.value }))
+
     /** PROPS */
     @Prop() autowidth: boolean = false
 
@@ -45,7 +48,7 @@ export class FieldSlider {
     @Prop() label: string = ''
     @Watch('label') validLabel(newVal) { this.sanitizedLabel = SantizedHTML(newVal) }
 
-    @Prop() name: string = ''
+    @Prop({ mutable: true, reflect: true }) name: string = ''
     @Watch('name') nameWatcher(newVal) { this.updateName(newVal) }
 
     @Prop() maxvalue: number = 100
@@ -57,7 +60,7 @@ export class FieldSlider {
     @Prop() required: boolean = false
     @Watch('required') requiredWatcher(newVal) { SetAttribute(this.formInput, 'required', newVal) }
 
-    @Prop() slim: boolean = false
+    @Prop() nomargin: boolean = false
 
     @Prop() step: number = 0.01
     @Watch('step') stepWatcher(newVal) { this.updateDecimalSpaces(newVal) }
@@ -65,7 +68,7 @@ export class FieldSlider {
     @Prop({ reflect: true }) theme: 'inverse' | '' = ''
     @Watch('theme') themeWatcher(newVal) { this.updateTheme(newVal) }
 
-    @Prop() value: number = 0
+    @Prop({ mutable: true, reflect: true }) value: number = 0
     @Watch('value') valueWatcher(newVal) {
         const value = this.maxMin(this.toStep(newVal))
         if (value !== newVal) { this.value = value }
@@ -113,6 +116,8 @@ export class FieldSlider {
         if (this.labelInput) {
             this.labelInput.value = value.toString()
         }
+
+        this.debounceChanged()
     }
 
     handleDrag(e) {
@@ -179,7 +184,7 @@ export class FieldSlider {
 
         return <div
             ref={(el) => this.containerElement = el as HTMLElement}
-            class={`field-slider-container field-element-container${this.slim ? ' slim' : ''}${this.autowidth ? ' w-auto' : ''}${this.required ? ' required' : ''}${this.dragging ? ' dragging' : ''}`}
+            class={`field-slider-container field-element-container${this.nomargin ? ' nomargin' : ''}${this.autowidth ? ' w-auto' : ''}${this.required ? ' required' : ''}${this.dragging ? ' dragging' : ''}`}
         >
             <div class="field-slider-main-label-container">
                 <div class="field-slider-main-label-right">

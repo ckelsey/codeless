@@ -1,4 +1,4 @@
-import { Component, h, Element, Prop, State, Watch, Method } from '@stencil/core'
+import { Component, h, Prop, State, Watch, Method } from '@stencil/core'
 
 const getDate = (date: Date) => new Date(`${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`)
 
@@ -9,8 +9,6 @@ const getDate = (date: Date) => new Date(`${date.getMonth() + 1}/${date.getDate(
 })
 
 export class CalendarMonth {
-    @Element() host
-
     /** PROPERTIES */
     @Prop() active: boolean = false
     @Prop() disabled: boolean = false

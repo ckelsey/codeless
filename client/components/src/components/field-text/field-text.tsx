@@ -1,4 +1,4 @@
-import { Component, Prop, h, Watch, Element, Method, State } from '@stencil/core'
+import { Component, Prop, h, Watch, Element, Method, State, Event } from '@stencil/core'
 import ID from '../../../../utils/id'
 import AttributeSetRemove from '../../../../utils/dom/attribute-set-remove'
 import DispatchEvent from '../../../../utils/dom/dispatch-event'
@@ -8,6 +8,8 @@ import FormControl from '../../../../utils/dom/form-control'
 import SetAttribute from '../../../../utils/dom/set-attribute'
 import InputLabelId from '../../../../utils/dom/input-label-id'
 import { SantizedHTML } from '../../../../utils/validate/html'
+import WatchValue from '../../utils/watch-value'
+import Debounce from '../../../../utils/timing/debounce'
 
 const types = ['text', 'email', 'tel']
 
@@ -20,6 +22,9 @@ const types = ['text', 'email', 'tel']
 export class FieldText {
     @Element() host
 
+    @Event() changed
+    debounceChanged = Debounce(() => this.changed.emit({ element: this, value: this.value }))
+
     /** PROPS */
     @Prop() autocomplete: string = 'on'
 
@@ -27,7 +32,7 @@ export class FieldText {
 
     @Prop() autowidth: boolean = false
 
-    @Prop() count: number = 0
+    @Prop({ mutable: true }) count: number = 0
 
     @Prop() disabled: boolean = false
     @Watch('disabled') disabledWatcher(newVal) { SetAttribute(this.formInput, 'disabled', newVal) }
@@ -47,24 +52,30 @@ export class FieldText {
     @Prop() labelup: boolean = false
     @Watch('labelup') validLabelUp() { this.setLabelPosition() }
 
-    @Prop() name: string = ''
+    @Prop({ mutable: true, reflect: true }) name: string = ''
     @Watch('name') nameWatcher(newVal) {
         this.name = InputName(newVal, this.sanitizedLabel, this.inputid)
         SetAttribute(this.formInput, 'name', this.name)
     }
 
-    @Prop() max: number
-    @Watch('max') maxWatcher(newVal) { SetAttribute(this.formInput, 'maxlength', newVal) }
+    @Prop() maxlength: number
+    @Watch('maxlength') maxWatcher(newVal) {
+        SetAttribute(this.formInput, 'maxlength', newVal)
+        WatchValue.call(this, this)
+    }
 
-    @Prop() min: number
-    @Watch('min') minWatcher(newVal) { SetAttribute(this.formInput, 'minlength', newVal) }
+    @Prop() minlength: number
+    @Watch('minlength') minWatcher(newVal) {
+        SetAttribute(this.formInput, 'minlength', newVal)
+        WatchValue.call(this, this)
+    }
 
     @Prop() required: boolean = false
     @Watch('required') requiredWatcher(newVal) { SetAttribute(this.formInput, 'required', newVal) }
 
     @Prop() showcount: boolean = false
 
-    @Prop() slim: boolean = false
+    @Prop() nomargin: boolean = false
 
     @Prop({ reflect: true }) theme: 'inverse' | '' = ''
     @Watch('theme') themeWatcher(newVal) { this.updateTheme(newVal) }
@@ -75,8 +86,8 @@ export class FieldText {
         SetAttribute(this.formInput, 'type', newVal)
     }
 
-    @Prop() value: string = ''
-    @Watch('value') validValue(newVal) { if (typeof newVal == 'undefined') { return this.value = '' } }
+    @Prop({ mutable: true, reflect: true }) value: string = ''
+    @Watch('value') watchValue() { return WatchValue.call(this, this) }
 
 
     /** STATE */
@@ -122,6 +133,8 @@ export class FieldText {
         if (this.containerElement) {
             this.containerElement.setAttribute('empty', empty.toString())
         }
+
+        this.debounceChanged()
     }
 
     handleEnter(e) {
@@ -161,22 +174,26 @@ export class FieldText {
     }
 
     render() {
-        this.formInput = RenderLightDom(this.host, 'input.field-text-hidden-input', {
-            tagName: 'input',
-            type: this.type,
-            value: this.value,
-            name: this.name,
-            required: this.required,
-            disabled: this.disabled,
-            maxLength: this.max,
-            minLength: this.min,
-            class: 'field-text-hidden-input',
-            slot: 'form-control'
-        }) as HTMLInputElement
+        this.formInput = RenderLightDom(
+            this.host,
+            'input.field-text-hidden-input',
+            {
+                tagName: 'input',
+                type: 'text',
+                value: this.value,
+                name: this.name,
+                required: this.required,
+                disabled: this.disabled,
+                maxLength: this.maxlength,
+                minLength: this.minlength,
+                class: 'field-text-hidden-input',
+                slot: 'form-control'
+            }
+        ) as HTMLInputElement
 
         return <div
             ref={(el) => this.containerElement = el as HTMLElement}
-            class={`field-text-container field-element-container${this.slim ? ' slim' : ''}${this.autowidth ? ' w-auto' : ''}`}
+            class={`field-text-container field-element-container${this.nomargin ? ' nomargin' : ''}${this.autowidth ? ' w-auto' : ''}`}
         >
             <span class="icon-container"><slot name="icon" /></span>
             <div class="field-input-label">
@@ -190,8 +207,8 @@ export class FieldText {
                     disabled={this.disabled}
                     required={this.required}
                     id={this.inputid}
-                    maxLength={this.max}
-                    minLength={this.min}
+                    maxLength={this.maxlength}
+                    minLength={this.minlength}
                     name={this.name}
                     form={(this.externalForm() || {}).id}
                     onAnimationStart={() => this.setLabelPosition()}
@@ -207,7 +224,7 @@ export class FieldText {
             </div>
             <span class="field-input-bottom">
                 <span class="field-help-text">{this.sanitizedHelp}</span>
-                <span class="field-count-text">{this.showcount ? this.max ? `${this.count}/${this.max}` : this.count : ''}</span>
+                <span class="field-count-text">{this.showcount ? this.maxlength ? `${this.count}/${this.maxlength}` : this.count : ''}</span>
             </span>
             <div class="form-control"><slot name="form-control"></slot></div>
         </div>

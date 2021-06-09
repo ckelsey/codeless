@@ -1,0 +1,61 @@
+@import "../../global-styles/vars.scss";
+
+:host,
+color-inputs {
+    display: block;
+    max-width: 100%;
+    position: relative;
+}
+
+.color-inputs {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    max-width: 100%;
+    position: relative;
+
+    drop-down {
+        margin-right: 0.5em;
+        width: 3em;
+    }
+
+    field-number {
+        max-width: 3.38em;
+    }
+
+    field-text {
+        width: 100%;
+        max-width: 15em;
+    }
+
+    field-text,
+    field-number {
+        margin: 0 0.25em;
+    }
+
+    .color-inputs-container {
+        max-width: 20em;
+        width: 100%;
+        position: relative;
+    }
+
+    .color-inputs-row {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    .color-inputs-dropdown-item,
+    .color-inputs-dropdown-label {
+        cursor: pointer;
+        text-transform: uppercase;
+    }
+    .color-inputs-dropdown-item {
+        padding: 0.5em 1em;
+        transition: background-color 0.2s ease-in-out;
+
+        &:hover {
+            background-color: theme-color("accent");
+        }
+    }
+}

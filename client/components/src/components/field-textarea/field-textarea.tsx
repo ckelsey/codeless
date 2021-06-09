@@ -1,5 +1,5 @@
 
-import { Component, Prop, h, Watch, Element, Method, State } from '@stencil/core'
+import { Component, Prop, h, Watch, Element, Method, State, Event } from '@stencil/core'
 import ID from '../../../../utils/id'
 import RenderLightDom from '../../../../utils/dom/render-light-dom'
 import InputName from '../../../../utils/dom/input-name'
@@ -8,6 +8,8 @@ import TextareaHeight from '../../../../utils/dom/textarea-height'
 import SetAttribute from '../../../../utils/dom/set-attribute'
 import InputLabelId from '../../../../utils/dom/input-label-id'
 import { SantizedHTML } from '../../../../utils/validate/html'
+import WatchValue from '../../utils/watch-value'
+import Debounce from '../../../../utils/timing/debounce'
 
 @Component({
     tag: 'field-textarea',
@@ -17,6 +19,9 @@ import { SantizedHTML } from '../../../../utils/validate/html'
 
 export class FieldTextarea {
     @Element() host
+
+    @Event() changed
+    debounceChanged = Debounce(() => this.changed.emit({ element: this, value: this.value }))
 
     /** PROPS */
     @Prop() autocomplete: string = 'on'
@@ -47,30 +52,37 @@ export class FieldTextarea {
     @Prop() labelup: boolean = false
     @Watch('labelup') validLabelUp() { this.setLabelPosition() }
 
-    @Prop() name: string = ''
+    @Prop({ mutable: true, reflect: true }) name: string = ''
     @Watch('name') nameWatcher(newVal) {
         this.name = InputName(newVal, this.sanitizedLabel, this.inputid)
         SetAttribute(this.formInput, 'name', this.name)
     }
 
-    @Prop() max: number
-    @Watch('max') maxWatcher(newVal) { SetAttribute(this.formInput, 'maxlength', newVal) }
+    @Prop() maxlength: number
+    @Watch('maxlength') maxWatcher(newVal) {
+        SetAttribute(this.formInput, 'maxlength', newVal)
+        WatchValue.call(this, this)
 
-    @Prop() min: number
-    @Watch('min') minWatcher(newVal) { SetAttribute(this.formInput, 'min', newVal) }
+    }
+
+    @Prop() minlength: number
+    @Watch('minlength') minWatcher(newVal) {
+        SetAttribute(this.formInput, 'minlength', newVal)
+        WatchValue.call(this, this)
+    }
 
     @Prop() required: boolean = false
     @Watch('required') requiredWatcher(newVal) { SetAttribute(this.formInput, 'required', newVal) }
 
     @Prop() showcount: boolean = false
 
-    @Prop() slim: boolean = false
+    @Prop() nomargin: boolean = false
 
     @Prop({ reflect: true }) theme: 'inverse' | '' = ''
     @Watch('theme') themeWatcher(newVal) { this.updateTheme(newVal) }
 
-    @Prop() value: string = ''
-    @Watch('value') validValue(newVal) { if (typeof newVal == 'undefined') { return this.value = '' } }
+    @Prop({ mutable: true, reflect: true }) value: string = ''
+    @Watch('value') watchValue() { return WatchValue.call(this, this) }
 
 
     /** STATE */
@@ -110,6 +122,7 @@ export class FieldTextarea {
         this.value = this.inputElement.value
         this.count = this.formInput.value.length
         if (!!this.error && this.isvalid()) { this.error = this.formInput.validationMessage }
+        this.debounceChanged()
     }
 
     setLabelPosition() {
@@ -142,14 +155,14 @@ export class FieldTextarea {
             required: this.required,
             disabled: this.disabled,
             class: 'field-textarea-hidden-input',
-            maxlength: !!this.max ? this.max : undefined,
-            minlength: !!this.min ? this.min : undefined,
+            maxlength: !!this.maxlength ? this.maxlength : undefined,
+            minlength: !!this.minlength ? this.minlength : undefined,
             slot: 'form-control'
         }) as HTMLTextAreaElement
 
         return <div
             ref={(el) => this.containerElement = el as HTMLElement}
-            class={`field-textarea-container field-element-container${this.slim ? ' slim' : ''}${this.autowidth ? ' w-auto' : ''}${this.fullwidth ? ' w-100' : ''}`}
+            class={`field-textarea-container field-element-container${this.nomargin ? ' nomargin' : ''}${this.autowidth ? ' w-auto' : ''}${this.fullwidth ? ' w-100' : ''}`}
         >
             <span class="icon-container"><slot name="icon" /></span>
             <div class="field-input-label">
@@ -163,8 +176,8 @@ export class FieldTextarea {
                     name={this.name}
                     required={this.required}
                     id={this.inputid}
-                    maxLength={this.max}
-                    minLength={this.min}
+                    maxLength={this.maxlength}
+                    minLength={this.minlength}
                     form={(this.externalForm() || {}).id}
                     onFocus={() => this.setLabelPosition()}
                     onAnimationStart={() => this.setLabelPosition()}
@@ -178,7 +191,7 @@ export class FieldTextarea {
 
             <span class="field-input-bottom">
                 <span class="field-help-text">{this.sanitizedHelp}</span>
-                <span class="field-count-text">{this.showcount ? this.max ? `${this.count}/${this.max}` : this.count : ''}</span>
+                <span class="field-count-text">{this.showcount ? this.maxlength ? `${this.count}/${this.maxlength}` : this.count : ''}</span>
             </span>
             <div class="form-control"><slot name="form-control"></slot></div>
         </div>

@@ -1,4 +1,4 @@
-import { Component, Prop, h, Watch, Element, Method, State, Listen } from '@stencil/core'
+import { Component, Prop, h, Watch, Element, Method, State, Listen, Event } from '@stencil/core'
 import ID from '../../../../utils/id'
 import AttributeSetRemove from '../../../../utils/dom/attribute-set-remove'
 import DispatchEvent from '../../../../utils/dom/dispatch-event'
@@ -7,6 +7,7 @@ import InputName from '../../../../utils/dom/input-name'
 import FormControl from '../../../../utils/dom/form-control'
 import SetAttribute from '../../../../utils/dom/set-attribute'
 import { SantizedHTML } from '../../../../utils/validate/html'
+import Debounce from '../../../../utils/timing/debounce'
 
 @Component({
     tag: 'field-datetime',
@@ -16,6 +17,9 @@ import { SantizedHTML } from '../../../../utils/validate/html'
 
 export class FieldDatetime {
     @Element() host
+
+    @Event() changed
+    debounceChanged = Debounce(() => this.changed.emit({ element: this, value: this.value }))
 
     /** PROPS */
     @Prop() autocomplete: string = 'on'
@@ -41,7 +45,7 @@ export class FieldDatetime {
     @Prop() labelup: boolean = false
     @Watch('labelup') validLabelUp() { this.setLabelPosition() }
 
-    @Prop() name: string = ''
+    @Prop({ mutable: true, reflect: true }) name: string = ''
     @Watch('name') nameWatcher(newVal) {
         this.name = InputName(newVal, this.sanitizedLabel, this.inputid)
         SetAttribute(this.formInput, 'name', this.name)
@@ -59,12 +63,12 @@ export class FieldDatetime {
     @Prop() showseconds: boolean = false
     @Watch('required') showsecondsWatcher(newVal) { this.timeElement.showseconds = newVal }
 
-    @Prop() slim: boolean = false
+    @Prop() nomargin: boolean = false
 
     @Prop({ reflect: true }) theme: 'inverse' | '' = ''
     @Watch('theme') themeWatcher(newVal) { this.updateTheme(newVal) }
 
-    @Prop() value: Date | string
+    @Prop({ mutable: true, reflect: true }) value: Date | string
     @Watch('value') valueWatcher(newVal) { this.updateDate(newVal) }
 
     /** STATE */
@@ -172,6 +176,7 @@ export class FieldDatetime {
     handleInput() {
         this.formInput.value = (this.value || '').toString()
         if (!!this.error && this.isvalid()) { this.error = this.formInput.validationMessage }
+        this.debounceChanged()
     }
 
     handleEnter(e) {
@@ -211,7 +216,7 @@ export class FieldDatetime {
 
         return <div
             ref={(el) => this.containerElement = el as HTMLElement}
-            class={`field-datetime-container field-element-container${this.slim ? ' slim' : ''}${this.autowidth ? ' w-auto' : ''}`}
+            class={`field-datetime-container field-element-container${this.nomargin ? ' nomargin' : ''}${this.autowidth ? ' w-auto' : ''}`}
             onMouseEnter={() => this.dropdownElement.open = true}
             onMouseLeave={() => this.dropdownElement.open = false}
         >
@@ -232,7 +237,7 @@ export class FieldDatetime {
                             value={this.time}
                             ref={el => this.timeElement = el as HTMLFieldTimeElement}
                             label="Time"
-                            slim={true}
+                            nomargin={true}
                             autowidth={true}
                             showseconds={this.showseconds}
                             theme="inverse"

@@ -1,10 +1,24 @@
-- field-color
-- field-wysiwyg
-- flash-message
-- snack-bar
-- image-loader
+** COMPONENTS **
+    - color-eyedropper
+    - field-color
+    - field-wysiwyg
+    - flash-message
+    - snack-bar
+    - image-loader
+    - media-player
+
+** BUGS **
+    - color-wheel - when page is scrolled, y is wron and prolly x too 
+    - drag-y not working after first drag
 
 ** NICE TO HAVES **
+    - slider-bar
+        - range
+        - replace in field-slider
+
+    - color-inputs
+        - tab between inputs
+        
     - calendar-header
         - Make month name a dropdown
         - Make year a number field

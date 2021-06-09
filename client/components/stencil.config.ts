@@ -1,5 +1,6 @@
 import { Config } from '@stencil/core';
 import { sass } from '@stencil/sass';
+import { readFileSync } from 'fs';
 
 export const config: Config = {
     namespace: 'components',
@@ -22,5 +23,11 @@ export const config: Config = {
     ],
     plugins: [
         sass()
-    ]
+    ],
+    devServer: {
+        https: {
+            cert: readFileSync('myssl.crt', 'utf8'),
+            key: readFileSync('myssl.key', 'utf8')
+        }
+    }
 };

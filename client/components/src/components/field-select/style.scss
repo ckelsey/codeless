@@ -9,20 +9,20 @@
         select {
             @include field;
             appearance: none;
-            padding: 1.238em 0.7em 0.3em;
+            padding: 1.238em 1.25em 0.3em 0.7em;
             min-height: 2.725em;
         }
 
-        &[label-up="true"].w-auto {
-            select {
-                background-position: calc(100% - 0.25em) 72%;
-            }
+        // &[label-up="true"].w-auto {
+        //     select {
+        //         // background-position: calc(100% - 0.25em) 72%;
+        //     }
 
-            .field-select-arrow {
-                transform: translateY(-12%);
-                right: -0.2em;
-            }
-        }
+        //     .field-select-arrow {
+        //         transform: translateY(-12%);
+        //         right: -0.2em;
+        //     }
+        // }
 
         .field-select-arrow {
             position: absolute;

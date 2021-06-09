@@ -20,7 +20,7 @@ export class FieldButton {
 
     @Prop() size: string = ''
     @Watch('size')
-    validateSize(newValue: string) { if (typeof newValue != 'string' || ['big', 'small'].indexOf(newValue) == -1) { this.size = '' } }
+    validateSize(newValue: string) { if (typeof newValue != 'string' || ['big', 'medium', 'small'].indexOf(newValue) == -1) { this.size = '' } }
 
     @Prop() kind: string = ''
     @Watch('kind')
@@ -29,26 +29,32 @@ export class FieldButton {
     @Prop() disabled: boolean = false
     @Prop() spinner: boolean = false
 
+    @Prop() nomargin: boolean = false
+    @Watch('nomargin')
+
 
     /** INTERNAL METHODS */
     externalForm() { return this.host.closest('form') }
 
-    triggerSubmit() { this.formButton.click() }
+
+
+    triggerSubmit() {
+        if (this.externalForm()) { this.formButton.click() }
+    }
 
     btn!: HTMLButtonElement
     containerElement!: HTMLElement
     formButton!: HTMLButtonElement
 
     render() {
-        this.formButton = RenderLightDom(this.host, 'button.field-button-hidden', {
-            tagName: 'button',
-            type: this.type,
-            disabled: this.disabled,
-            class: 'field-button-hidden',
-            slot: 'form-control'
-        }) as HTMLInputElement
+        this.formButton = RenderLightDom(
+            this.host,
+            'button.field-button-hidden',
+            { tagName: 'button', type: this.type, disabled: this.disabled, class: 'field-button-hidden', slot: 'form-control' },
+            { click: e => e.stopPropagation() }
+        ) as HTMLInputElement
 
-        return <div ref={(el) => this.containerElement = el as HTMLElement} class="field-button-container hide-until-ready">
+        return <div ref={(el) => this.containerElement = el as HTMLElement} class={`field-button-container hide-until-ready${this.nomargin ? ' nomargin' : ''}`}>
             <button
                 ref={(el) => this.btn = el as HTMLButtonElement}
                 type={this.type}

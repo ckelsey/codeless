@@ -14,6 +14,7 @@ import RenderLightDom from '../../../../utils/dom/render-light-dom'
 import InputName from '../../../../utils/dom/input-name'
 import FormControl from '../../../../utils/dom/form-control'
 import SetAttribute from '../../../../utils/dom/set-attribute'
+import WatchValue from '../../utils/watch-value'
 
 /** TYPINGS */
 export type InternalValue = [string, string, string, string]
@@ -49,6 +50,8 @@ const defaultMin = '0:00:00'
 export class FieldTime {
     @Element() host
 
+    @Event() changed
+    debounceChanged = Debounce(() => this.changed.emit({ element: this, value: this.value }))
 
     /** PROPS */
     @Prop() autowidth: boolean = false
@@ -71,12 +74,12 @@ export class FieldTime {
     @Watch('labelup') validLabelUp() { this.setLabelPosition() }
 
     @Prop() max: string
-    @Watch('max') validMax() { this.valueDebouncer() }
+    @Watch('max') validMax() { return WatchValue.call(this, this) }
 
     @Prop() min: string
-    @Watch('max') validMin() { this.valueDebouncer() }
+    @Watch('max') validMin() { return WatchValue.call(this, this) }
 
-    @Prop() name: string
+    @Prop({ mutable: true, reflect: true }) name: string
     @Watch('name') nameWatcher(newVal) {
         this.name = InputName(newVal, this.sanitizedLabel, this.inputid)
         SetAttribute(this.formInput, 'name', this.name)
@@ -88,13 +91,13 @@ export class FieldTime {
     @Prop() showseconds: boolean = false
     @Watch('showseconds') validSHowSeconds() { this.handleValueUpdate(2, '00') }
 
-    @Prop() slim: boolean = false
+    @Prop() nomargin: boolean = false
 
     @Prop({ reflect: true }) theme: 'inverse' | '' = ''
     @Watch('theme') themeWatcher(newVal) { this.updateTheme(newVal) }
 
-    @Prop() value: string = ''
-    @Watch('value') validValue() { this.valueDebouncer() }
+    @Prop({ mutable: true, reflect: true }) value: string = ''
+    @Watch('value') watchValue() { return WatchValue.call(this, this) }
 
 
 
@@ -140,8 +143,6 @@ export class FieldTime {
         this.valuechange.emit(this.value)
         this.timechange.emit(this.value)
     })
-
-    valueDebouncer = Debounce(() => this.externalToInternal(), 0)
 
     internalValueDebouncer = Debounce(() => this.internalToExternal(), 0)
 
@@ -195,6 +196,7 @@ export class FieldTime {
 
         this.internalValue = proxy
         this.setInputValues(proxy)
+        this.debounceChanged()
     }
 
     handleKeyDown(event) {
@@ -281,7 +283,7 @@ export class FieldTime {
 
         return <div
             ref={(el) => this.containerElement = el as HTMLElement}
-            class={`field-time-container field-element-container${this.slim ? ' slim' : ''}${this.autowidth ? ' w-auto' : ''}`}
+            class={`field-time-container field-element-container${this.nomargin ? ' nomargin' : ''}${this.autowidth ? ' w-auto' : ''}`}
             onClick={() => this.focused() ? undefined : this.hourInputElement.focus()}
         >
             <div class={`field-time-contents${this.showseconds ? '' : ' hide-seconds'}${isEmpty(this.internalValue[0]) ? ' hide-meridien' : ''}`}>
@@ -309,7 +311,7 @@ export class FieldTime {
                             <field-select
                                 ref={(el) => this.meridienElement = el as HTMLFieldSelectElement}
                                 options={[{ value: "am", textContent: "AM" }, { value: "pm", textContent: "PM" }]}
-                                slim={true}
+                                nomargin={true}
                                 autowidth={true}
                                 label=" "
                                 labelup={true}

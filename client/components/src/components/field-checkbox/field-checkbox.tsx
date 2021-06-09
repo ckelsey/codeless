@@ -1,4 +1,4 @@
-import { Component, Prop, h, Watch, Element, Method, State } from '@stencil/core'
+import { Component, Prop, h, Watch, Element, Method, State, Event } from '@stencil/core'
 import { SantizedHTML } from '../../../../utils/validate/html'
 import ID from '../../../../utils/id'
 import AttributeSetRemove from '../../../../utils/dom/attribute-set-remove'
@@ -8,6 +8,7 @@ import InputName from '../../../../utils/dom/input-name'
 import FormControl from '../../../../utils/dom/form-control'
 import SetAttribute from '../../../../utils/dom/set-attribute'
 import InputLabelId from '../../../../utils/dom/input-label-id'
+import Debounce from '../../../../utils/timing/debounce'
 
 @Component({
     tag: 'field-checkbox',
@@ -17,6 +18,9 @@ import InputLabelId from '../../../../utils/dom/input-label-id'
 
 export class FieldCheckbox {
     @Element() host
+
+    @Event() changed
+    debounceChanged = Debounce(() => this.changed.emit({ element: this, value: this.value }))
 
     /** PROPS */
     @Prop() autofocus: boolean = false
@@ -41,7 +45,7 @@ export class FieldCheckbox {
     @Prop() mixed: boolean = false
     @Watch('mixed') validMixed(newVal) { AttributeSetRemove(this.containerElement, 'mixed', newVal) }
 
-    @Prop() name: string = ''
+    @Prop({ mutable: true, reflect: true }) name: string = ''
     @Watch('name') nameWatcher(newVal) {
         this.name = InputName(newVal, this.sanitizedLabel, this.inputid)
         SetAttribute(this.formInput, 'name', this.name)
@@ -52,13 +56,19 @@ export class FieldCheckbox {
     @Prop() required: boolean = false
     @Watch('required') requiredWatcher(newVal) { SetAttribute(this.formInput, 'required', newVal) }
 
-    @Prop() slim: boolean = false
+    @Prop() nomargin: boolean = false
 
     @Prop({ reflect: true }) theme: 'inverse' | '' = ''
     @Watch('theme') themeWatcher(newVal) { this.updateTheme(newVal) }
 
-    @Prop() value: boolean = false
-    @Watch('value') validValue(newVal) { if (typeof newVal == 'undefined') { return this.value = false } }
+    @Prop({ mutable: true, reflect: true }) value: boolean = false
+    @Watch('value') validValue(newVal) {
+        if (typeof newVal == 'undefined') {
+            this.value = false
+        }
+        this.inputElement.checked = this.value
+        this.handleInput()
+    }
 
 
     /** STATE */
@@ -94,6 +104,7 @@ export class FieldCheckbox {
     handleInput() {
         this.formInput.checked = this.value = !!this.inputElement.checked
         if (!!this.error && this.isvalid()) { this.error = SantizedHTML(this.formInput.validationMessage) }
+        this.debounceChanged()
     }
 
     handleEnter(e) {
@@ -134,7 +145,7 @@ export class FieldCheckbox {
 
         return <div
             ref={(el) => this.containerElement = el as HTMLElement}
-            class={`field-checkbox-container field-element-container${this.slim ? ' slim' : ''}${this.autowidth ? ' w-auto' : ''}`}
+            class={`field-checkbox-container field-element-container${this.nomargin ? ' nomargin' : ''}${this.autowidth ? ' w-auto' : ''}`}
         >
             <span class="icon-container"><slot name="icon" /></span>
             <div class="field-input-label">

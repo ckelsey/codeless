@@ -3,7 +3,7 @@
  * Make year a number field
  */
 
-import { Component, Prop, h, Watch, Element, State, Event } from '@stencil/core'
+import { Component, Prop, h, Watch, State, Event } from '@stencil/core'
 
 @Component({
     tag: 'calendar-header',
@@ -12,7 +12,6 @@ import { Component, Prop, h, Watch, Element, State, Event } from '@stencil/core'
 })
 
 export class CalendarHeader {
-    @Element() host
 
     /** PROPS */
     @Prop() date: Date | string = new Date()

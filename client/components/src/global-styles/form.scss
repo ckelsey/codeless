@@ -1,0 +1,12 @@
+@import "vars";
+
+.form-row {
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    @include itemsSpace;
+
+    &.vcenter {
+        align-items: center;
+    }
+}

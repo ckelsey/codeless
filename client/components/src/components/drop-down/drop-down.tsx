@@ -1,8 +1,7 @@
-import { Component, h, Element, Prop, Watch } from '@stencil/core'
+import { Component, h, Element, Prop, Watch, Event } from '@stencil/core'
 import AppendStyleElement from '../../../../utils/dom/append-style-element'
 import WasClickedOn from '../../../../utils/dom/was-clicked-on'
 import ArrayFrom from '../../../../utils/conversion/array-from'
-import DispatchEvent from '../../../../utils/dom/dispatch-event'
 
 const itemStyle = 'drop-down [slot="item"]{color:inherit; white-space: nowrap; min-width: 100%; cursor: pointer; position: relative; padding: 0.5em 1em; box-sizing: border-box;} drop-down [slot="item"]::before{content: ""; position: absolute; width: 100%; height: 100%; left:0; top:0; background-color: currentColor; opacity:0; transition: opacity 0.2s;} drop-down [slot="item"]:hover::before{opacity:0.1;}'
 
@@ -21,10 +20,12 @@ export class DropDown {
     @Prop() closeonclick: boolean = true
     @Prop() openonhover: boolean = true
     @Prop({ mutable: true, reflect: true }) open: boolean = false
-    @Watch('open') openWatcher(newVal) {
-        // If any inputs inside, blur them out
-        if (!newVal) { this.inputElement.focus() }
-    }
+    // @Watch('open') openWatcher(newVal) {
+    //     // If any inputs inside, blur them out
+    //     if (!newVal) { this.inputElement.focus() }
+    // }
+
+    @Event() dropdownitemclicked
 
     inputElement!: HTMLInputElement
     containerElement!: HTMLElement
@@ -32,7 +33,7 @@ export class DropDown {
     clicked(e: Event) {
         const item = WasClickedOn(ArrayFrom(this.host.querySelectorAll('[slot="item"]')), e)
 
-        if (item) { DispatchEvent(this.host, 'itemclicked', item) }
+        if (item) { this.dropdownitemclicked.emit(item) }
 
         if (this.closeonclick && this.open) { return this.open = false }
 

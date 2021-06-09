@@ -1,4 +1,4 @@
-import { Component, Prop, h, Watch, Element, Method, State } from '@stencil/core'
+import { Component, Prop, h, Watch, Element, Method, State, Event } from '@stencil/core'
 import ID from '../../../../utils/id'
 import AttributeSetRemove from '../../../../utils/dom/attribute-set-remove'
 import DispatchEvent from '../../../../utils/dom/dispatch-event'
@@ -8,6 +8,8 @@ import FormControl from '../../../../utils/dom/form-control'
 import SetAttribute from '../../../../utils/dom/set-attribute'
 import InputLabelId from '../../../../utils/dom/input-label-id'
 import { SantizedHTML } from '../../../../utils/validate/html'
+import WatchValue from '../../utils/watch-value'
+import Debounce from '../../../../utils/timing/debounce'
 
 @Component({
     tag: 'field-number',
@@ -17,6 +19,9 @@ import { SantizedHTML } from '../../../../utils/validate/html'
 
 export class FieldNumber {
     @Element() host
+
+    @Event() changed
+    debounceChanged = Debounce(() => this.changed.emit({ element: this, value: this.value }))
 
     /** PROPS */
     @Prop() autocomplete: string = 'on'
@@ -43,7 +48,7 @@ export class FieldNumber {
     @Prop() labelup: boolean = false
     @Watch('labelup') validLabelUp() { this.setLabelPosition() }
 
-    @Prop() name: string = ''
+    @Prop({ mutable: true, reflect: true }) name: string = ''
     @Watch('name') nameWatcher(newVal) {
         this.name = InputName(newVal, this.sanitizedLabel, this.inputid)
         SetAttribute(this.formInput, 'name', this.name)
@@ -56,15 +61,13 @@ export class FieldNumber {
     @Prop() required: boolean = false
     @Watch('required') requiredWatcher(newVal) { SetAttribute(this.formInput, 'required', newVal) }
 
-    @Prop() slim: boolean = false
+    @Prop() nomargin: boolean = false
 
     @Prop({ reflect: true }) theme: 'inverse' | '' = ''
     @Watch('theme') themeWatcher(newVal) { this.updateTheme(newVal) }
 
-    @Prop() value: number | undefined
-    @Watch('value') validValue(newVal) {
-        this.value = isNaN(newVal) ? undefined : newVal
-    }
+    @Prop({ mutable: true, reflect: true }) value: number | undefined
+    @Watch('value') watchValue() { return WatchValue.call(this, this) }
 
 
     /** STATE */
@@ -110,6 +113,7 @@ export class FieldNumber {
         this.value = parseFloat(this.inputElement.value)
         this.formInput.value = (this.value || '').toString()
         if (!!this.error && this.isvalid()) { this.error = this.formInput.validationMessage }
+        this.debounceChanged()
     }
 
     handleEnter(e) {
@@ -151,7 +155,7 @@ export class FieldNumber {
 
         return <div
             ref={(el) => this.containerElement = el as HTMLElement}
-            class={`field-number-container field-element-container${this.slim ? ' slim' : ''}${this.autowidth ? ' w-auto' : ''}`}
+            class={`field-number-container field-element-container${this.nomargin ? ' nomargin' : ''}${this.autowidth ? ' w-auto' : ''}`}
         >
             <span class="icon-container"><slot name="icon" /></span>
             <div class="field-input-label">

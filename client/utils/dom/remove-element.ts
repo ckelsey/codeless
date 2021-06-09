@@ -1,5 +1,5 @@
-import RemoveElementEvents from "../../utils/component-builder/remove-element-events";
 import ArrayFrom from '../conversion/array-from'
+import Get from "../objects/get";
 
 export default function RemoveElement(el: HTMLElement) {
     if (!el) { return el }
@@ -8,7 +8,7 @@ export default function RemoveElement(el: HTMLElement) {
 
     ArrayFrom(el.children || []).forEach(RemoveElement)
 
-    RemoveElementEvents(el)
+    Get(el, 'events.dispose()')
 
     if (el.parentElement) {
         el.parentElement.removeChild(el)

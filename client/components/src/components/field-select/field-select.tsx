@@ -1,4 +1,4 @@
-import { Component, Prop, h, Watch, Element, Method, State } from '@stencil/core'
+import { Component, Prop, h, Watch, Element, Method, State, Event } from '@stencil/core'
 import ID from '../../../../utils/id'
 import DispatchEvent from '../../../../utils/dom/dispatch-event'
 import Pipe from '../../../../utils/function-helpers/pipe'
@@ -13,6 +13,7 @@ import InputName from '../../../../utils/dom/input-name'
 import FormControl from '../../../../utils/dom/form-control'
 import SetAttribute from '../../../../utils/dom/set-attribute'
 import { SantizedHTML } from '../../../../utils/validate/html'
+import Debounce from '../../../../utils/timing/debounce'
 
 const optionsToArray = Pipe(ToArray, CommasToArray, ToOptions, IfInvalid([]))
 const processedValue = (value, options) => Get(
@@ -30,6 +31,9 @@ const processedValue = (value, options) => Get(
 
 export class FieldSelect {
     @Element() host
+
+    @Event() changed
+    debounceChanged = Debounce(() => this.changed.emit({ element: this, value: this.value }))
 
     /** PROPS */
     @Prop() autocomplete: string = 'on'
@@ -53,7 +57,7 @@ export class FieldSelect {
     @Prop() labelup: boolean = false
     @Watch('labelup') validLabelUp() { this.setLabelPosition() }
 
-    @Prop() name: string = ''
+    @Prop({ mutable: true, reflect: true }) name: string = ''
     @Watch('name') nameWatcher(newVal) {
         this.name = InputName(newVal, this.sanitizedLabel, this.inputid)
         SetAttribute(this.formInput, 'name', this.name)
@@ -68,12 +72,12 @@ export class FieldSelect {
     @Prop() required: boolean = false
     @Watch('required') requiredWatcher(newVal) { SetAttribute(this.formInput, 'required', newVal) }
 
-    @Prop() slim: boolean = false
+    @Prop() nomargin: boolean = false
 
     @Prop({ reflect: true }) theme: 'inverse' | '' = ''
     @Watch('theme') themeWatcher(newVal) { this.updateTheme(newVal) }
 
-    @Prop() value: string = ''
+    @Prop({ mutable: true, reflect: true }) value: string = ''
     @Watch('value') validValue(newVal) {
         const processed = processedValue(newVal, this.optionsArray)
         if (processed !== newVal) { this.value = processed }
@@ -117,6 +121,7 @@ export class FieldSelect {
         this.formInput.value = this.value = GetInputValue(this.inputElement)
         if (!!this.error && this.isvalid()) { this.error = this.formInput.validationMessage }
         this.setLabelPosition()
+        this.debounceChanged()
     }
 
     handleEnter(e) {
@@ -170,7 +175,7 @@ export class FieldSelect {
 
         return <div
             ref={(el) => this.containerElement = el as HTMLElement}
-            class={`field-select-container field-element-container${this.slim ? ' slim' : ''}${this.autowidth ? ' w-auto' : ''}`}
+            class={`field-select-container field-element-container${this.nomargin ? ' nomargin' : ''}${this.autowidth ? ' w-auto' : ''}`}
         >
             <span class="icon-container"><slot name="icon" /></span>
             <div class="field-input-label">

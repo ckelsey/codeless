@@ -1,4 +1,4 @@
-import { Component, h, Element, Prop, State, Watch, Method, Event } from '@stencil/core'
+import { Component, h, Prop, State, Watch, Method, Event } from '@stencil/core'
 
 @Component({
     tag: 'calendar-day',
@@ -7,8 +7,6 @@ import { Component, h, Element, Prop, State, Watch, Method, Event } from '@stenc
 })
 
 export class CalendarDay {
-    @Element() host
-
     /** PROPERTIES */
     @Prop() active: boolean = false
     @Prop() disabled: boolean = false
