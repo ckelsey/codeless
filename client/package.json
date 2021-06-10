@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "browser-sync start --server --https"
   },
   "repository": {
     "type": "git",
@@ -15,8 +15,5 @@
   "bugs": {
     "url": "https://github.com/ckelsey/codeless/issues"
   },
-  "homepage": "https://github.com/ckelsey/codeless#readme",
-  "devDependencies": {
-    "stencil": "0.0.5"
-  }
+  "homepage": "https://github.com/ckelsey/codeless#readme"
 }
