@@ -1,4 +1,4 @@
-import ID from '../../../utils/id'
+import ID from '../../utils/id'
 
 const attributes = {
     autofocus: false,
