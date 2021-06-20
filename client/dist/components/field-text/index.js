@@ -186,15 +186,8 @@ function subscribeStates(el) {
     inputAttributes.forEach(attr => el.state[attr].subscribe(() => updateInputAttributes(el, [attr])));
 }
 export default class FieldText extends HTMLElement {
-    constructor() {
-        super();
-        this.state = {};
-        this.events = {};
-        attachShadow(this);
-        setStates(this);
-        subscribeStates(this);
-    }
     static get observedAttributes() { return inputAttributes.concat(['count', 'error', 'help', 'iconleft', 'iconright', 'input', 'label']); }
+    state = {};
     get autocomplete() { return this.state.autocomplete.value; }
     set autocomplete(v) { this.state.autocomplete.next(v); }
     get autofocus() { return this.state.autofocus.value; }
@@ -243,6 +236,13 @@ export default class FieldText extends HTMLElement {
     get validity() { return this.input.validity; }
     get validationMessage() { return this.input.validationMessage; }
     set validationMessage(error) { this.input.setCustomValidity(error); }
+    events = {};
+    constructor() {
+        super();
+        attachShadow(this);
+        setStates(this);
+        subscribeStates(this);
+    }
     setLabelPosition() {
         const focused = this.focused.toString();
         const empty = this.isempty.toString();

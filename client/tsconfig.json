@@ -1,22 +1,29 @@
 {
-    "include": [
-        "./src/types/*.ts",
-        "./src/components/**/*.ts"
-    ],
     "compilerOptions": {
         "strict": true,
         "module": "ESNext",
+        "target": "ES2020",
         "moduleResolution": "node",
-        "target": "ES6",
         "esModuleInterop": true,
         "isolatedModules": true,
+        "allowSyntheticDefaultImports": true,
         "forceConsistentCasingInFileNames": true,
-        "rootDir": "src",
-        "outDir": "dist",
-        "allowJs": true,
-        "resolveJsonModule": true,
+        "allowJs": false,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
-        "removeComments": true
+        "removeComments": true,
+        "noImplicitAny": true,
+        "baseUrl": "./src",
+        "paths": {
+            "*.scss": [
+                "typings/scss.d.ts"
+            ],
+            "*.css": [
+                "typings/css.d.ts"
+            ],
+            "*.html": [
+                "typings/html.d.ts"
+            ]
+        }
     }
 }
