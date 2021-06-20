@@ -117,7 +117,7 @@ export default function Observer(initialValue?: any, options: ObserverOptions = 
     let _this: any = [ID()]
     observerKeys[_this[0]] = _this
     const noInit = options.noInit ? true : false
-    const nextOnNew = options.nextOnNew ? true : false
+    const nextOnNew = options.nextOnNew === false ? false : true
     const matchType = options.matchType ? true : false
     const onSubscribe = options.onSubscribe && typeof options.onSubscribe === 'function' ? options.onSubscribe : (val: any) => val
     const formatter = options.formatter && typeof options.formatter === 'function' ? options.formatter : (val: any) => val
@@ -174,7 +174,7 @@ export default function Observer(initialValue?: any, options: ObserverOptions = 
 
         delete observerKeys[_this[0]]
         observers.delete(_this)
-        _this = undefined
+        _this = null
     }
 
     const callFn = (

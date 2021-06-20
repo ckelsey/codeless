@@ -2,3 +2,5 @@ node_modules
 .DS_Store
 myssl.crt
 myssl.key
+client/tmp
+client/tests_output

@@ -13,14 +13,42 @@
                 font-size: 16px;
                 color: #eee;
             }
+
+            field-text {
+                margin: 2em 0.5em;
+            }
+
+            form {
+                display: flex;
+                align-items: flex-start;
+                justify-content: flex-start;
+                flex-wrap: wrap;
+            }
         </style>
 
-        <script type="module" src="/components/dist/field-text/index.js"></script>
+        <script type="module" src="/dist/components/field-text/index.js"></script>
     </head>
 
     <body>
-        <field-text label="Text field" autowidth="true"></field-text>
-        <!-- <field-base label="Text field" autowidth="true"></field-base> -->
+        <form action="/" method="POST" id="login">
+            <field-text label="Email" autowidth="true" type="email" id="email-field" name="username">
+                <input slot="input" id="username">
+            </field-text>
+            <field-text label="Password" autowidth="true" type="password" id="password-field" name="password" inputid="password"></field-text>
+            <button type="submit" id="loginButton">Submit</button>
+        </form>
+
+        <div id="put-here"></div>
+
+        <script>
+            // window.document.addEventListener('DOMContentLoaded', () => {
+            //     window.field = document.getElementById('email-field')
+            //     field.addEventListener('formsubmit', e => {
+            //         e.detail.originalEvent.preventDefault()
+            //         console.log('tryin to submit')
+            //     })
+            // })
+        </script>
     </body>
 
 </html>

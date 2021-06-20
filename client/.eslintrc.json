@@ -7,6 +7,9 @@
         "ecmaVersion": 2020,
         "sourceType": "module"
     },
+    "plugins": [
+        "@typescript-eslint"
+    ],
     "env": {
         "browser": true,
         "node": true,

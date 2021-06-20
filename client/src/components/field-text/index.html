@@ -1,0 +1,36 @@
+<div class="field-element-container">
+    <div class="field-element-container-inner">
+        <span class="icon-container icon-padding">
+            <slot name="iconleft"></slot>
+        </span>
+        <div class="field-input-label">
+            <div class="field-label">
+                <slot name="label"></slot>
+            </div>
+            <div class="field-input">
+                <slot name="input"></slot>
+            </div>
+        </div>
+        <span class="icon-container error-icon">
+            <slot name="error-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" style="width:100%;fill:currentColor;">
+                    <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"></path>
+                </svg>
+            </slot>
+        </span>
+        <span class="icon-container">
+            <slot name="iconright"></slot>
+        </span>
+    </div>
+    <span class="field-input-bottom-container">
+        <span class="field-error-text">
+            <slot name="error"></slot>
+        </span>
+        <span class="field-input-bottom">
+            <span class="field-help-text">
+                <slot name="help"></slot>
+            </span>
+            <span class="field-count-text"></span>
+        </span>
+    </span>
+</div>

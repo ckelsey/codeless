@@ -1,0 +1,106 @@
+$background: (
+    "base": #222,
+    "light": #333,
+    "dark": #111,
+) !default;
+$foreground: (
+    "base": #eee,
+    "light": #fff,
+    "dark": #bbb,
+) !default;
+$accent: (
+    "base": rgb(62, 142, 168),
+    "light": rgb(77, 167, 197),
+    "dark": rgb(55, 120, 142),
+) !default;
+$accent-offset: (
+    "base": #eee,
+    "light": #fff,
+    "dark": #ddd,
+) !default;
+$danger: (
+    "base": #df0700,
+    "light": #ff312a,
+    "dark": #c90600,
+) !default;
+$danger-offset: (
+    "base": #ffecec,
+    "light": #ffffff,
+    "dark": #fcc7c5,
+) !default;
+$warning: (
+    "base": #f79138,
+    "light": #ffa85d,
+    "dark": #eb8a35,
+) !default;
+$warning-offset: (
+    "base": #fff2e6,
+    "light": #ffffff,
+    "dark": #ffd8b6,
+) !default;
+$success: (
+    "base": rgb(94, 204, 114),
+    "light": rgb(108, 225, 130),
+    "dark": rgb(79, 175, 97),
+) !default;
+$success-offset: (
+    "base": rgb(238, 255, 241),
+    "light": rgb(255, 255, 255),
+    "dark": rgb(182, 230, 191),
+) !default;
+$info: (
+    "base": rgb(70, 154, 182),
+    "light": rgb(77, 167, 197),
+    "dark": rgb(55, 120, 142),
+) !default;
+$info-offset: (
+    "base": rgb(232, 249, 255),
+    "light": rgb(255, 255, 255),
+    "dark": rgb(183, 218, 230),
+) !default;
+
+$theme-colors: (
+    "background": $background,
+    "foreground": $foreground,
+    "accent": $accent,
+    "accent-offset": $accent-offset,
+    "danger": $danger,
+    "danger-offset": $danger-offset,
+    "warning": $warning,
+    "warning-offset": $warning-offset,
+    "success": $success,
+    "success-offset": $success-offset,
+    "info": $info,
+    "info-offset": $info-offset,
+);
+
+@function theme-color($key: "foreground", $variant: "base") {
+    $map: map-get($theme-colors, $key);
+    @return map-get($map, $variant);
+}
+
+$space1: 0.5em;
+$space2: 1em;
+$space3: 1.5em;
+$space4: 2em;
+
+@mixin itemsSpace {
+    margin-left: -$space1;
+    margin-right: -$space1;
+    max-width: 100%;
+
+    & > * {
+        margin-left: $space1;
+        margin-right: $space1;
+        display: inline-block;
+    }
+}
+
+@mixin activeBackground {
+    background-color: theme-color("accent");
+    color: theme-color("accent-offset");
+}
+
+$fontFamily: Arial, Helvetica, sans-serif;
+$fontSize: 16px;
+$borderRadius: 3px;

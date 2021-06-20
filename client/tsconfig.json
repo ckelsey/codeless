@@ -1,23 +1,22 @@
 {
     "include": [
-        "src/components/**/*.ts"
+        "./src/types/*.ts",
+        "./src/components/**/*.ts"
     ],
     "compilerOptions": {
         "strict": true,
         "module": "ESNext",
-        "esModuleInterop": true,
-        "lib": [
-            "es6",
-            "dom",
-            "dom.iterable"
-        ],
-        "target": "ES6",
         "moduleResolution": "node",
-        "declaration": true,
-        "declarationMap": true,
-        "sourceMap": true,
+        "target": "ES6",
+        "esModuleInterop": true,
+        "isolatedModules": true,
         "forceConsistentCasingInFileNames": true,
         "rootDir": "src",
-        "outDir": "dist"
+        "outDir": "dist",
+        "allowJs": true,
+        "resolveJsonModule": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "removeComments": true
     }
 }

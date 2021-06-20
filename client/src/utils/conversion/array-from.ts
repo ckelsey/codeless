@@ -11,6 +11,8 @@ export default function ArrayFrom(elements: any) {
             result.push(elements[index])
             index = index + 1
         }
+    } else if (elements) {
+        result.push(elements)
     }
 
     return result

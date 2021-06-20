@@ -12,4 +12,3 @@ export default function ID() {
     index = index + 1;
     return doId(index);
 }
-//# sourceMappingURL=id.js.map

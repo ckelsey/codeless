@@ -1,0 +1,79 @@
+@keyframes rotating {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes onAutoFillStart {
+    from {
+        background: transparent;
+    }
+
+    to {
+        background: transparent;
+    }
+}
+
+@keyframes onAutoFillCancel {
+    from {
+        background: transparent;
+    }
+
+    to {
+        background: transparent;
+    }
+}
+
+@keyframes delayOverflowIn {
+    0% {
+        overflow: hidden;
+    }
+
+    99% {
+        overflow: hidden;
+    }
+
+    100% {
+        overflow: visible;
+    }
+}
+
+@keyframes delayOverflowOut {
+    0% {
+        overflow: visible;
+    }
+
+    99% {
+        overflow: visible;
+    }
+
+    100% {
+        overflow: hidden;
+    }
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}

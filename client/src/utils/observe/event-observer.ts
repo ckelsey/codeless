@@ -33,7 +33,7 @@ export default function EventObserver(
         element.addEventListener(eventName, eventHandler, options.useCapture)
     }
 
-    const observer = Observer(undefined, Object.assign({}, options, { onSubscribe, noSubsComplete: true }))
+    const observer = Observer(undefined, Object.assign({}, options, { onSubscribe, nextOnNew: false }))
 
     function eventHandler(event: Event) {
         if (!observer || !observer.subscriptions || Object.keys(observer.subscriptions).length === 0) { return shutDown() }
