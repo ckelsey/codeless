@@ -8,22 +8,11 @@
         "isolatedModules": true,
         "allowSyntheticDefaultImports": true,
         "forceConsistentCasingInFileNames": true,
-        "allowJs": true,
+        "allowJs": false,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "removeComments": true,
         "noImplicitAny": true,
-        "baseUrl": "./src",
-        "paths": {
-            "*.scss": [
-                "typings/scss.d.ts"
-            ],
-            "*.css": [
-                "typings/css.d.ts"
-            ],
-            "*.html": [
-                "typings/html.d.ts"
-            ]
-        }
+        "baseUrl": "./src"
     }
 }

@@ -27,9 +27,11 @@ function run(_kind?: string, filename?: string) {
         runningTS = false
         runningTransforms = true
 
-        if (res.messages.length) {
+        if (res.messages && res.messages.length) {
             console.log('TYPESCRIPT MESSAGES:')
             console.log(res.messages.join('\n'))
+        } else if (errored) {
+            console.log(res)
         }
 
         const msg = `Compile/render ${errored ? 'errored' : 'completed'} for ${!!filename ? filename : 'all'} in ${new Date().getTime() - start.getTime()}ms`

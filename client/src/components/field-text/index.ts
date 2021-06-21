@@ -1,10 +1,3 @@
-/**
- * TODO
- * - docs
- * - testing
- * - aria/accessibility
- */
-
 import Observer, { ObserverInstance } from '../../utils/observe/observer'
 import { slotEvent, getSlottedElement, getSlot } from '../../utils/dom/web-components/field-utils/slot-element'
 import EventObserver from '../../utils/observe/event-observer'

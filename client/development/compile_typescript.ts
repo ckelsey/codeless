@@ -1,5 +1,6 @@
 import ts from "typescript"
 import importTransformer from "./import-transformer.js"
+import requireTransformer from "./require-transformer.js"
 
 interface DocEntry {
     name?: string
@@ -17,7 +18,12 @@ export default function compileTypescript(config: { files: string[], options: ts
     return new Promise((resolve, reject) => {
         const ast: DocEntry[] = []
         const program = ts.createProgram(files, options)
-        const transformers: ts.CustomTransformers = { "after": [importTransformer(program)] }
+        const transformers: ts.CustomTransformers = {
+            "after": [
+                importTransformer(program),
+                requireTransformer(program)
+            ]
+        }
         const emitResult = program.emit(undefined, undefined, undefined, false, transformers)
         const messages: string[] = []
         const diagnostics = ts.getPreEmitDiagnostics(program).concat(emitResult.diagnostics)
