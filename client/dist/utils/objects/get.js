@@ -1,5 +1,5 @@
-import ToStringOrNumber from '../conversion/to-string-or-number.js';
-import IsItNull from '../checks/is-it-null.js';
+import ToStringOrNumber from "../conversion/to-string-or-number.js";
+import IsItNull from "../checks/is-it-null.js";
 function emptyModifyFn(v) {
     return v;
 }

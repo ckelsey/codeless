@@ -8,7 +8,7 @@
         "isolatedModules": true,
         "allowSyntheticDefaultImports": true,
         "forceConsistentCasingInFileNames": true,
-        "allowJs": false,
+        "allowJs": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "removeComments": true,

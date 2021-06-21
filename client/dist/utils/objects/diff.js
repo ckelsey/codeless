@@ -1,4 +1,4 @@
-import Type from '../types/type.js';
+import Type from "../types/type.js";
 export default function Diff(sourceObject, compareObject) {
     const differences = {};
     const sourceType = Type(sourceObject);

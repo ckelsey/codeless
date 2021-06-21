@@ -1,4 +1,4 @@
-import Set from '../objects/set.js';
+import Set from "../objects/set.js";
 export default function Create({ tag = '', properties = {}, evaluatedProperties = {}, attributes = {}, subscriptions = {}, children = [] }) {
     if (!tag) {
         return;

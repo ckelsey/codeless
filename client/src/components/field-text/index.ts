@@ -5,8 +5,6 @@
  * - aria/accessibility
  */
 
-import html from 'index.html'
-import styles from 'style.scss'
 import Observer, { ObserverInstance } from '../../utils/observe/observer'
 import { slotEvent, getSlottedElement, getSlot } from '../../utils/dom/web-components/field-utils/slot-element'
 import EventObserver from '../../utils/observe/event-observer'
@@ -23,6 +21,9 @@ import SetAttribute from '../../utils/dom/set-attribute'
 import IsNothing from '../../utils/checks/is-nothing'
 import Get from '../../utils/objects/get'
 import DispatchEvent from '../../utils/dom/dispatch-event'
+
+const html = require('index.html')
+const styles = require('style.scss')
 
 const innerHTMLValue = (value: string | HTMLElement) => typeof value === 'string' ? SantizedHTML(value) : Get(value, 'innerHTML', '')
 const elementCreateOptions = (tag: string, slot: string) => (value?: any) => ({ tag, attributes: { slot }, properties: { innerHTML: innerHTMLValue(value) } })

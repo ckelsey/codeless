@@ -1,14 +1,13 @@
 import { resolve } from 'path'
-import { lstatSync, mkdirSync, watch, FSWatcher } from 'fs'
+import { watch, FSWatcher } from 'fs'
 import notifier from 'node-notifier'
 import tsConfig from "./ts-config.js"
-import renderJS from './render-js.js'
+// import renderJS from './render-js.js'
 import compileTypescript from './compile_typescript.js'
-import glob from 'glob'
+// import glob from 'glob'
 import './server.js'
 
 const root = resolve('')
-const distPath = resolve(root, 'dist')
 let timer: NodeJS.Timeout
 let watcher: FSWatcher | undefined
 let runningTS = false
@@ -21,52 +20,36 @@ function run(_kind?: string, filename?: string) {
         return
     }
 
-    try {
-        const distDir = lstatSync(distPath)
-        if (!distDir) { throw Error }
-    } catch (error) {
-        mkdirSync(distPath)
-    }
-
     const start = new Date()
     clearTimeout(timer)
+
+    function endCompile(res: any, errored = false) {
+        runningTS = false
+        runningTransforms = true
+
+        if (res.messages.length) {
+            console.log('TYPESCRIPT MESSAGES:')
+            console.log(res.messages.join('\n'))
+        }
+
+        const msg = `Compile/render ${errored ? 'errored' : 'completed'} for ${!!filename ? filename : 'all'} in ${new Date().getTime() - start.getTime()}ms`
+
+        notifier.notify(msg)
+        console.log(msg)
+        console.log(' ')
+        runningTransforms = false
+
+        if (queue.length) {
+            run('change', queue.shift())
+        }
+    }
 
     timer = setTimeout(() => {
         console.log(`Running compiler on ${!!filename ? filename : 'all'}...${start.toString()}`)
         runningTS = true
-
-        const config = tsConfig(!!filename ? resolve(root, 'src', filename) : '')
-
-        compileTypescript(config.files, config.options)
-            .then((res: any) => {
-                runningTS = false
-                runningTransforms = true
-
-                console.log('files', Object.keys(res.ast))
-
-                if (res.messages.length) {
-                    console.log('TYPESCRIPT MESSAGES:')
-                    console.log(res.messages.join('\n'))
-                }
-
-                const filesEmitted = glob.sync(resolve(distPath, '**'))
-
-                if (filesEmitted.length) {
-                    filesEmitted.forEach(file => renderJS(file))
-                }
-
-                const msg = `Compile/render completed for ${!!filename ? filename : 'all'} in ${new Date().getTime() - start.getTime()}ms`
-
-                notifier.notify(msg)
-                console.log(msg)
-                console.log(' ')
-                runningTransforms = false
-
-                if (queue.length) {
-                    run('change', queue.shift())
-                }
-            })
-            .catch(console.log)
+        compileTypescript(tsConfig(!!filename ? resolve(root, 'src', filename) : ''))
+            .then((res: any) => endCompile(res, false))
+            .catch((res: any) => endCompile(res, true))
     }, 120)
 }
 

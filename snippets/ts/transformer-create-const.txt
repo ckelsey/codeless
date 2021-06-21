@@ -1,0 +1,14 @@
+
+context.factory.createVariableStatement(
+    undefined,
+    context.factory.createVariableDeclarationList(
+        [
+            context.factory.createVariableDeclaration(
+                context.factory.createIdentifier(name),
+                undefined, undefined,
+                context.factory.createStringLiteral(code)
+            ),
+        ],
+        ts.NodeFlags.Const,
+    )
+)

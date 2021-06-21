@@ -1,4 +1,4 @@
-import SetValid from './set-valid.js';
+import SetValid from "./set-valid.js";
 export default function FromEntities(value) {
     if (typeof value == 'string') {
         return SetValid(value

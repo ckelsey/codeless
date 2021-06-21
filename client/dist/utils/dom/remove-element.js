@@ -1,6 +1,6 @@
-import ArrayFrom from '../conversion/array-from.js';
-import Get from '../objects/get.js';
-import Try from '../try.js';
+import ArrayFrom from "../conversion/array-from.js";
+import Get from "../objects/get.js";
+import Try from "../try.js";
 export default function RemoveElement(el) {
     if (!el) {
         return el;

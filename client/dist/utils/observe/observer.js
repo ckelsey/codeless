@@ -1,9 +1,9 @@
-import ID from '../id.js';
-import Type from '../types/type.js';
-import Equals from '../checks/equals.js';
-import Debounce from '../timing/debounce.js';
-import Get from '../objects/get.js';
-import Diff from '../objects/diff.js';
+import ID from "../id.js";
+import Type from "../types/type.js";
+import Equals from "../checks/equals.js";
+import Debounce from "../timing/debounce.js";
+import Get from "../objects/get.js";
+import Diff from "../objects/diff.js";
 const observers = new WeakMap();
 const observerKeys = {};
 window.observers = () => ({

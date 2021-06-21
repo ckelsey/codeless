@@ -1,4 +1,4 @@
-import SetValid, { IsValid } from '../conversion/set-valid.js';
+import SetValid, { IsValid } from "../conversion/set-valid.js";
 export default function IfInvalid(replacement, value) {
     function IfInvalidPartial(v) {
         const doReplacement = !IsValid(v);

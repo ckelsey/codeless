@@ -1,6 +1,6 @@
-import Try from '../try.js';
-import FromEntities from '../conversion/from-entities.js';
-import SelectAll from '../dom/select-all.js';
+import Try from "../try.js";
+import FromEntities from "../conversion/from-entities.js";
+import SelectAll from "../dom/select-all.js";
 export default function ValidateHtml(str, disallowedHtmlTags = [], allowedHtmlTags = []) {
     const original = str;
     const converted = Try(() => FromEntities(str.toString()), '');

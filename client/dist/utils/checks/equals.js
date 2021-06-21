@@ -1,5 +1,5 @@
-import IsNonCollection from '../types/is-non-collection.js';
-import Type from '../types/type.js';
+import IsNonCollection from "../types/is-non-collection.js";
+import Type from "../types/type.js";
 export default function Equals(value1, value2) {
     const type = Type(value1);
     if (Type(value2) !== type) {

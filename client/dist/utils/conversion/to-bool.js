@@ -1,4 +1,4 @@
-import SetValid from './set-valid.js';
+import SetValid from "./set-valid.js";
 const falses = ['0', 0, 'off', 'false', false];
 const trues = ['1', 1, 'on', 'true', true];
 export default function ToBool(value) {

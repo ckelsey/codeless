@@ -1,6 +1,6 @@
-import RemoveElement from '../../remove-element.js';
-import Create from '../../create.js';
-import EventObserver from '../../../observe/event-observer.js';
+import RemoveElement from "../../remove-element.js";
+import Create from "../../create.js";
+import EventObserver from "../../../observe/event-observer.js";
 function slottedElement(slotted, createOptions) {
     return slotted ? slotted : Create(createOptions);
 }

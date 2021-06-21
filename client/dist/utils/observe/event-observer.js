@@ -1,4 +1,4 @@
-import Observer, { nullObserver } from './observer.js';
+import Observer, { nullObserver } from "./observer.js";
 export default function EventObserver(element, eventName, options = {}) {
     if (!element || !eventName) {
         return nullObserver();
