@@ -1,5 +1,7 @@
-import ToStringOrNumber from "../conversion/to-string-or-number"
-import IsItNull from '../checks/is-it-null'
+function toStringOrNumber(arg: string | number): string | number {
+    const argNumber = parseFloat(arg as string)
+    return !isNaN(arg as number) ? (arg as string).trim() : argNumber
+}
 
 function emptyModifyFn(v: any): any {
     return v
@@ -28,7 +30,7 @@ export default function Get(
     let loopIndex = pathParts.length
 
     while (loopIndex) {
-        if (IsItNull(result)) {
+        if (result === undefined || result === null) {
             result = emptyVal
             break
         }
@@ -45,7 +47,7 @@ export default function Get(
                     result,
                     getFunctionParams(pathParts[partIndex])
                         .split(',')
-                        .map(ToStringOrNumber)
+                        .map(toStringOrNumber)
                 )
 
                 loopIndex = loopIndex - 1
@@ -58,7 +60,7 @@ export default function Get(
     }
 
     /** If nothing was found return emptyVal */
-    if (IsItNull(result)) { result = emptyVal }
+    if (result === undefined || result === null) { result = emptyVal }
 
     return modifyFn(result)
 }

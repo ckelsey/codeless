@@ -9,10 +9,12 @@
         "allowSyntheticDefaultImports": true,
         "forceConsistentCasingInFileNames": true,
         "allowJs": false,
+        "declaration": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "removeComments": true,
         "noImplicitAny": true,
-        "baseUrl": "./src"
+        "baseUrl": "./src",
+        "skipLibCheck": true
     }
 }

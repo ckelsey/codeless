@@ -34,7 +34,7 @@ export default function Equals(value1: any, value2: any) {
 
     if (type === 'dom') {
         // return value1.isEqualNode(value2) // 2 different but similar nodes returns true
-        return value1 === value2
+        return value1.isSameNode(value2)
     }
 
     // Start walking

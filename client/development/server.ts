@@ -2,7 +2,7 @@ import browserSync, { create } from "browser-sync"
 let bs: browserSync.BrowserSyncInstance | undefined
 
 const server: browserSync.ServerOptions = {
-    baseDir: './',
+    baseDir: './public',
     routes: {},
     middleware: [function (req: any, res: any, next: any) {
         if (req.method.toUpperCase() == 'POST') {

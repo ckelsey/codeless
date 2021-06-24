@@ -121,7 +121,8 @@ export default function Observer(initialValue?: any, options: ObserverOptions = 
     const matchType = options.matchType ? true : false
     const onSubscribe = options.onSubscribe && typeof options.onSubscribe === 'function' ? options.onSubscribe : (val: any) => val
     const formatter = options.formatter && typeof options.formatter === 'function' ? options.formatter : (val: any) => val
-    const initialType = Type(formatter(initialValue))
+    initialValue = formatter(initialValue)
+    const initialType = Type(initialValue)
     const takeFirst = !!options.takeFirst
     const takeLast = !!options.takeLast
     const debounced = !!takeFirst || !!takeLast
@@ -135,7 +136,7 @@ export default function Observer(initialValue?: any, options: ObserverOptions = 
         return inst && matchType && Type(f) != initialType ? inst.data.value : f
     }
 
-    const states = [formatValue(initialValue)]
+    const states = [initialValue]
 
     const addedRemovedReducer = (source: any[]) => (target: any[], current: any) => {
         if (source.indexOf(current) === -1) { target.push(current) }

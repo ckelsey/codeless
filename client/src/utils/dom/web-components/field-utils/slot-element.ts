@@ -2,19 +2,19 @@ import RemoveElement from '../../remove-element'
 import Create, { CreateOptions } from '../../create'
 import EventObserver from '../../../observe/event-observer'
 
-function slottedElement(slotted: HTMLElement, createOptions: CreateOptions) {
+function slottedElement(slotted: HTMLElement | Element | undefined, createOptions: CreateOptions) {
     return slotted ? slotted : Create(createOptions) as HTMLElement
 }
 
-function findSLottedAndRemoveOthers(el: HTMLElement, name: string, slotted?: HTMLElement) {
+function findSLottedAndRemoveOthers(el: HTMLElement, name: string, slotted?: Element | HTMLElement | undefined) {
     const slotteds = Array.from(el.querySelectorAll(`[slot="${name}"]`))
 
-    if (!slotted) { slotted = slotteds.pop() as HTMLElement }
+    if (!slotted) { slotted = slotteds.pop() }
 
     while (slotteds.length) {
-        const currentSlotted = slotteds.pop() as HTMLElement
+        const currentSlotted = slotteds.pop() as Element | HTMLElement | undefined
 
-        if (currentSlotted !== slotted) {
+        if (currentSlotted && currentSlotted !== slotted) {
             RemoveElement(currentSlotted)
         }
     }
@@ -36,6 +36,7 @@ export function slotEvent(el: any, slot: any, createOptions: CreateOptions) {
 
     const name = slot.getAttribute('name')
     const eventName = `${name}SlotChange`
+
     if (slot && !el.events[eventName]) {
         el.events[eventName] = EventObserver(slot, 'slotchange', { noSubsComplete: false })
         el.events[eventName].subscribe(() => el.state[name].next(getSlottedElement(el, name, createOptions)))

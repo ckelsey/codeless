@@ -1,10 +1,8 @@
 import { resolve } from 'path'
 import { watch, FSWatcher } from 'fs'
 import notifier from 'node-notifier'
-import tsConfig from "./ts-config.js"
-// import renderJS from './render-js.js'
+import tsConfig, { src } from "./ts-config.js"
 import compileTypescript from './compile_typescript.js'
-// import glob from 'glob'
 import './server.js'
 
 const root = resolve('')
@@ -49,14 +47,14 @@ function run(_kind?: string, filename?: string) {
     timer = setTimeout(() => {
         console.log(`Running compiler on ${!!filename ? filename : 'all'}...${start.toString()}`)
         runningTS = true
-        compileTypescript(tsConfig(!!filename ? resolve(root, 'src', filename) : ''))
+        compileTypescript(tsConfig(!!filename ? resolve(root, src, filename) : ''))
             .then((res: any) => endCompile(res, false))
             .catch((res: any) => endCompile(res, true))
     }, 120)
 }
 
 if (process.env.NODE_ENV === 'development') {
-    watcher = watch(resolve(root, 'src'), { recursive: true }, run)
+    watcher = watch(resolve(root, src), { recursive: true }, run)
 }
 
 run()
