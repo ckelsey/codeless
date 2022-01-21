@@ -9,7 +9,9 @@
  */
 
 export default function IsDate(value: any) {
-    let tempValue: any = new Date(Date.parse(value))
+    if (typeof value === 'string' && parseFloat(value).toString() === value) { return false } // i.e. 222 is a date, but we don't want that
+
+    const tempValue: any = new Date(Date.parse(value))
 
     return (
         tempValue !== 'Invalid Date'

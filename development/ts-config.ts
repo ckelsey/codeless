@@ -3,17 +3,13 @@ import { readFileSync } from 'fs'
 import glob from 'glob'
 import ts from 'typescript'
 
-export const src = 'src'
-export const dist = 'public/dist'
-export const srcToDist = (path: string) => path.split(`/${src}/`).join(`/${dist}/`)
 const root = resolve('')
-const defaultEntry = join(root, src, 'components', '**', '*.ts')
 
-function configData(pathToFile: string = '', config: { [key: string]: any } = {}) {
-    const ext = pathToFile.split('.').pop()
+function configData(source: string, assets: string, defaultEntry: string, pathToFiles: string[] = [], config: { [key: string]: any } = {}) {
+    const files = pathToFiles.filter(f => f.split('.').pop() === 'ts')
 
     return {
-        files: !!pathToFile && ext === 'ts' ? [pathToFile] : glob.sync(defaultEntry),
+        files: files.length ? files : glob.sync(defaultEntry || `${root}/**/*.ts`),
         options: Object.assign(
             {},
             config.compilerOptions,
@@ -24,8 +20,8 @@ function configData(pathToFile: string = '', config: { [key: string]: any } = {}
                     module: ts.ModuleKind[config.compilerOptions.module || 'ESNext'] || ts.ModuleKind.ESNext,
                     target: ts.ModuleKind[config.compilerOptions.module || 'ES2020'] || ts.ModuleKind.ES2020,
                     moduleResolution: ts.ModuleResolutionKind[config.compilerOptions.moduleResolution || 'NodeJs'] || ts.ModuleResolutionKind.NodeJs,
-                    rootDir: join(root, src),
-                    outDir: join(root, dist)
+                    rootDir: join(root, source),
+                    outDir: join(root, assets)
                 }
             )
         )
@@ -36,9 +32,9 @@ function getBaseConfig() {
     return readFileSync(resolve(root, 'tsconfig.json')).toString()
 }
 
-export default function tsConfig(pathToFile: string) {
+export default function tsConfig(source: string, assets: string, defaultEntry: string, pathToFiles: string[]) {
     return configData(
-        pathToFile,
+        source, assets, defaultEntry, pathToFiles,
         JSON.parse(getBaseConfig())
     )
 }

@@ -1,5 +1,11 @@
 import Type from '../types/type'
 
+function isEmpty(toCheck: any) {
+    if (toCheck === undefined) { return true }
+    if (typeof toCheck === 'object' && Object.keys(toCheck).length === 0) { return true }
+    return false
+}
+
 export default function Diff(sourceObject: any, compareObject: any) {
     const differences: { [key: string]: any } = {}
     const sourceType = Type(sourceObject)
@@ -7,7 +13,7 @@ export default function Diff(sourceObject: any, compareObject: any) {
     const validTypes = ['object', 'array']
 
     if (validTypes.indexOf(sourceType) == -1 || validTypes.indexOf(compareType) == -1) {
-        return sourceObject !== compareObject ? compareObject || sourceObject : undefined
+        return sourceObject !== compareObject ? compareObject === undefined ? sourceObject : compareObject : undefined
     }
 
     if (sourceType !== compareType) {
@@ -19,7 +25,7 @@ export default function Diff(sourceObject: any, compareObject: any) {
 
         const compared = Diff(sourceObject[index], compareObject[index])
 
-        if (compared !== undefined) {
+        if (!isEmpty(compared)) {
             differences[index] = sourceObject[index] === compared ? undefined : compared
         }
     }

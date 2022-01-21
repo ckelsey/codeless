@@ -1,0 +1,307 @@
+[
+    {
+        "id": 505,
+        "callFrame": {
+            "functionName": "",
+            "scriptId": "7",
+            "url": "http://localhost:3000/dist/components/field-text/index.js",
+            "lineNumber": 0,
+            "columnNumber": 0
+        },
+        "hitCount": 0,
+        "children": [
+            506,
+            514
+        ]
+    },
+    {
+        "id": 519,
+        "callFrame": {
+            "functionName": "FieldText",
+            "scriptId": "7",
+            "url": "http://localhost:3000/dist/components/field-text/index.js",
+            "lineNumber": 363,
+            "columnNumber": 15
+        },
+        "hitCount": 0,
+        "children": [
+            520,
+            522,
+            525,
+            571
+        ]
+    },
+    {
+        "id": 525,
+        "callFrame": {
+            "functionName": "",
+            "scriptId": "7",
+            "url": "http://localhost:3000/dist/components/field-text/index.js",
+            "lineNumber": 369,
+            "columnNumber": 68
+        },
+        "hitCount": 0,
+        "children": [
+            526,
+            531,
+            560
+        ]
+    },
+    {
+        "id": 536,
+        "callFrame": {
+            "functionName": "formatter",
+            "scriptId": "7",
+            "url": "http://localhost:3000/dist/components/field-text/index.js",
+            "lineNumber": 71,
+            "columnNumber": 29
+        },
+        "hitCount": 0,
+        "children": [
+            537,
+            539,
+            556
+        ]
+    },
+    {
+        "id": 539,
+        "callFrame": {
+            "functionName": "",
+            "scriptId": "7",
+            "url": "http://localhost:3000/dist/components/field-text/index.js",
+            "lineNumber": 59,
+            "columnNumber": 20
+        },
+        "hitCount": 0,
+        "children": [
+            540,
+            546
+        ]
+    },
+    {
+        "id": 540,
+        "callFrame": {
+            "functionName": "htmlValue",
+            "scriptId": "7",
+            "url": "http://localhost:3000/dist/components/field-text/index.js",
+            "lineNumber": 28,
+            "columnNumber": 18
+        },
+        "hitCount": 0,
+        "children": [
+            541
+        ]
+    },
+    {
+        "id": 571,
+        "callFrame": {
+            "functionName": "subscribeStates",
+            "scriptId": "7",
+            "url": "http://localhost:3000/dist/components/field-text/index.js",
+            "lineNumber": 295,
+            "columnNumber": 24
+        },
+        "hitCount": 0,
+        "children": [
+            572
+        ]
+    },
+    {
+        "id": 573,
+        "callFrame": {
+            "functionName": "",
+            "scriptId": "7",
+            "url": "http://localhost:3000/dist/components/field-text/index.js",
+            "lineNumber": 296,
+            "columnNumber": 29
+        },
+        "hitCount": 0,
+        "children": [
+            574,
+            583
+        ]
+    },
+    {
+        "id": 577,
+        "callFrame": {
+            "functionName": "set inputid",
+            "scriptId": "7",
+            "url": "http://localhost:3000/dist/components/field-text/index.js",
+            "lineNumber": 338,
+            "columnNumber": 15
+        },
+        "hitCount": 0,
+        "children": [
+            578
+        ]
+    },
+    {
+        "id": 583,
+        "callFrame": {
+            "functionName": "updateInputAttributes",
+            "scriptId": "7",
+            "url": "http://localhost:3000/dist/components/field-text/index.js",
+            "lineNumber": 241,
+            "columnNumber": 30
+        },
+        "hitCount": 0,
+        "children": [
+            584
+        ]
+    },
+    {
+        "id": 584,
+        "callFrame": {
+            "functionName": "",
+            "scriptId": "7",
+            "url": "http://localhost:3000/dist/components/field-text/index.js",
+            "lineNumber": 250,
+            "columnNumber": 33
+        },
+        "hitCount": 0,
+        "children": [
+            585,
+            616
+        ]
+    },
+    {
+        "id": 588,
+        "callFrame": {
+            "functionName": "set error",
+            "scriptId": "7",
+            "url": "http://localhost:3000/dist/components/field-text/index.js",
+            "lineNumber": 328,
+            "columnNumber": 13
+        },
+        "hitCount": 0,
+        "children": [
+            589
+        ]
+    },
+    {
+        "id": 591,
+        "callFrame": {
+            "functionName": "formatter",
+            "scriptId": "7",
+            "url": "http://localhost:3000/dist/components/field-text/index.js",
+            "lineNumber": 71,
+            "columnNumber": 29
+        },
+        "hitCount": 0,
+        "children": [
+            592
+        ]
+    },
+    {
+        "id": 616,
+        "callFrame": {
+            "functionName": "set error",
+            "scriptId": "7",
+            "url": "http://localhost:3000/dist/components/field-text/index.js",
+            "lineNumber": 328,
+            "columnNumber": 13
+        },
+        "hitCount": 0,
+        "children": [
+            617
+        ]
+    },
+    {
+        "id": 595,
+        "callFrame": {
+            "functionName": "",
+            "scriptId": "7",
+            "url": "http://localhost:3000/dist/components/field-text/index.js",
+            "lineNumber": 310,
+            "columnNumber": 29
+        },
+        "hitCount": 0,
+        "children": [
+            596
+        ]
+    },
+    {
+        "id": 602,
+        "callFrame": {
+            "functionName": "attributeChangedCallback",
+            "scriptId": "7",
+            "url": "http://localhost:3000/dist/components/field-text/index.js",
+            "lineNumber": 396,
+            "columnNumber": 28
+        },
+        "hitCount": 0,
+        "children": [
+            603
+        ]
+    },
+    {
+        "id": 605,
+        "callFrame": {
+            "functionName": "formatter",
+            "scriptId": "7",
+            "url": "http://localhost:3000/dist/components/field-text/index.js",
+            "lineNumber": 71,
+            "columnNumber": 29
+        },
+        "hitCount": 0,
+        "children": [
+            606
+        ]
+    },
+    {
+        "id": 606,
+        "callFrame": {
+            "functionName": "",
+            "scriptId": "7",
+            "url": "http://localhost:3000/dist/components/field-text/index.js",
+            "lineNumber": 59,
+            "columnNumber": 20
+        },
+        "hitCount": 0,
+        "children": [
+            607
+        ]
+    },
+    {
+        "id": 607,
+        "callFrame": {
+            "functionName": "htmlValue",
+            "scriptId": "7",
+            "url": "http://localhost:3000/dist/components/field-text/index.js",
+            "lineNumber": 28,
+            "columnNumber": 18
+        },
+        "hitCount": 0,
+        "children": [
+            608
+        ]
+    },
+    {
+        "id": 611,
+        "callFrame": {
+            "functionName": "connectedCallback",
+            "scriptId": "7",
+            "url": "http://localhost:3000/dist/components/field-text/index.js",
+            "lineNumber": 401,
+            "columnNumber": 21
+        },
+        "hitCount": 0,
+        "children": [
+            612
+        ]
+    },
+    {
+        "id": 634,
+        "callFrame": {
+            "functionName": "",
+            "scriptId": "7",
+            "url": "http://localhost:3000/dist/components/field-text/index.js",
+            "lineNumber": 103,
+            "columnNumber": 41
+        },
+        "hitCount": 0,
+        "children": [
+            635
+        ]
+    }
+]

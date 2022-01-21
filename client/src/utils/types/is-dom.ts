@@ -8,6 +8,9 @@
  * IsDom(element) // true
  * IsDom('nope') // false
  */
+
+var isBrowser = new Function("try {return this===window;}catch(e){ return false;}")
 export default function IsDom(value: any) {
+    if (!isBrowser()) { return false }
     return (value instanceof Element) || (value instanceof Node)
 }

@@ -1,23 +1,13 @@
 {
     "scripts": {
-        "start": "NODE_ENV=development node --loader ts-node/esm development/index.ts",
-        "build": "NODE_ENV=production node --loader ts-node/esm development/index.ts"
+        "start": "codelessdev --server --compile --watch --test",
+        "server": "codelessdev --server",
+        "test": "codelessdev --test"
     },
     "type": "module",
     "devDependencies": {
-        "@types/browser-sync": "^2.26.1",
-        "@types/glob": "^7.1.3",
-        "@types/html-minifier": "^4.0.0",
-        "@types/node-notifier": "^8.0.0",
-        "@types/node-sass": "^4.11.1",
-        "browser-sync": "^2.26.14",
+        "codelessdev": "latest",
         "eslint": "^7.29.0",
-        "glob": "^7.1.7",
-        "html-minifier": "^4.0.0",
-        "node-notifier": "^10.0.0",
-        "node-sass": "^6.0.0",
-        "ts-node": "^10.0.0",
-        "typescript": "^4.3.4",
-        "typescript-eslint": "0.0.1-alpha.0"
+        "typescript": "^4.3.4"
     }
 }

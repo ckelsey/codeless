@@ -1,0 +1,35 @@
+Profiler
+    - trace
+    - find expensive calls
+        - memory
+        - time
+    - find excessive calls
+    - find memory leak
+compiler to run in child process
+    - ts-config creates a config for fs.watch file
+    - child processes
+        - store file name before start
+        - compile typescript
+        - run tests
+            - generate coverage and profiling
+    - fs.watch 
+        - if child process
+            - gather new file name and previous child processing filename
+            - kill process
+        - start child process
+Get rid of browser-sync
+Replace playwright, just chrome for now
+
+Dropdown component
+Options on field text
+field-text-area
+field-json
+field-checkbox
+field-bool
+field-select
+component-viewer
+component-doc
+component-attributes
+component-methods
+drag-drop components
+

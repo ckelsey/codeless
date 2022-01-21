@@ -1,0 +1,1030 @@
+{
+    "scriptId": "7",
+    "url": "http://localhost:3000/dist/components/field-text/index.js",
+    "entries": [
+        {
+            "offset": 22055,
+            "types": [
+                {
+                    "name": "undefined"
+                }
+            ]
+        },
+        {
+            "offset": 8404,
+            "types": [
+                {
+                    "name": "string"
+                }
+            ]
+        },
+        {
+            "offset": 8553,
+            "types": [
+                {
+                    "name": "Function"
+                }
+            ]
+        },
+        {
+            "offset": 8409,
+            "types": [
+                {
+                    "name": "string"
+                }
+            ]
+        },
+        {
+            "offset": 8849,
+            "types": [
+                {
+                    "name": "string"
+                }
+            ]
+        },
+        {
+            "offset": 8846,
+            "types": [
+                {
+                    "name": "Function"
+                }
+            ]
+        },
+        {
+            "offset": 8819,
+            "types": [
+                {
+                    "name": "Function"
+                }
+            ]
+        },
+        {
+            "offset": 9550,
+            "types": [
+                {
+                    "name": "Function"
+                }
+            ]
+        },
+        {
+            "offset": 7774,
+            "types": [
+                {
+                    "name": "Function"
+                }
+            ]
+        },
+        {
+            "offset": 7609,
+            "types": [
+                {
+                    "name": "undefined"
+                }
+            ]
+        },
+        {
+            "offset": 7560,
+            "types": [
+                {
+                    "name": "Function"
+                }
+            ]
+        },
+        {
+            "offset": 19129,
+            "types": [
+                {
+                    "name": "undefined"
+                }
+            ]
+        },
+        {
+            "offset": 16695,
+            "types": [
+                {
+                    "name": "Array"
+                }
+            ]
+        },
+        {
+            "offset": 19745,
+            "types": [
+                {
+                    "name": "HTMLElement"
+                }
+            ]
+        },
+        {
+            "offset": 19417,
+            "types": [
+                {
+                    "name": "Object"
+                }
+            ]
+        },
+        {
+            "offset": 19425,
+            "types": [
+                {
+                    "name": "string"
+                }
+            ]
+        },
+        {
+            "offset": 19702,
+            "types": [
+                {
+                    "name": "Object"
+                }
+            ]
+        },
+        {
+            "offset": 7804,
+            "types": [
+                {
+                    "name": "string"
+                }
+            ]
+        },
+        {
+            "offset": 8181,
+            "types": [
+                {
+                    "name": "string"
+                },
+                {
+                    "name": "boolean"
+                },
+                {
+                    "name": "HTMLInputElement"
+                },
+                {
+                    "name": "null"
+                }
+            ]
+        },
+        {
+            "offset": 7798,
+            "types": [
+                {
+                    "name": "HTMLElement"
+                }
+            ]
+        },
+        {
+            "offset": 10909,
+            "types": [
+                {
+                    "name": "string"
+                }
+            ]
+        },
+        {
+            "offset": 10578,
+            "types": [
+                {
+                    "name": "string"
+                }
+            ]
+        },
+        {
+            "offset": 9547,
+            "types": [
+                {
+                    "name": "HTMLDivElement"
+                },
+                {
+                    "name": "HTMLInputElement"
+                },
+                {
+                    "name": "HTMLLabelElement"
+                }
+            ]
+        },
+        {
+            "offset": 8886,
+            "types": [
+                {
+                    "name": "string"
+                },
+                {
+                    "name": "HTMLInputElement"
+                },
+                {
+                    "name": "null"
+                },
+                {
+                    "name": "HTMLDivElement"
+                }
+            ]
+        },
+        {
+            "offset": 8438,
+            "types": [
+                {
+                    "name": "string"
+                }
+            ]
+        },
+        {
+            "offset": 8550,
+            "types": [
+                {
+                    "name": "HTMLDivElement"
+                },
+                {
+                    "name": "HTMLLabelElement"
+                }
+            ]
+        },
+        {
+            "offset": 6762,
+            "types": [
+                {
+                    "name": "string"
+                }
+            ]
+        },
+        {
+            "offset": 6871,
+            "types": [
+                {
+                    "name": "string"
+                }
+            ]
+        },
+        {
+            "offset": 8794,
+            "types": [
+                {
+                    "name": "HTMLDivElement"
+                },
+                {
+                    "name": "HTMLInputElement"
+                },
+                {
+                    "name": "HTMLLabelElement"
+                }
+            ]
+        },
+        {
+            "offset": 8696,
+            "types": [
+                {
+                    "name": "HTMLDivElement"
+                },
+                {
+                    "name": "HTMLInputElement"
+                },
+                {
+                    "name": "HTMLLabelElement"
+                }
+            ]
+        },
+        {
+            "offset": 7639,
+            "types": [
+                {
+                    "name": "string"
+                }
+            ]
+        },
+        {
+            "offset": 7646,
+            "types": [
+                {
+                    "name": "undefined"
+                },
+                {
+                    "name": "Object"
+                }
+            ]
+        },
+        {
+            "offset": 7771,
+            "types": [
+                {
+                    "name": "string"
+                }
+            ]
+        },
+        {
+            "offset": 12074,
+            "types": [
+                {
+                    "name": "string"
+                }
+            ]
+        },
+        {
+            "offset": 12119,
+            "types": [
+                {
+                    "name": "boolean"
+                }
+            ]
+        },
+        {
+            "offset": 7599,
+            "types": [
+                {
+                    "name": "string"
+                }
+            ]
+        },
+        {
+            "offset": 7614,
+            "types": [
+                {
+                    "name": "string"
+                }
+            ]
+        },
+        {
+            "offset": 7178,
+            "types": [
+                {
+                    "name": "null"
+                }
+            ]
+        },
+        {
+            "offset": 7260,
+            "types": [
+                {
+                    "name": "null"
+                }
+            ]
+        },
+        {
+            "offset": 7085,
+            "types": [
+                {
+                    "name": "string"
+                },
+                {
+                    "name": "null"
+                }
+            ]
+        },
+        {
+            "offset": 7154,
+            "types": [
+                {
+                    "name": "string"
+                },
+                {
+                    "name": "null"
+                }
+            ]
+        },
+        {
+            "offset": 12970,
+            "types": [
+                {
+                    "name": "string"
+                }
+            ]
+        },
+        {
+            "offset": 12930,
+            "types": [
+                {
+                    "name": "string"
+                }
+            ]
+        },
+        {
+            "offset": 12969,
+            "types": [
+                {
+                    "name": "string"
+                }
+            ]
+        },
+        {
+            "offset": 13779,
+            "types": [
+                {
+                    "name": "Function"
+                }
+            ]
+        },
+        {
+            "offset": 13102,
+            "types": [
+                {
+                    "name": "HTMLElement"
+                }
+            ]
+        },
+        {
+            "offset": 13778,
+            "types": [
+                {
+                    "name": "undefined"
+                }
+            ]
+        },
+        {
+            "offset": 13122,
+            "types": [
+                {
+                    "name": "undefined"
+                }
+            ]
+        },
+        {
+            "offset": 13112,
+            "types": [
+                {
+                    "name": "null"
+                }
+            ]
+        },
+        {
+            "offset": 16568,
+            "types": [
+                {
+                    "name": "undefined"
+                }
+            ]
+        },
+        {
+            "offset": 15705,
+            "types": [
+                {
+                    "name": "HTMLElement"
+                }
+            ]
+        },
+        {
+            "offset": 15913,
+            "types": [
+                {
+                    "name": "undefined"
+                }
+            ]
+        },
+        {
+            "offset": 15741,
+            "types": [
+                {
+                    "name": "HTMLInputElement"
+                }
+            ]
+        },
+        {
+            "offset": 6889,
+            "types": [
+                {
+                    "name": "HTMLElement"
+                }
+            ]
+        },
+        {
+            "offset": 6993,
+            "types": [
+                {
+                    "name": "Function"
+                }
+            ]
+        },
+        {
+            "offset": 6990,
+            "types": [
+                {
+                    "name": "undefined"
+                }
+            ]
+        },
+        {
+            "offset": 6912,
+            "types": [
+                {
+                    "name": "HTMLInputElement"
+                },
+                {
+                    "name": "HTMLLabelElement"
+                },
+                {
+                    "name": "HTMLDivElement"
+                }
+            ]
+        },
+        {
+            "offset": 17728,
+            "types": [
+                {
+                    "name": "string"
+                }
+            ]
+        },
+        {
+            "offset": 17746,
+            "types": [
+                {
+                    "name": "string"
+                }
+            ]
+        },
+        {
+            "offset": 17779,
+            "types": [
+                {
+                    "name": "undefined"
+                }
+            ]
+        },
+        {
+            "offset": 14041,
+            "types": [
+                {
+                    "name": "undefined"
+                },
+                {
+                    "name": "Array"
+                }
+            ]
+        },
+        {
+            "offset": 15678,
+            "types": [
+                {
+                    "name": "undefined"
+                }
+            ]
+        },
+        {
+            "offset": 13995,
+            "types": [
+                {
+                    "name": "HTMLElement"
+                }
+            ]
+        },
+        {
+            "offset": 13962,
+            "types": [
+                {
+                    "name": "Array"
+                }
+            ]
+        },
+        {
+            "offset": 13883,
+            "types": [
+                {
+                    "name": "string"
+                }
+            ]
+        },
+        {
+            "offset": 13875,
+            "types": [
+                {
+                    "name": "Array"
+                }
+            ]
+        },
+        {
+            "offset": 13955,
+            "types": [
+                {
+                    "name": "Array"
+                }
+            ]
+        },
+        {
+            "offset": 17626,
+            "types": [
+                {
+                    "name": "HTMLInputElement"
+                }
+            ]
+        },
+        {
+            "offset": 17830,
+            "types": [
+                {
+                    "name": "HTMLLabelElement"
+                }
+            ]
+        },
+        {
+            "offset": 15674,
+            "types": [
+                {
+                    "name": "undefined"
+                },
+                {
+                    "name": "HTMLInputElement"
+                }
+            ]
+        },
+        {
+            "offset": 14225,
+            "types": [
+                {
+                    "name": "string"
+                }
+            ]
+        },
+        {
+            "offset": 7015,
+            "types": [
+                {
+                    "name": "boolean"
+                }
+            ]
+        },
+        {
+            "offset": 7061,
+            "types": [
+                {
+                    "name": "null"
+                }
+            ]
+        },
+        {
+            "offset": 18734,
+            "types": [
+                {
+                    "name": "boolean"
+                }
+            ]
+        },
+        {
+            "offset": 7540,
+            "types": [
+                {
+                    "name": "undefined"
+                }
+            ]
+        },
+        {
+            "offset": 7404,
+            "types": [
+                {
+                    "name": "HTMLElement"
+                }
+            ]
+        },
+        {
+            "offset": 17002,
+            "types": [
+                {
+                    "name": "boolean"
+                }
+            ]
+        },
+        {
+            "offset": 20302,
+            "types": [
+                {
+                    "name": "string"
+                }
+            ]
+        },
+        {
+            "offset": 18856,
+            "types": [
+                {
+                    "name": "boolean"
+                }
+            ]
+        },
+        {
+            "offset": 18512,
+            "types": [
+                {
+                    "name": "undefined"
+                }
+            ]
+        },
+        {
+            "offset": 19013,
+            "types": [
+                {
+                    "name": "string"
+                }
+            ]
+        },
+        {
+            "offset": 17210,
+            "types": [
+                {
+                    "name": "HTMLDivElement"
+                }
+            ]
+        },
+        {
+            "offset": 17226,
+            "types": [
+                {
+                    "name": "string"
+                }
+            ]
+        },
+        {
+            "offset": 17257,
+            "types": [
+                {
+                    "name": "undefined"
+                }
+            ]
+        },
+        {
+            "offset": 16025,
+            "types": [
+                {
+                    "name": "undefined"
+                }
+            ]
+        },
+        {
+            "offset": 15947,
+            "types": [
+                {
+                    "name": "HTMLLabelElement"
+                }
+            ]
+        },
+        {
+            "offset": 16191,
+            "types": [
+                {
+                    "name": "boolean"
+                }
+            ]
+        },
+        {
+            "offset": 16268,
+            "types": [
+                {
+                    "name": "string"
+                }
+            ]
+        },
+        {
+            "offset": 18633,
+            "types": [
+                {
+                    "name": "HTMLSpanElement"
+                }
+            ]
+        },
+        {
+            "offset": 8208,
+            "types": [
+                {
+                    "name": "string"
+                }
+            ]
+        },
+        {
+            "offset": 8297,
+            "types": [
+                {
+                    "name": "HTMLSpanElement"
+                },
+                {
+                    "name": "HTMLSlotElement"
+                },
+                {
+                    "name": "HTMLDivElement"
+                }
+            ]
+        },
+        {
+            "offset": 8204,
+            "types": [
+                {
+                    "name": "HTMLElement"
+                }
+            ]
+        },
+        {
+            "offset": 7380,
+            "types": [
+                {
+                    "name": "string"
+                }
+            ]
+        },
+        {
+            "offset": 7305,
+            "types": [
+                {
+                    "name": "string"
+                }
+            ]
+        },
+        {
+            "offset": 7291,
+            "types": [
+                {
+                    "name": "HTMLSpanElement"
+                }
+            ]
+        },
+        {
+            "offset": 16301,
+            "types": [
+                {
+                    "name": "HTMLDivElement"
+                }
+            ]
+        },
+        {
+            "offset": 16455,
+            "types": [
+                {
+                    "name": "undefined"
+                }
+            ]
+        },
+        {
+            "offset": 16492,
+            "types": [
+                {
+                    "name": "string"
+                }
+            ]
+        },
+        {
+            "offset": 16565,
+            "types": [
+                {
+                    "name": "Function"
+                }
+            ]
+        },
+        {
+            "offset": 16564,
+            "types": [
+                {
+                    "name": "undefined"
+                }
+            ]
+        },
+        {
+            "offset": 20333,
+            "types": [
+                {
+                    "name": "string"
+                }
+            ]
+        },
+        {
+            "offset": 20350,
+            "types": [
+                {
+                    "name": "string"
+                }
+            ]
+        },
+        {
+            "offset": 20453,
+            "types": [
+                {
+                    "name": "undefined"
+                }
+            ]
+        },
+        {
+            "offset": 20339,
+            "types": [
+                {
+                    "name": "null"
+                }
+            ]
+        },
+        {
+            "offset": 21821,
+            "types": [
+                {
+                    "name": "undefined"
+                }
+            ]
+        },
+        {
+            "offset": 20541,
+            "types": [
+                {
+                    "name": "undefined"
+                }
+            ]
+        },
+        {
+            "offset": 20513,
+            "types": [
+                {
+                    "name": "string"
+                }
+            ]
+        },
+        {
+            "offset": 9571,
+            "types": [
+                {
+                    "name": "HTMLElement"
+                }
+            ]
+        },
+        {
+            "offset": 9577,
+            "types": [
+                {
+                    "name": "string"
+                }
+            ]
+        },
+        {
+            "offset": 10460,
+            "types": [
+                {
+                    "name": "undefined"
+                }
+            ]
+        },
+        {
+            "offset": 8320,
+            "types": [
+                {
+                    "name": "string"
+                }
+            ]
+        },
+        {
+            "offset": 8316,
+            "types": [
+                {
+                    "name": "HTMLElement"
+                }
+            ]
+        },
+        {
+            "offset": 8372,
+            "types": [
+                {
+                    "name": "HTMLSlotElement"
+                }
+            ]
+        },
+        {
+            "offset": 8672,
+            "types": [
+                {
+                    "name": "HTMLInputElement"
+                }
+            ]
+        },
+        {
+            "offset": 8576,
+            "types": [
+                {
+                    "name": "string"
+                }
+            ]
+        },
+        {
+            "offset": 10450,
+            "types": [
+                {
+                    "name": "undefined"
+                }
+            ]
+        },
+        {
+            "offset": 9928,
+            "types": [
+                {
+                    "name": "HTMLLabelElement"
+                },
+                {
+                    "name": "HTMLDivElement"
+                }
+            ]
+        },
+        {
+            "offset": 10171,
+            "types": [
+                {
+                    "name": "number"
+                }
+            ]
+        },
+        {
+            "offset": 9925,
+            "types": [
+                {
+                    "name": "HTMLLabelElement"
+                },
+                {
+                    "name": "HTMLDivElement"
+                }
+            ]
+        }
+    ]
+}

@@ -1,6 +1,6 @@
 import path from "path"
 import ts from "typescript"
-import { srcToDist } from "./ts-config.js"
+import Config from "./config.js"
 
 interface ImportSchema {
     name?: string
@@ -42,6 +42,8 @@ interface ClassSchema {
     properties: { [key: string]: PropertySchema },
     description?: string
 }
+
+const root = path.resolve('')
 
 function isNodeExported(node: ts.Node): boolean {
     return ((ts.getCombinedModifierFlags(node as ts.Declaration) & ts.ModifierFlags.Export) !== 0 || (!!node.parent && node.parent.kind === ts.SyntaxKind.SourceFile))
@@ -235,11 +237,20 @@ function importSchema(node: any) {
     return result
 }
 
+function srcToDist(src: string) {
+    const initial = !src.includes(root) ? path.join(root, src) : src
+    return initial.split(`/${Config.source}/`).join(`/${Config.assets}/`)
+}
+
+function schemaFilename(src: string) {
+    return `${path.basename(src, path.extname(src))}.json`
+}
+
 export default function transformJson(program: ts.Program): ts.TransformerFactory<ts.SourceFile> {
     return _context => file => {
         const typeChecker = program.getTypeChecker()
         const sourcePath = path.dirname((file as ts.SourceFile).fileName)
-        const outPath = srcToDist(`${path.join(sourcePath, 'schema.json')}`)
+        const outPath = srcToDist(`${path.join(sourcePath, schemaFilename((file as ts.SourceFile).fileName))}`)
         const imports: ImportSchema[] = []
         const definitions = {}
         const errors: any[] = []
@@ -274,7 +285,9 @@ export default function transformJson(program: ts.Program): ts.TransformerFactor
 
         })
 
-        ts.sys.writeFile(outPath, JSON.stringify({ imports, definitions, errors }))
+        const resultString = JSON.stringify({ imports, definitions, errors })
+
+        ts.sys.writeFile(outPath, resultString)
 
         return file
     }

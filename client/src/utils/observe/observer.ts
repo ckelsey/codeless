@@ -133,7 +133,7 @@ export default function Observer(initialValue?: any, options: ObserverOptions = 
     const formatValue = (toFormat: any, obs: any = {}) => {
         const f = formatter(toFormat, obs)
         const inst = getInstance()
-        return inst && matchType && Type(f) != initialType ? inst.data.value : f
+        return inst && matchType && Type(f) !== initialType ? inst.data.value : f
     }
 
     const states = [initialValue]
@@ -319,6 +319,7 @@ export default function Observer(initialValue?: any, options: ObserverOptions = 
 
         next: function (v: any, force?: boolean) {
             const inst = getInstance()
+
             if (!inst) { return }
 
             const formatted = formatValue(v, inst)

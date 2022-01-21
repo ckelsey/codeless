@@ -2,13 +2,19 @@
  * TODO
  * - options
  * - filter
+ * - ::part
+ * - error x to click to clear
+ * - on error focus input
+ * - focus/blur methods
  * - decorator to do getter/setter automatically
+ * - input being set via HTML string doesn't work
+ * - validate input being set is an actual input or textarea
+ * - initial error occasionally doesn't work, i.e. <field-text label="Email" error="Eeek" autowidth="true" type="email" id="email-field" name="username">
  */
 import Observer, { ObserverInstance, ObserverOptions } from '../../utils/observe/observer'
 import EventObserver from '../../utils/observe/event-observer'
 import Type from '../../utils/types/type'
 import Pipe from '../../utils/function-helpers/pipe'
-import ToJSON from '../../utils/conversion/to-json'
 import ToBool from '../../utils/conversion/to-bool'
 import ToNumber from '../../utils/conversion/to-number'
 import IfInvalid from '../../utils/checks/if-invalid'
@@ -76,6 +82,9 @@ function append(el: FieldText) { return function (element: HTMLElement) { el && 
 /** If value is not true, return null */
 function trueOrNull(value: boolean) { return value === true ? true : null }
 
+/** If value is not a string and not empty, return null */
+function stringOrNull(value: boolean) { return !!value && typeof value === 'string' ? value : null }
+
 /** If value is not a number, return null */
 function numberOrNull(value: any) { return IsNothing(value) ? null : Pipe(ToNumber, IfInvalid(null))(value) }
 
@@ -100,11 +109,8 @@ function initialValue(host: any, key: string) {
     }
 
     const attrValue = host.getAttribute(key)
-
     if (attrValue !== null) { return attrValue }
-
     if (key === 'inputid') { return ID() }
-
     return (propertyMeta as any)[key].initial
 }
 
@@ -173,7 +179,7 @@ function slotEvent(host: any, name: string) {
             const assigned = (Array.from(slot.assignedNodes()) as HTMLElement[]).sort((a: any, b: any) => {
                 const createdOnA = a.createdOn
                 const createdOnB = b.createdOn
-                return !createdOnA && !createdOnB ? 0 : !createdOnA ? -1 : 1
+                return !createdOnA && !createdOnB ? 0 : !createdOnA ? 1 : !createdOnB ? -1 : createdOnA > createdOnB ? 1 : -1
             })
 
             const next = assigned.pop()
@@ -185,8 +191,6 @@ function slotEvent(host: any, name: string) {
             while (assigned.length) {
                 RemoveElement(assigned.pop())
             }
-
-
         })
     }
 }
@@ -196,7 +200,12 @@ const propertyMeta: PropertyMetaObject = {
     autocomplete: {
         initial: 'on',
         inputAttribute: true,
-        formatter: orRevert(value => typeof value === 'string', value => value === 'true' || value === true ? 'on' : value === 'false' || value === false ? 'off' : value)
+        formatter: (value: any) => {
+            if (value === 'true' || value === true) { return 'on' }
+            if (value === 'false' || value === false) { return 'off' }
+            if (typeof value !== 'string') { return null }
+            return value
+        }
     },
     autofocus: {
         initial: false,
@@ -238,7 +247,8 @@ const propertyMeta: PropertyMetaObject = {
     inputid: {
         initial: '',
         inputAttribute: true,
-        matchType: true
+        matchType: true,
+        formatter: orRevert(value => !!value && typeof value === 'string')
     },
     label: {
         initial: '',
@@ -257,12 +267,12 @@ const propertyMeta: PropertyMetaObject = {
     name: {
         initial: '',
         inputAttribute: true,
-        matchType: true,
+        formatter: stringOrNull
     },
     pattern: {
         initial: null,
         inputAttribute: true,
-        formatter: orRevert(value => typeof value === 'string')
+        formatter: stringOrNull
     },
     required: {
         initial: false,
@@ -279,11 +289,14 @@ const propertyMeta: PropertyMetaObject = {
     value: {
         initial: null,
         inputAttribute: true,
-        formatter: (newValue: any, observer: ObserverInstance | undefined) => {
-            if (typeof newValue === 'string') { return newValue }
-            const valueType = Type(newValue)
-            if (['number', 'function', 'date'].indexOf(valueType) > -1) { return newValue.toString() }
-            if (['array', 'object'].indexOf(valueType) > -1 && observer) { return Pipe(ToJSON, IfInvalid(observer.changed))(newValue) }
+        formatter: (host: FieldText) => (newValue: any, observer: ObserverInstance | undefined) => {
+            if (!host.state.disabled || !host.disabled) {
+                if (typeof newValue === 'string') { return newValue }
+                // const valueType = Type(newValue)
+                // if (['number', 'function', 'date'].indexOf(valueType) > -1) { return newValue.toString() }
+                // if (['array', 'object'].indexOf(valueType) > -1 && observer) { return Pipe(ToJSON, IfInvalid(observer.changed))(newValue) }
+            }
+
             if (observer) { return observer.changed }
         }
     }
@@ -312,6 +325,7 @@ function updateInputAttributes(el: FieldText, changedAttributeKeys: string[] = g
         const value = (el.state as any)[attr].value
 
         if (attr === 'value') {
+            if (el.state.disabled && el.state.disabled.value === true) { return }
             if (input.value !== value && value !== undefined) { input.value = value }
             setCountText(el)
             el.setLabelPosition()
@@ -337,7 +351,11 @@ function updateInputAttributes(el: FieldText, changedAttributeKeys: string[] = g
         if (attr === 'autofocus') {
             const autofocus = trueOrNull(value)
             SetAttribute(input, attr, autofocus)
-            if (autofocus) { input.focus() }
+            if (autofocus) {
+                input.focus()
+            } else if (el.focused) {
+                input.blur()
+            }
             return
         }
 
@@ -347,25 +365,26 @@ function updateInputAttributes(el: FieldText, changedAttributeKeys: string[] = g
 
 /** Subscribes to the component's state properties where needed */
 function subscribeStates(el: FieldText) {
+    el.state.input.subscribe((input: any) => {
+        SetAttribute(input, 'placeholder', ' ')
+        append(el)(input)
+        el.inputid = input.id || el.inputid
+        updateInputAttributes(el)
+    })
+
+    el.state.label.subscribe((label: any) => {
+        append(el)(label)
+        updateInputAttributes(el)
+    })
+    el.state.help.subscribe(append(el))
+    el.state.iconleft.subscribe(append(el))
+    el.state.iconright.subscribe(append(el))
     el.state.count.subscribe((count: boolean) => count ? setCountText(el) : setCountTextContent(el.countElement, ''))
 
     el.state.error.subscribe((errorElement: HTMLElement) => {
         append(el)(errorElement)
         SetAttribute(el, 'error-message', !!el.validationMessage ? el.validationMessage : null)
     })
-
-    el.state.help.subscribe(append(el))
-    el.state.iconleft.subscribe(append(el))
-    el.state.iconright.subscribe(append(el))
-
-    el.state.input.subscribe((input: any) => {
-        input.setAttribute('placeholder', ' ')
-        append(el)(input)
-        el.inputid = input.id || el.inputid
-        updateInputAttributes(el)
-    })
-
-    el.state.label.subscribe(append(el))
 
     getInputAttributes().forEach(attr => (el.state as any)[attr].subscribe(() => updateInputAttributes(el, [attr])))
 }
@@ -443,7 +462,9 @@ export default class FieldText extends HTMLElement {
     set required(v) { this.state.required.next(v) }
 
     /** @description Specifies the type of text input */
-    get type(): PropertyValues['type'] { return this.state.type.value }
+    get type(): PropertyValues['type'] {
+        return this.state.type.value
+    }
     set type(v) { this.state.type.next(v) }
 
     /** @description Specifies the value of the input */
@@ -486,7 +507,7 @@ export default class FieldText extends HTMLElement {
                     [key]: Observer(initialValue(this, key),
                         {
                             matchType: (propertyMeta as any)[key].matchType,
-                            formatter: (propertyMeta as any)[key].formatter
+                            formatter: key === 'value' ? (propertyMeta as any)[key].formatter(this) : (propertyMeta as any)[key].formatter
                         }
                     )
                 }),

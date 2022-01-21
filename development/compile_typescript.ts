@@ -26,12 +26,17 @@ export default function compileTypescript(config: { files: string[], options: ts
             ],
             // "afterDeclarations": [transformJson(program)]
         }
+
         const emitResult = program.emit(undefined, undefined, undefined, false, transformers)
+        const getCompiledName = (f: string) => {
+            const parts = f.split(root)
+            return parts[1] ? parts[1].slice(1) : f
+        }
 
         const visit = (node: ts.Node) => {
             const fileName = getFileName(node)
             if (!isNodeExported(node) || filesCompiled.indexOf(fileName) > -1) { return }
-            filesCompiled.push(fileName.split(root)[1].slice(1))
+            filesCompiled.push(getCompiledName(fileName))
         }
 
         for (const sourceFile of program.getSourceFiles()) {

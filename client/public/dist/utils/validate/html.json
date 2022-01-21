@@ -1,0 +1,1 @@
+{"imports":[{"from":"../try","name":"Try"},{"from":"../conversion/from-entities","name":"FromEntities"},{"from":"../dom/select-all","name":"SelectAll"}],"definitions":{},"errors":["ValidateHtml","htmlTags","svgTags","SantizedHTML"]}

@@ -5,10 +5,9 @@ import SelectAll from '../dom/select-all'
 
 export default function ValidateHtml(
     str: string,
-    disallowedHtmlTags: string[] = [],
+    disallowedHtmlTags: string[] = ['script'],
     allowedHtmlTags: string[] = [],
 ): ValidationResult {
-
     const original = str
     const converted = Try(() => FromEntities(str.toString()), '')
 
@@ -26,7 +25,6 @@ export default function ValidateHtml(
     if (!doc) { return { original: original, valid: true, sanitized: converted, reason: ['no html present'], } }
 
     const totalElements = SelectAll('*', doc)
-    const elementsToDestroy: Element[] = []
     let tagsToDestroy: string[] = []
 
     function allowedHtmlTagsEach(tag: string) {
@@ -39,13 +37,11 @@ export default function ValidateHtml(
 
     function tagsToDestroyEach(tag: string) {
         const els = SelectAll(tag, doc)
-        let elsIndex = els.length
-        while (elsIndex--) {
-            elementsToDestroy.push(els[elsIndex])
-        }
+        while (els.length) { destroyElement(els.pop()) }
     }
 
-    function elementsToDestroyEach(el: Element) {
+    function destroyElement(el: Element | undefined) {
+        if (!el) { return }
         const parent = el.parentNode
         if (el && parent) {
 
@@ -78,8 +74,6 @@ export default function ValidateHtml(
     }
 
     tagsToDestroy.forEach(tagsToDestroyEach)
-
-    elementsToDestroy.forEach(elementsToDestroyEach)
 
     const leftOverElements = SelectAll('*', doc)
     const diff = totalElements.length - leftOverElements.length

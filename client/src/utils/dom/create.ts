@@ -1,3 +1,7 @@
+/**
+ * TODO
+ * look into https://developers.google.com/web/updates/2015/08/using-requestidlecallback in regards to using document fragment
+ */
 import Set from '../objects/set'
 
 export interface CreateOptions {

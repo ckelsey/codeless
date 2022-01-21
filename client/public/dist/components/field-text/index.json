@@ -1,0 +1,286 @@
+{
+    "imports": [
+        {
+            "from": "../../utils/observe/event-observer",
+            "name": "EventObserver"
+        },
+        {
+            "from": "../../utils/types/type",
+            "name": "Type"
+        },
+        {
+            "from": "../../utils/function-helpers/pipe",
+            "name": "Pipe"
+        },
+        {
+            "from": "../../utils/conversion/to-bool",
+            "name": "ToBool"
+        },
+        {
+            "from": "../../utils/conversion/to-number",
+            "name": "ToNumber"
+        },
+        {
+            "from": "../../utils/checks/if-invalid",
+            "name": "IfInvalid"
+        },
+        {
+            "from": "../../utils/validate/html",
+            "names": [
+                "SantizedHTML"
+            ]
+        },
+        {
+            "from": "../../utils/dom/create",
+            "name": "Create"
+        },
+        {
+            "from": "../../utils/id",
+            "name": "ID"
+        },
+        {
+            "from": "../../utils/dom/set-attribute",
+            "name": "SetAttribute"
+        },
+        {
+            "from": "../../utils/checks/is-nothing",
+            "name": "IsNothing"
+        },
+        {
+            "from": "../../utils/objects/get",
+            "name": "Get"
+        },
+        {
+            "from": "../../utils/dom/dispatch-event",
+            "name": "DispatchEvent"
+        },
+        {
+            "from": "../../utils/checks/if-selector",
+            "name": "IfSelector"
+        },
+        {
+            "from": "../../utils/dom/remove-element",
+            "name": "RemoveElement"
+        },
+        {
+            "from": "../../utils/checks/index-of",
+            "name": "IndexOf"
+        },
+        {
+            "from": "../../utils/try",
+            "name": "Try"
+        }
+    ],
+    "definitions": {
+        "FieldText": {
+            "methods": {
+                "setLabelPosition": {
+                    "description": "Sets the component's focused and empty attributes that changes the label position",
+                    "name": "setLabelPosition",
+                    "parameters": [],
+                    "returns": "() => string | boolean"
+                },
+                "attributeChangedCallback": {
+                    "param": {
+                        "name": "The name of the attribute",
+                        "_oldValue": "The previous value of the attribute",
+                        "newValue": "The new value of the attribute"
+                    },
+                    "description": "Called when a component's attribute has changed",
+                    "name": "attributeChangedCallback",
+                    "parameters": [
+                        {
+                            "name": "name",
+                            "type": "string",
+                            "optional": false
+                        },
+                        {
+                            "name": "_oldValue",
+                            "type": "string",
+                            "optional": false
+                        },
+                        {
+                            "name": "newValue",
+                            "type": "string",
+                            "optional": false
+                        }
+                    ],
+                    "returns": "(name: string, _oldValue: string, newValue: string) => void"
+                },
+                "connectedCallback": {
+                    "description": "Called when the component is added to the DOM",
+                    "name": "connectedCallback",
+                    "parameters": [],
+                    "returns": "() => void"
+                },
+                "disconnectedCallback": {
+                    "description": "Called when the component is removed to the DOM",
+                    "name": "disconnectedCallback",
+                    "parameters": [],
+                    "returns": "() => void"
+                }
+            },
+            "properties": {
+                "observedAttributes": {
+                    "readonly": true,
+                    "name": "observedAttributes",
+                    "type": "string[]"
+                },
+                "autocomplete": {
+                    "readonly": false,
+                    "name": "autocomplete",
+                    "type": "string | boolean",
+                    "description": "Browser based auto complete rule"
+                },
+                "autofocus": {
+                    "readonly": false,
+                    "name": "autofocus",
+                    "type": "boolean",
+                    "description": "Sets focus to the input element on page load"
+                },
+                "count": {
+                    "readonly": false,
+                    "name": "count",
+                    "type": "boolean",
+                    "description": "Show the value character or not"
+                },
+                "disabled": {
+                    "readonly": false,
+                    "name": "disabled",
+                    "type": "boolean",
+                    "description": "If true, makes the element not mutable, focusable, or even submitted with the form"
+                },
+                "error": {
+                    "readonly": false,
+                    "name": "error",
+                    "type": "string | HTMLElement",
+                    "description": "Updates the error slot element. Can be set using a text string, DOM selector string, or DOM element. DOM elements must have slot=\"error\" attribute. Always returns a DOM element"
+                },
+                "help": {
+                    "readonly": false,
+                    "name": "help",
+                    "type": "string | HTMLElement",
+                    "description": "Updates the help slot element. Can be set using a text string, DOM selector string, or DOM element. DOM elements must have slot=\"help\" attribute. Always returns a DOM element"
+                },
+                "iconleft": {
+                    "readonly": false,
+                    "name": "iconleft",
+                    "type": "string | HTMLElement",
+                    "description": "Updates the left icon slot element. Can be set using a text string, DOM selector string, or DOM element. DOM elements must have slot=\"iconleft\" attribute. Always returns a DOM element"
+                },
+                "iconright": {
+                    "readonly": false,
+                    "name": "iconright",
+                    "type": "string | HTMLElement",
+                    "description": "Updates the right icon slot element. Can be set using a text string, DOM selector string, or DOM element. DOM elements must have slot=\"iconright\" attribute. Always returns a DOM element"
+                },
+                "input": {
+                    "readonly": false,
+                    "name": "input",
+                    "type": "HTMLInputElement | null",
+                    "description": "Updates the input slot element. Can be set using a text string, DOM selector string, or DOM element. DOM elements must have slot=\"input\" attribute. Always returns a DOM element"
+                },
+                "inputid": {
+                    "readonly": false,
+                    "name": "inputid",
+                    "type": "string",
+                    "description": "The id for the input element"
+                },
+                "label": {
+                    "readonly": false,
+                    "name": "label",
+                    "type": "string | HTMLElement",
+                    "description": "Updates the label slot element. Can be set using a text string, DOM selector string, or DOM element. DOM elements must have slot=\"label\" attribute. Always returns a DOM element"
+                },
+                "max": {
+                    "readonly": false,
+                    "name": "max",
+                    "type": "number | null",
+                    "description": "The maximum number of characters the value can have or null for no maximum"
+                },
+                "min": {
+                    "readonly": false,
+                    "name": "min",
+                    "type": "number | null",
+                    "description": "The minimum number of characters the value can have or null for no minimum"
+                },
+                "name": {
+                    "readonly": false,
+                    "name": "name",
+                    "type": "string",
+                    "description": "The name for the input element"
+                },
+                "pattern": {
+                    "readonly": false,
+                    "name": "pattern",
+                    "type": "string | null",
+                    "description": "Specifies a regular expression the input element's value should match"
+                },
+                "required": {
+                    "readonly": false,
+                    "name": "required",
+                    "type": "boolean",
+                    "description": "Specifies if the input element is required for form submission"
+                },
+                "type": {
+                    "readonly": false,
+                    "name": "type",
+                    "type": "string",
+                    "description": "Specifies the type of text input"
+                },
+                "value": {
+                    "readonly": false,
+                    "name": "value",
+                    "type": "string | null",
+                    "description": "Specifies the value of the input"
+                },
+                "countElement": {
+                    "readonly": true,
+                    "name": "countElement",
+                    "type": "Element | null",
+                    "description": "Read-only element that displays the input's value length"
+                },
+                "focused": {
+                    "readonly": true,
+                    "name": "focused",
+                    "type": "boolean",
+                    "description": "Read-only focused state of the input element"
+                },
+                "form": {
+                    "readonly": true,
+                    "name": "form",
+                    "type": "HTMLFormElement | null",
+                    "description": "Read-only form element if found"
+                },
+                "isempty": {
+                    "readonly": true,
+                    "name": "isempty",
+                    "type": "boolean",
+                    "description": "If the component has a value, read-only"
+                },
+                "validity": {
+                    "readonly": true,
+                    "name": "validity",
+                    "type": "ValidityState | undefined",
+                    "description": "Read-only validity object for the input element"
+                },
+                "validationMessage": {
+                    "readonly": false,
+                    "name": "validationMessage",
+                    "type": "string",
+                    "description": "The custom or native error message"
+                }
+            },
+            "name": "FieldText",
+            "description": "Input component that renders a text field"
+        }
+    },
+    "errors": [
+        "html",
+        "styles",
+        "slotProperties",
+        "types",
+        "boolOrFalse",
+        null
+    ]
+}
